@@ -2,6 +2,7 @@ function hd = DrawSilhouette()
 	global silhouetteStruct_;
 	global axHandle_;
 	global meshType_;
+	axHandle_ = gca;
 	if strcmp(meshType_, 'CARTESIAN_GRID')
 		for ii=1:1:length(silhouetteStruct_)
 			hd(ii) = patch(axHandle_, silhouetteStruct_(ii)); hold(axHandle_, 'on');

@@ -157,7 +157,7 @@ function ImportStressFields(fileName)
 		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.xPatchs));	
 
 		global nodStruct_; global boundaryElements_;
-		nodStruct_ = NodeStruct(); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
+		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
 		for ii=1:numEles_
 			for jj=1:8
 				nodStruct_(eNodMat_(ii,jj)).adjacentEles(1,end+1) = ii;

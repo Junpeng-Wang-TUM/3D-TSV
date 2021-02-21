@@ -1,5 +1,4 @@
 function GenerateSpaceFillingPSLs()
-	global functionality_;
 	global seedPoints_;
 	global seedPointsValence_;
 	global majorPSLpool_; global minorPSLpool_; 
@@ -39,7 +38,8 @@ function GenerateSpaceFillingPSLs()
 			majorPSL = GridGrowthTrigger(seed, 'MAJORPSL');		
 			if 0==majorPSL.length
 				looper = sum(sum(seedPointsValence_)); 
-				Processing = [looper 2*numSamplings]
+				disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
+					' Total.: ' sprintf('%6i',2*numSamplings)]);
 				continue; 
 			end
 			majorPSLpool_(end+1,1) = majorPSL;
@@ -66,7 +66,8 @@ function GenerateSpaceFillingPSLs()
 			minorPSL = GridGrowthTrigger(seed, 'MINORPSL');
 			if 0==minorPSL.length
 				looper = sum(sum(seedPointsValence_)); 
-				Processing = [looper 2*numSamplings]
+				disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
+					' Total.: ' sprintf('%6i',2*numSamplings)]);
 				continue; 
 			end
 			minorPSLpool_(end+1,1) = minorPSL;
@@ -88,10 +89,62 @@ function GenerateSpaceFillingPSLs()
 			end					
 		end
 		
-		looper = sum(sum(samplingPointsValence_));
-		Processing = [looper 2*numSamplings]		
+		looper = sum(sum(seedPointsValence_));
+		disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
+			' Total.: ' sprintf('%6i',2*numSamplings)]);			
 	end
 	CompactPSLs();
+end
+
+function PreprocessSeedPoints()
+	global seedPoints_;
+	global seedPointsValence_;
+	global majorPSLpool_; global minorPSLpool_; 
+	global mergeTrigger_; global relaxedFactor_;
+	
+	numMajorPSLs = length(majorPSLpool_);
+	for ii=1:numMajorPSLs
+		majorPSL = majorPSLpool_(ii);
+		if majorPSL.length>0					
+			sppsEmptyMajorValence = find(0==seedPointsValence_(:,1));
+			if length(sppsEmptyMajorValence)>0
+				[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(...	
+					seedPoints_(sppsEmptyMajorValence,:), majorPSL.phyCoordList);
+				potentialSolidSppsMajor = find(potentialDisListMajor<=relaxedFactor_);
+				if ~isempty(potentialSolidSppsMajor)
+					spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);							
+					seedPoints_(spps2BeMerged,:) = ...
+						potentialPosListMajor(potentialSolidSppsMajor,:);
+					seedPointsValence_(spps2BeMerged,1) = 1;						
+					modifiedMinorValences = HighCurvatureModification(...
+						spps2BeMerged, 'MINORPSL');
+					seedPointsValence_(modifiedMinorValences,2) = 1;							
+				end
+			end
+		end
+	end
+
+	numMinorPSLs = length(minorPSLpool_);
+	for ii=1:numMinorPSLs
+		minorPSL = minorPSLpool_(ii);
+		if minorPSL.length>0	
+			sppsEmptyMinorValence = find(0==seedPointsValence_(:,2));
+			if length(sppsEmptyMinorValence)>0	
+				[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(...	
+					seedPoints_(sppsEmptyMinorValence,:), minorPSL.phyCoordList);
+				potentialSolidSppsMinor = find(potentialDisListMinor<=relaxedFactor_);
+				if ~isempty(potentialSolidSppsMinor)
+					spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
+					seedPoints_(spps2BeMerged,:) = ...
+						potentialPosListMinor(potentialSolidSppsMinor,:);
+					seedPointsValence_(spps2BeMerged,2) = 1;
+					modifiedMajorValences = HighCurvatureModification(...
+						spps2BeMerged, 'MAJORPSL');
+					seedPointsValence_(modifiedMajorValences,1) = 1;													
+				end
+			end
+		end
+	end		
 end
 
 function iPSL = GridGrowthTrigger(seed, psDir)
@@ -100,9 +153,9 @@ function iPSL = GridGrowthTrigger(seed, psDir)
 	stopCond = 2*ceil(norm(vtxUpperBound_-vtxLowerBound_)/tracingStepWidth_);	
 	switch psDir
 		case 'MAJORPSL'
-			[iPSL, ~, ~] = GeneratePrincipalStressLines3D(seed, 'MAJORPSL', stopCond);
+			[iPSL, ~, ~] = GeneratePrincipalStressLines(seed, 'MAJORPSL', stopCond);
 		case 'MINORPSL'
-			[~, ~, iPSL] = GeneratePrincipalStressLines3D(seed, 'MINORPSL', stopCond);
+			[~, ~, iPSL] = GeneratePrincipalStressLines(seed, 'MINORPSL', stopCond);
 	end
 	global snappingOpt_;
 	if strcmp(snappingOpt_, 'ON'), iPSL = CroppingPSLifNeeded(iPSL, psDir); end	
@@ -280,6 +333,7 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 	end
 	tarPSL.eleIndexList = srcPSL.eleIndexList(startPos:endPos,:);
 	tarPSL.phyCoordList = srcPSL.phyCoordList(startPos:endPos,:);
+	tarPSL.cartesianStressList = srcPSL.cartesianStressList(startPos:endPos,:);
 	tarPSL.paraCoordList = srcPSL.paraCoordList(startPos:endPos,:);
 	tarPSL.vonMisesStressList = srcPSL.vonMisesStressList(startPos:endPos,:);
 	tarPSL.principalStressList = srcPSL.principalStressList(startPos:endPos,:);
