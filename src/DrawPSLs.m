@@ -1,4 +1,4 @@
-function VisualizePSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt)
+function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt)
 	global majorPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global minorHierarchy_;
 	global tracingStepWidth_;

@@ -17,5 +17,5 @@ disp(['Done! It costs: ' sprintf('%10.3g',toc) 's']);
 % stressComponentOpt = 'None'; %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 % lw = 2; %% tubeRadius = lw, ribbonWidth = 4*lw
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
-VisualizePSLs(["Geo", "Geo"], [1,1], ["TUBE", "TUBE"], 'None', 1.5, 1);
+DrawPSLs(["Geo", "Geo"], [1,1], ["TUBE", "TUBE"], 'None', 1.5, 1);
 
