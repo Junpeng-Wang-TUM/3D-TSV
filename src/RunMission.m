@@ -1,12 +1,16 @@
 function RunMission(fileName, seedStrategy, minimumEpsilon, numLevels)
 	%%1. Global Variable Statement and Import Dataset
 	GlobalVariables;
+	global majorPSLindexList_;
+	global minorPSLindexList_;	
 	if ~strcmp(dataName_, fileName)		
 		ImportStressFields(fileName);
 		dataName_ = fileName;
 	end
-	seedSpan4VolumeOptCartesianMesh_ = ceil(minimumEpsilon/1.7); 
-	
+	if isempty(seedSpan4VolumeOptCartesianMesh_)
+		seedSpan4VolumeOptCartesianMesh_ = ceil(minimumEpsilon/1.7);
+	end
+
 	%%2. Seeding
 	GenerateSeedPoints(seedStrategy);
 	
@@ -16,10 +20,9 @@ function RunMission(fileName, seedStrategy, minimumEpsilon, numLevels)
     minorPSLindexList_ = struct('arr', []); minorPSLindexList_ = repmat(minorPSLindexList_, 1, numLevels);	
     index = 1;
     while index<=numLevels
-        seedPoints_ = seedPointsHistory_;
-        seedPointsValence_ = zeros(size(seedPoints_,1), 2);
-        mergeTrigger_ = minimumEpsilon * 2^(numLevels-index) * tracingStepWidth_;
-        GenerateSpaceFillingPSLs();
+        % mergeTrigger_ = minimumEpsilon * 2^(numLevels-index) * tracingStepWidth_;
+		iEpsilon = minimumEpsilon * 2^(numLevels-index);
+        GenerateSpaceFillingPSLs(iEpsilon);
         majorPSLindexList_(index).arr = 1:length(majorPSLpool_);
         minorPSLindexList_(index).arr = 1:length(minorPSLpool_);
 		index = index + 1;

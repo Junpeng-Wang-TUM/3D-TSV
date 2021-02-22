@@ -2,6 +2,7 @@ function GenerateSeedPoints(seedStrategy)
 	global meshType_;
 	global nodeCoords_;
 	global nodState_;
+	global nodeLoadVec_;
 	global seedPointsHistory_;
 	
 	switch seedStrategy
@@ -50,7 +51,9 @@ function GenerateSeedPoints(seedStrategy)
 			end
 		case 'Surface'
 			seedPointsHistory_ = nodeCoords_(1==nodState_,:);
-		case 'Near Topology (only Cartesian Mesh)'
+		case 'LoadingArea'			
+			seedPointsHistory_ = nodeCoords_(nodeLoadVec_(:,1),:);			
+		case 'ApproxTopology' %% only Work Cartesian Mesh
 			if strcmp(meshType_, 'CARTESIAN_GRID')
 				seedPointsHistory_ = GetDegenerateElements();
 			else

@@ -1,15 +1,21 @@
-function GenerateSpaceFillingPSLs()
-	global seedPoints_;
-	global seedPointsValence_;
+function GenerateSpaceFillingPSLs(iEpsilon)
+	global seedPoints_; global seedPointsHistory_;
+	global seedPointsValence_; global tracingStepWidth_;
 	global majorPSLpool_; global minorPSLpool_; 
 	global majorCoordList_; global minorCoordList_;
 	global mergeTrigger_; global relaxedFactor_;
 	global startCoord_;
 	
-	numSamplings = size(seedPoints_,1);
+	%% Pre-process Seed Points
+	mergeTrigger_ = iEpsilon*tracingStepWidth_;
+    seedPoints_ = seedPointsHistory_;
+	numSamplings = size(seedPoints_,1);	
+    seedPointsValence_ = zeros(numSamplings, 2);	
+	PreprocessSeedPoints();
 	
+	%% Iteration
 	its = 0;
-	looper = sum(sum(seedPointsValence_));
+	looper = sum(sum(seedPointsValence_));	
 	while looper<2*numSamplings
 		its = its + 1;
 		valenceMetric = sum(seedPointsValence_,2);
@@ -169,10 +175,10 @@ function [potentialDisList, potentialPosList] = GetDisListOfPointList2Curve(poin
 		pointList = gpuArray(pointList);
 		curveLine = gpuArray(curveLine);	
 	end
-	disX = curveLine(:,1) - pointList(:,1)';
-	disY = curveLine(:,2) - pointList(:,2)';
-	disZ = curveLine(:,3) - pointList(:,3)';
-	disT = sqrt(disX.^2 + disY.^2 + disZ.^2);	
+	disT = (curveLine(:,1) - pointList(:,1)').^2;
+	disT = disT + (curveLine(:,2) - pointList(:,2)').^2;
+	disT = disT + (curveLine(:,3) - pointList(:,3)').^2;
+	disT = sqrt(disT);	
 	[minVal, minValPos] = min(disT,[],1);
 	if strcmp(GPU_, 'ON')
 		minVal = gather(minVal);

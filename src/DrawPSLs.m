@@ -39,6 +39,8 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
 	numTarMinorPSLs = length(tarMinorPSLs);
 	
+	if 0==numTarMajorPSLs && 0==numTarMinorPSLs, return; end
+	
 	%% Initialize Stress Component for Coloring
 	color4MajorPSLs = struct('arr', []); color4MajorPSLs = repmat(color4MajorPSLs, numTarMajorPSLs, 1);
 	color4MinorPSLs = struct('arr', []); color4MinorPSLs = repmat(color4MinorPSLs, numTarMinorPSLs, 1);
@@ -122,7 +124,6 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	
 	%%Draw
 	figure; handleSilhouette = DrawSilhouette(); 
-	if strcmp(stressComponentOpt, 'Sigma'), colormap([BlueRGB(); RedRGB()]); end
 	switch pslGeo(1)
 		case 'TUBE'
 			handleMajorPSL = ExpandPSLs2Tubes(tarMajorPSLs, color4MajorPSLs, lineWidthTube);
@@ -158,9 +159,20 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		elseif strcmp(stressComponentOpt, "Sigma")
 			cb = colorbar('Location', 'east');
 			v1 = min(cValOnMinor); v2 = max(cValOnMinor);
-			v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
-			set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
-			L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);	
+			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
+			if 0==numTarMajorPSLs
+				colormap('Winter');
+				t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);		
+			elseif 0==numTarMinorPSLs
+				colormap('Autumn');
+				t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);
+			else
+				colormap([BlueRGB(); RedRGB()]);
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);
+			end
 		else
 			colormap('jet'); cb = colorbar('Location', 'east');
 			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
@@ -200,6 +212,7 @@ end
 
 function hd = ExpandPSLs2Tubes(PSLs, colorSrc, r)
 	global axHandle_; axHandle_ = gca;
+	hd = []; if isempty(PSLs), return; end
 	n = 8; ct=0.5*r;
 	numLines = length(PSLs);
 	gridXYZ = zeros(3,n+1,1);
@@ -243,6 +256,7 @@ end
 function [hdFace, hdOutline] = ExpandPSLs2Ribbon(PSLs, colorSrc, lw, smoothingOpt)
 	%%1. initialize arguments
 	global axHandle_; axHandle_ = gca;
+	hd = []; if isempty(PSLs), return; end
 	numPSLs = length(PSLs);
 	if 0==numPSLs, hdFace = []; hdOutline = []; return; end
 	%%2. Expand PSL to ribbon
