@@ -183,7 +183,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	
 	%%Lighting, Reflection
 	if 1
-		% view(-1.108713692790638e+00, 1.972962667454830e+01); %%femur
+		% view(-1.108713692790638e+00, 1.972962667454830e+01); %%femur 
+		% view(7.067303146269593e+01, 1.240029108758532e+00); %%femur 
+		% view(-1.960848849982980e+02, 1.313055949258412e+01); %%bunny
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'

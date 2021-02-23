@@ -18,7 +18,7 @@ disp(['Done! It costs: ' sprintf('%10.3g',toc) 's']);
 % lw = 2; %% tubeRadius = lw, ribbonWidth = 4*lw
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
-DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'None', 1.5, 1);
+DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'None', 1.0, 1);
 
 % global majorHierarchy_; global minorHierarchy_;
 % figure; 
