@@ -12,6 +12,8 @@ function ImportStressFields(fileName)
 	global eleCentroidList_;
 	global silhouetteStruct_;
 	global meshType_;
+	global surfaceQuadMeshNodeCoords_;
+	global surfaceQuadMeshElements_;	
 	
 	%%read mesh and cartesian stress field
 	fid = fopen(fileName, 'r');
@@ -83,6 +85,21 @@ function ImportStressFields(fileName)
 		fvc = isocaps(nodPosX, nodPosY, nodPosZ, valForExtctBoundary, 0);
 		silhouetteStruct_ = fv;
 		silhouetteStruct_(2) = fvc;	
+		
+		%%Re-organize Silhouette into quad-mesh for exporting
+		faceIndex = zeros(4,6*numEles_);
+		mapEle2patch = [1 2 3 4; 5 6 7 8; 1 2 6 5; 4 3 7 8; 1 4 8 5; 2 3 7 6]';
+		for ii=1:numEles_
+			index = (ii-1)*6;
+			iEleVtx = eNodMat_(ii,:)';
+			faceIndex(:,index+1:index+6) = iEleVtx(mapEle2patch);
+		end
+		tmp = nodState_(faceIndex'); tmp = sum(tmp,2);
+		BoundaryEleFace = faceIndex(:,find(4==tmp)');		
+		boundaryNode = find(1==nodState_);
+		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
+		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
+		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');		
 	else
 		tmp = fscanf(fid, '%s', 1); 
 		numNodes_ = fscanf(fid, '%d', 1);
@@ -123,13 +140,6 @@ function ImportStressFields(fileName)
 		eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
 		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
 		eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;
-		% disX = eleCentroidList_(:,1) - eleNodCoordListX; disX = disX.^2;
-		% disY = eleCentroidList_(:,2) - eleNodCoordListY; disY = disY.^2;
-		% disZ = eleCentroidList_(:,3) - eleNodCoordListZ; disZ = disZ.^2;
-		% disT = disX+disY+disZ; 
-		% global eleSizeList_; eleSizeList_ = min(disT, [], 2); eleSizeList_ = sqrt(eleSizeList_);
-		% eleSize_ = sum(eleSizeList_)/length(eleSizeList_);
-		% eleSize_ = sqrt((2*eleSize_)^2/3);
 		
 		vtxLowerBound_ = [min(nodeCoords_(:,1)) min(nodeCoords_(:,2)) ...
 			min(nodeCoords_(:,3))];
@@ -139,7 +149,7 @@ function ImportStressFields(fileName)
 		%%extract silhouette
 		faceIndex = zeros(4,6*numEles_);
 		mapEle2patch = [1 2 3 4; 5 6 7 8; 1 2 6 5; 4 3 7 8; 1 4 8 5; 2 3 7 6]';
-		for ii=1:1:numEles_
+		for ii=1:numEles_
 			index = (ii-1)*6;
 			iEleVtx = eNodMat_(ii,:)';
 			faceIndex(:,index+1:index+6) = iEleVtx(mapEle2patch);
@@ -155,7 +165,12 @@ function ImportStressFields(fileName)
 		zPatchs = nodeCoords_(:,3); 
 		silhouetteStruct_.zPatchs = zPatchs(BoundaryEleFace);
 		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.xPatchs));	
-
+		%%Re-organize Silhouette into quad-mesh for exporting
+		boundaryNode = find(1==nodState_);
+		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
+		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
+		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
+		
 		global nodStruct_; global boundaryElements_;
 		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
 		for ii=1:numEles_
@@ -165,6 +180,7 @@ function ImportStressFields(fileName)
 		end		
 		boundaryElements_ = unique([nodStruct_(1==nodState_).adjacentEles]);		
 	end
+
 end
 
 function RecoverCartesianMesh()	

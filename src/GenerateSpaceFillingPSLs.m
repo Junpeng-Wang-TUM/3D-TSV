@@ -164,7 +164,7 @@ function iPSL = GridGrowthTrigger(seed, psDir)
 			[~, ~, iPSL] = GeneratePrincipalStressLines(seed, 'MINORPSL', stopCond);
 	end
 	global snappingOpt_;
-	if strcmp(snappingOpt_, 'ON'), iPSL = CroppingPSLifNeeded(iPSL, psDir); end	
+	if snappingOpt_, iPSL = CroppingPSLifNeeded(iPSL, psDir); end	
 end
 
 function [potentialDisList, potentialPosList] = GetDisListOfPointList2Curve(pointList, curveLine)

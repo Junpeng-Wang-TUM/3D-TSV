@@ -428,9 +428,9 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 end
 
 function val = AngleTerminationCondition3D(dirct1, dirct2)
-	global interceptionThreshold_;
+	global permittedMaxAdjacentTangentAngleDeviation_;
 	angle = acos((dirct1*dirct2') / (norm(dirct1)*norm(dirct2)));
-	if angle > pi/interceptionThreshold_
+	if angle > pi/permittedMaxAdjacentTangentAngleDeviation_
 		val = 0;
 	else
 		val = 1;

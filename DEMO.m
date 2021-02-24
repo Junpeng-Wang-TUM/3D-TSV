@@ -1,14 +1,16 @@
 clc;
 addpath('./src');
-fileName = 'D:/MyDataSets/StressFields4LLGP/Vis2021_femur3D.vtk';
+fileName = 'D:/MyProjects/StressField3D-PSLs-Investigator/data/Vis2021_femur3D_HexMesh.vtk';
 
-seedStrategy = 'Volume'; %% 'Volume', 'Surface', 'LoadingArea', 'ApproxTopology'
-minimumEpsilon = 8;
-numLevels = 3;
-
+%% PSLs Generation
+%% ======Syntax======
+%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);
+%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
 tic
-RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);
-disp(['Done! It costs: ' sprintf('%10.3g',toc) 's']);
+RunMission(fileName, 'Volume', 8, 3); %% "femur" test
+% RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5); %% "bunny_hex" test
+% RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); %% "bridge" test
+disp(['Done! It Costs: ' sprintf('%10.3g',toc) 's']); 
 
 %%Vis
 % imOpt = ["Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
@@ -19,30 +21,3 @@ disp(['Done! It costs: ' sprintf('%10.3g',toc) 's']);
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
 DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'None', 1.0, 1);
-
-% global majorHierarchy_; global minorHierarchy_;
-% figure; 
-% plot(majorHierarchy_(:,1), '-', 'LineWidth', 2); hold on
-% plot(majorHierarchy_(:,2), '-r', 'LineWidth', 2); hold on
-% plot(majorHierarchy_(:,3), '-g', 'LineWidth', 2); hold on
-% plot(majorHierarchy_(:,4), '-k', 'LineWidth', 2); hold on
-% xlabel('Major PSLs'); ylabel('Importance Metric');
-% legend('Geo-based', 'PS-based', 'vM-based', 'Length-based');
-% set(gca, 'FontName', 'Times New Roman', 'FontSize', 20);	
-
-% figure; 
-% plot(minorHierarchy_(:,1), '-', 'LineWidth', 2); hold on
-% plot(minorHierarchy_(:,2), '-r', 'LineWidth', 2); hold on
-% plot(minorHierarchy_(:,3), '-g', 'LineWidth', 2); hold on
-% plot(minorHierarchy_(:,4), '-k', 'LineWidth', 2); hold on
-% xlabel('Minor PSLs'); ylabel('Importance Metric');
-% legend('Geo-based', 'PS-based', 'vM-based', 'Length-based');
-% set(gca, 'FontName', 'Times New Roman', 'FontSize', 20);
-
-% global majorHierarchy_; global minorHierarchy_;
-% figure; 
-% plot(majorHierarchy_(:,1), '-r', 'LineWidth', 2); hold on
-% plot(minorHierarchy_(:,1), '--b', 'LineWidth', 2); hold on
-% xlabel('PSLs'); ylabel('Geo-based Importance Metric');
-% legend('Major PSLs', 'Minor PSLs');
-% set(gca, 'FontName', 'Times New Roman', 'FontSize', 20);
