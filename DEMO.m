@@ -1,15 +1,24 @@
 clc;
 addpath('./src');
-fileName = 'D:/MyProjects/StressField3D-PSLs-Investigator/data/Vis2021_femur3D_HexMesh.vtk';
+% fileName = 'D:/MyProjects/StressField3D-PSLs-Investigator/data/Vis2021_femur3D.vtk';
 
 %% PSLs Generation
 %% ======Syntax======
 %% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);
 %% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
 tic
-RunMission(fileName, 'Volume', 8, 3); %% "femur" test
-% RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5); %% "bunny_hex" test
-% RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); %% "bridge" test
+
+%% Some Examples for Test
+%% =======================================femur
+fileName = './data/Vis2021_femur3D.vtk'; 
+RunMission(fileName, 'Volume', 8, 3); 
+%% =======================================Bunny_HexMesh
+% fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
+% RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5); 
+%% =======================================bridge
+% fileName = './data/Vis2021_bridge3D.vtk'; 
+% RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); 
+
 disp(['Done! It Costs: ' sprintf('%10.3g',toc) 's']); 
 
 %%Vis
@@ -20,4 +29,4 @@ disp(['Done! It Costs: ' sprintf('%10.3g',toc) 's']);
 % lw = 2; %% tubeRadius = lw, ribbonWidth = 4*lw
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
-DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'None', 1.0, 1);
+DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'Sigma', 1.0, 1);

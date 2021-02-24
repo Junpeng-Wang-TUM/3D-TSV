@@ -25,12 +25,13 @@
 % OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function zeromqReplier
-    % Either call the function javaclasspath below, or use:
+	% Either call the function javaclasspath below, or use:
     % cd(prefdir)
     % edit javaclasspath.txt
     % -> Add a global path to the .jar file.
+	addpath('./src'); %% Direct to work path
     javaclasspath('libs/jeromq-0.5.2.jar')
-
+	
     import org.zeromq.SocketType;
     import org.zeromq.ZMQ;
     import org.zeromq.ZContext;
@@ -58,9 +59,23 @@ function zeromqReplier
         disp(request);
 
         % ... do something with the received request ...
-
+		%% Hope I understand this function correctly, below you may need to make some adjustment in terms of the 
+		%% variable names in case they don't fit.
+		%% You can go to check file "RunMission.m" for the data format of these arguments if needed. --- Junpeng
+		fileName = request.fileName;
+		seedStrategy = request.seedStrategy;
+		minimumEpsilon = request.minimumEpsilon;
+		numLevels = request.numLevels;
+		maxAngleDevi = request.maxAngleDevi;
+		snappingOpt = request.snappingOpt;
+		minPSLength = request.minPSLength;
+		volumeSeedingOpt = request.volumeSeedingOpt;
+		[opt, PSLdatasetFile] = RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, ...
+			maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
+		if 0==opt, error('Failed to Generate PSLs!'); end
+		
         % Send a reply.
-        reply = struct('filenames', 'test umlaut ü');
+        reply = struct('filenames', PSLdatasetFile);
         reply_string = unicode2native(jsonencode(reply), 'UTF-8');
         %fprintf('Reply string: %s\n', reply_string);
         disp(reply);
@@ -72,3 +87,4 @@ function zeromqReplier
         socket.close();
     end
 end
+
