@@ -1,12 +1,12 @@
 clc;
 addpath('./src');
 % fileName = 'D:/MyProjects/StressField3D-PSLs-Investigator/data/Vis2021_femur3D.vtk';
-
+global tPool_;
 %% PSLs Generation
 %% ======Syntax======
 %% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);
 %% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
-tic
+tStart = tic;
 
 %% Some Examples for Test
 %% =======================================femur
@@ -19,7 +19,7 @@ RunMission(fileName, 'Volume', 8, 3);
 % fileName = './data/Vis2021_bridge3D.vtk'; 
 % RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); 
 
-disp(['Done! It Costs: ' sprintf('%10.3g',toc) 's']); 
+disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']); 
 
 %%Vis
 % imOpt = ["Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'

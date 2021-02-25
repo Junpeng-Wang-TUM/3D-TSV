@@ -1,301 +1,55 @@
-function [majorPSL, mediumPSL, minorPSL] = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps)
+function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps)
 	global tracingStepWidth_;
-	majorPSL = PrincipalStressLineStruct();
-	mediumPSL = PrincipalStressLineStruct();
-	minorPSL = PrincipalStressLineStruct();
+	iPSL = PrincipalStressLineStruct();
 	switch tracingType
-		case 'ALL'
-			%%1. prepare for tracing			
-			[eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(initialSeed);
-			if 0==opt, return; end
-			
-			%%2. tracing the major PSL
-			PSLphyCoordList = phyCoord;
-			PSLcartesianStressList = cartesianStress;
-			PSLeleIndexList = eleIndex;
-			PSLparaCoordList = paraCoord;
-			PSLvonMisesStressList = vonMisesStress;
-			PSLprincipalStressList = principalStress;
-			%%2.1 tracing the major PSL along first direction (v1)		
-			nextPoint = phyCoord + tracingStepWidth_*principalStress(1,10:12);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, principalStress(1,10:12), eleIndex, 'MAJORPSL', limiSteps);
-			PSLphyCoordList = [PSLphyCoordList; phyCoordList];
-			PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
-			PSLeleIndexList = [PSLeleIndexList; eleIndexList];
-			PSLparaCoordList = [PSLparaCoordList; paraCoordList];
-			PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-			PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
-			%%2.2 tracing the major PSL along second direction (-v1)	
-			nextPoint = phyCoord - tracingStepWidth_*principalStress(1,10:12);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, -principalStress(1,10:12), eleIndex, 'MAJORPSL', limiSteps);
-			if size(phyCoordList,1) > 1
-				phyCoordList = flip(phyCoordList);
-				cartesianStressList = flip(cartesianStressList);
-				eleIndexList = flip(eleIndexList);
-				paraCoordList = flip(paraCoordList);
-				vonMisesStressList = flip(vonMisesStressList);
-				principalStressList = flip(principalStressList);
-			end					
-			PSLphyCoordList = [phyCoordList; PSLphyCoordList];
-			PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
-			PSLeleIndexList = [eleIndexList; PSLeleIndexList];
-			PSLparaCoordList = [paraCoordList; PSLparaCoordList];
-			PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
-			PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
-			majorPSL.midPointPosition = size(phyCoordList,1)+1;
-			%%2.3 finish Tracing the current major PSL			
-			majorPSL.length = size(PSLphyCoordList,1);
-			majorPSL.eleIndexList = PSLeleIndexList;
-			majorPSL.phyCoordList = PSLphyCoordList;
-			majorPSL.cartesianStressList = PSLcartesianStressList;
-			majorPSL.paraCoordList = PSLparaCoordList;	
-			majorPSL.vonMisesStressList = PSLvonMisesStressList;
-			majorPSL.principalStressList = PSLprincipalStressList;			
-			
-			%%3. tracing the medium PSL
-			PSLphyCoordList = phyCoord;
-			PSLcartesianStressList = cartesianStress;
-			PSLeleIndexList = eleIndex;
-			PSLparaCoordList = paraCoord;
-			PSLvonMisesStressList = vonMisesStress;
-			PSLprincipalStressList = principalStress;
-			%%3.1 tracing the medium PSL along first direction (v1)
-			nextPoint = phyCoord + tracingStepWidth_*principalStress(1,6:8);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, principalStress(1,6:8), eleIndex, 'MEDIUMPSL', limiSteps);
-			PSLphyCoordList = [PSLphyCoordList; phyCoordList];
-			PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
-			PSLeleIndexList = [PSLeleIndexList; eleIndexList];
-			PSLparaCoordList = [PSLparaCoordList; paraCoordList];
-			PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-			PSLprincipalStressList = [PSLprincipalStressList; principalStressList];	
-			%%3.2 tracing the medium PSL along second direction (-v1)
-			nextPoint = phyCoord - tracingStepWidth_*principalStress(1,6:8);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, -principalStress(1,6:8), eleIndex, 'MEDIUMPSL', limiSteps);
-			if size(phyCoordList,1) > 1
-				phyCoordList = flip(phyCoordList);
-				cartesianStressList = flip(cartesianStressList);
-				eleIndexList = flip(eleIndexList);
-				paraCoordList = flip(paraCoordList);
-				vonMisesStressList = flip(vonMisesStressList);
-				principalStressList = flip(principalStressList);
-			end						
-			PSLphyCoordList = [phyCoordList; PSLphyCoordList];
-			PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
-			PSLeleIndexList = [eleIndexList; PSLeleIndexList];
-			PSLparaCoordList = [paraCoordList; PSLparaCoordList];
-			PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
-			PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
-			mediumPSL.midPointPosition = size(phyCoordList,1)+1;
-			%%3.3 finish Tracing the current medium PSL			
-			mediumPSL.length = size(PSLphyCoordList,1);
-			mediumPSL.eleIndexList = PSLeleIndexList;
-			mediumPSL.phyCoordList = PSLphyCoordList;
-			mediumPSL.cartesianStressList = PSLcartesianStressList;
-			mediumPSL.paraCoordList = PSLparaCoordList;	
-			mediumPSL.vonMisesStressList = PSLvonMisesStressList;
-			mediumPSL.principalStressList = PSLprincipalStressList;
-			
-			%%4. tracing the minimum PSL
-			PSLphyCoordList = phyCoord;
-			PSLcartesianStressList = cartesianStress;
-			PSLeleIndexList = eleIndex;
-			PSLparaCoordList = paraCoord;
-			PSLvonMisesStressList = vonMisesStress;
-			PSLprincipalStressList = principalStress;
-			%%4.1 tracing the minor PSL along first direction (v1)
-			nextPoint = phyCoord + tracingStepWidth_*principalStress(1,2:4);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, principalStress(1,2:4), eleIndex, 'MINORPSL', limiSteps);
-			PSLphyCoordList = [PSLphyCoordList; phyCoordList];
-			PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
-			PSLeleIndexList = [PSLeleIndexList; eleIndexList];
-			PSLparaCoordList = [PSLparaCoordList; paraCoordList];
-			PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-			PSLprincipalStressList = [PSLprincipalStressList; principalStressList];			
-			%%4.2 tracing the minor PSL along second direction (-v1)
-			nextPoint = phyCoord - tracingStepWidth_*principalStress(1,2:4);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, -principalStress(1,2:4), eleIndex, 'MINORPSL', limiSteps);
-			if size(phyCoordList,1) > 1
-				phyCoordList = flip(phyCoordList);
-				cartesianStressList = flip(cartesianStressList);
-				eleIndexList = flip(eleIndexList);
-				paraCoordList = flip(paraCoordList);
-				vonMisesStressList = flip(vonMisesStressList);
-				principalStressList = flip(principalStressList);
-			end						
-			PSLphyCoordList = [phyCoordList; PSLphyCoordList];
-			PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
-			PSLeleIndexList = [eleIndexList; PSLeleIndexList];				
-			PSLparaCoordList = [paraCoordList; PSLparaCoordList];
-			PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
-			PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
-			minorPSL.midPointPosition = size(phyCoordList,1)+1;		
-			%%4.3 finish Tracing the current minor PSL			
-			minorPSL.length = size(PSLphyCoordList,1);
-			minorPSL.eleIndexList = PSLeleIndexList;
-			minorPSL.phyCoordList = PSLphyCoordList;
-			minorPSL.cartesianStressList = PSLcartesianStressList;
-			minorPSL.paraCoordList = PSLparaCoordList;	
-			minorPSL.vonMisesStressList = PSLvonMisesStressList;
-			minorPSL.principalStressList = PSLprincipalStressList;			
-		case 'MAJORPSL'
-			%%1. prepare for tracing			
-			[eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = ...
-				PreparingForTracing(initialSeed);
-			if 0==opt, return; end
-			
-			%%2. tracing the major PSL
-			PSLphyCoordList = phyCoord;
-			PSLcartesianStressList = cartesianStress;
-			PSLeleIndexList = eleIndex;
-			PSLparaCoordList = paraCoord;
-			PSLvonMisesStressList = vonMisesStress;
-			PSLprincipalStressList = principalStress;			
-			%%2.1 tracing the major PSL along first direction (v1)		
-			nextPoint = phyCoord + tracingStepWidth_*principalStress(1,10:12);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, principalStress(1,10:12), eleIndex, 'MAJORPSL', limiSteps);
-			PSLphyCoordList = [PSLphyCoordList; phyCoordList];
-			PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
-			PSLeleIndexList = [PSLeleIndexList; eleIndexList];
-			PSLparaCoordList = [PSLparaCoordList; paraCoordList];
-			PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-			PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
-			%%2.2 tracing the major PSL along second direction (-v1)	
-			nextPoint = phyCoord - tracingStepWidth_*principalStress(1,10:12);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, -principalStress(1,10:12), eleIndex, 'MAJORPSL', limiSteps);
-			if size(phyCoordList,1) > 1
-				phyCoordList = flip(phyCoordList);
-				cartesianStressList = flip(cartesianStressList);
-				eleIndexList = flip(eleIndexList);
-				paraCoordList = flip(paraCoordList);
-				vonMisesStressList = flip(vonMisesStressList);
-				principalStressList = flip(principalStressList);
-			end						
-			PSLphyCoordList = [phyCoordList; PSLphyCoordList];
-			PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
-			PSLeleIndexList = [eleIndexList; PSLeleIndexList];
-			PSLparaCoordList = [paraCoordList; PSLparaCoordList];
-			PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
-			PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
-			majorPSL.midPointPosition = size(phyCoordList,1)+1;
-			%%2.3 finish Tracing the current major PSL			
-			majorPSL.length = size(PSLphyCoordList,1);
-			majorPSL.eleIndexList = PSLeleIndexList;
-			majorPSL.phyCoordList = PSLphyCoordList;
-			majorPSL.cartesianStressList = PSLcartesianStressList;
-			majorPSL.paraCoordList = PSLparaCoordList;	
-			majorPSL.vonMisesStressList = PSLvonMisesStressList;
-			majorPSL.principalStressList = PSLprincipalStressList;
-		case 'MEDIUMPSL'
-			%%1. prepare for tracing			
-			[eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = ...
-				PreparingForTracing(initialSeed);
-			if 0==opt, return; end
-			
-			%%2. tracing the medium PSL
-			PSLphyCoordList = phyCoord;
-			PSLcartesianStressList = cartesianStress;
-			PSLeleIndexList = eleIndex;
-			PSLparaCoordList = paraCoord;
-			PSLvonMisesStressList = vonMisesStress;
-			PSLprincipalStressList = principalStress;
-			%%2.1 tracing the medium PSL along first direction (v1)
-			nextPoint = phyCoord + tracingStepWidth_*principalStress(1,6:8);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, principalStress(1,6:8), eleIndex, 'MEDIUMPSL', limiSteps);
-			PSLphyCoordList = [PSLphyCoordList; phyCoordList];
-			PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
-			PSLeleIndexList = [PSLeleIndexList; eleIndexList];
-			PSLparaCoordList = [PSLparaCoordList; paraCoordList];
-			PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-			PSLprincipalStressList = [PSLprincipalStressList; principalStressList];	
-			%%2.2 tracing the medium PSL along second direction (-v1)
-			nextPoint = phyCoord - tracingStepWidth_*principalStress(1,6:8);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, -principalStress(1,6:8), eleIndex, 'MEDIUMPSL', limiSteps);
-			if size(phyCoordList,1) > 1
-				phyCoordList = flip(phyCoordList);
-				cartesianStressList = flip(cartesianStressList);
-				eleIndexList = flip(eleIndexList);
-				paraCoordList = flip(paraCoordList);
-				vonMisesStressList = flip(vonMisesStressList);
-				principalStressList = flip(principalStressList);
-			end						
-			PSLphyCoordList = [phyCoordList; PSLphyCoordList];
-			PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
-			PSLeleIndexList = [eleIndexList; PSLeleIndexList];
-			PSLparaCoordList = [paraCoordList; PSLparaCoordList];
-			PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
-			PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
-			mediumPSL.midPointPosition = size(phyCoordList,1)+1;
-			%%2.3 finish Tracing the current medium PSL			
-			mediumPSL.length = size(PSLphyCoordList,1);
-			mediumPSL.eleIndexList = PSLeleIndexList;
-			mediumPSL.phyCoordList = PSLphyCoordList;
-			mediumPSL.cartesianStressList = PSLcartesianStressList;
-			mediumPSL.paraCoordList = PSLparaCoordList;	
-			mediumPSL.vonMisesStressList = PSLvonMisesStressList;
-			mediumPSL.principalStressList = PSLprincipalStressList;			
-		case 'MINORPSL'
-			%%1. prepare for tracing			
-			[eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = ...
-				PreparingForTracing(initialSeed);
-			if 0==opt, return; end
-			
-			%%2. tracing the minor PSL
-			PSLphyCoordList = phyCoord;
-			PSLcartesianStressList = cartesianStress;
-			PSLeleIndexList = eleIndex;
-			PSLparaCoordList = paraCoord;
-			PSLvonMisesStressList = vonMisesStress;
-			PSLprincipalStressList = principalStress;
-			%%2.1 tracing the minor PSL along first direction (v1)
-			nextPoint = phyCoord + tracingStepWidth_*principalStress(1,2:4);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, principalStress(1,2:4), eleIndex, 'MINORPSL', limiSteps);
-			PSLphyCoordList = [PSLphyCoordList; phyCoordList];
-			PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
-			PSLeleIndexList = [PSLeleIndexList; eleIndexList];
-			PSLparaCoordList = [PSLparaCoordList; paraCoordList];
-			PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-			PSLprincipalStressList = [PSLprincipalStressList; principalStressList];			
-			%%2.2 tracing the minor PSL along second direction (-v1)
-			nextPoint = phyCoord - tracingStepWidth_*principalStress(1,2:4);
-			[phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-				TracingPSL(nextPoint, -principalStress(1,2:4), eleIndex, 'MINORPSL', limiSteps);
-			if size(phyCoordList,1) > 1
-				phyCoordList = flip(phyCoordList);
-				cartesianStressList = flip(cartesianStressList);
-				eleIndexList = flip(eleIndexList);
-				paraCoordList = flip(paraCoordList);
-				vonMisesStressList = flip(vonMisesStressList);
-				principalStressList = flip(principalStressList);
-			end						
-			PSLphyCoordList = [phyCoordList; PSLphyCoordList];
-			PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
-			PSLeleIndexList = [eleIndexList; PSLeleIndexList];
-			PSLparaCoordList = [paraCoordList; PSLparaCoordList];
-			PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
-			PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
-			minorPSL.midPointPosition = size(phyCoordList,1)+1;			
-			%%2.3 finish Tracing the current minor PSL			
-			minorPSL.length = size(PSLphyCoordList,1);
-			minorPSL.eleIndexList = PSLeleIndexList;
-			minorPSL.phyCoordList = PSLphyCoordList;
-			minorPSL.cartesianStressList = PSLcartesianStressList;
-			minorPSL.paraCoordList = PSLparaCoordList;	
-			minorPSL.vonMisesStressList = PSLvonMisesStressList;
-			minorPSL.principalStressList = PSLprincipalStressList;			
-		otherwise
-			error('Unexpected input type!');
+		case 'MAJORPSL', psDir = [10 11 12];
+		case 'MEDIUMPSL', psDir = [6 7 8];		
+		case 'MINORPSL', psDir = [2 3 4];
 	end
+	%%1. prepare for tracing			
+	[eleIndex, ~, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = ...
+		PreparingForTracing(initialSeed);
+	if 0==opt, return; end
+	
+	%%2. tracing the major PSL
+	PSLphyCoordList = phyCoord;
+	PSLcartesianStressList = cartesianStress;
+	PSLeleIndexList = eleIndex;
+	PSLvonMisesStressList = vonMisesStress;
+	PSLprincipalStressList = principalStress;			
+	%%2.1 tracing the major PSL along first direction (v1)		
+	nextPoint = phyCoord + tracingStepWidth_*principalStress(1,psDir);
+	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+		TracingPSL(nextPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);
+	PSLphyCoordList = [PSLphyCoordList; phyCoordList];
+	PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
+	PSLeleIndexList = [PSLeleIndexList; eleIndexList];
+	PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
+	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
+	%%2.2 tracing the major PSL along second direction (-v1)	
+	nextPoint = phyCoord - tracingStepWidth_*principalStress(1,psDir);
+	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+		TracingPSL(nextPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);
+	if size(phyCoordList,1) > 1
+		phyCoordList = flip(phyCoordList);
+		cartesianStressList = flip(cartesianStressList);
+		eleIndexList = flip(eleIndexList);
+		vonMisesStressList = flip(vonMisesStressList);
+		principalStressList = flip(principalStressList);
+	end						
+	PSLphyCoordList = [phyCoordList; PSLphyCoordList];
+	PSLcartesianStressList = [cartesianStressList; PSLcartesianStressList];
+	PSLeleIndexList = [eleIndexList; PSLeleIndexList];
+	PSLvonMisesStressList = [vonMisesStressList; PSLvonMisesStressList];
+	PSLprincipalStressList = [principalStressList; PSLprincipalStressList];
+	%%2.3 finish Tracing the current major PSL	
+	iPSL.midPointPosition = size(phyCoordList,1)+1;
+	iPSL.length = size(PSLphyCoordList,1);
+	iPSL.eleIndexList = PSLeleIndexList;
+	iPSL.phyCoordList = PSLphyCoordList;
+	iPSL.cartesianStressList = PSLcartesianStressList;	
+	iPSL.vonMisesStressList = PSLvonMisesStressList;
+	iPSL.principalStressList = PSLprincipalStressList;	
 end
 
 function [eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, principalStress, varargout] = PreparingForTracing(initialSeed)
@@ -353,78 +107,64 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	global tracingStepWidth_;
 	global meshType_; 
 	
-	phyCoordList = [];
-	cartesianStressList = [];
-	eleIndexList = [];
+	phyCoordList = zeros(limiSteps,3);
+	cartesianStressList = zeros(limiSteps,6);
+	eleIndexList = zeros(limiSteps,1);
 	paraCoordList = [];
-	vonMisesStressList = [];
-	principalStressList = [];
-	
+	vonMisesStressList = zeros(limiSteps,1);
+	principalStressList = zeros(limiSteps,12);		
 	if strcmp(meshType_, 'CARTESIAN_GRID')
 		[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(elementIndex, nextPoint);	
 		index = 0;	
 		while 1==bool1
-			index = index + 1; if index > limiSteps, break; end	
+			index = index + 1; if index > limiSteps, index = index-1; break; end	
 			cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);	
 			shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2), paraCoordinates(3));
 			cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
-			vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
-			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
-			switch typePSL					
-				case 'MINORPSL'
-					nextDir = IntegrationDirectionSelecting(iniDir, principalStress(2:4), -principalStress(2:4));
-				case 'MEDIUMPSL'
-					nextDir = IntegrationDirectionSelecting(iniDir, principalStress(6:8), -principalStress(6:8));			
-				case 'MAJORPSL'
-					nextDir = IntegrationDirectionSelecting(iniDir, principalStress(10:12), -principalStress(10:12));				
-				otherwise
-					error('Unexpected input type!');
-			end		
-			if 0 == AngleTerminationCondition3D(iniDir, nextDir), break; end
+			vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);	
+			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);				
+			nextDir = IntegrationDirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));	
+			if 0 == AngleTerminationCondition3D(iniDir, nextDir), index = index-1; break; end
 			iniDir = nextDir;
-			phyCoordList(end+1,:) = nextPoint;
-			cartesianStressList(end+1,:) = cartesianStressOnGivenPoint;
-			eleIndexList(end+1,:) = elementIndex;
-			paraCoordList(end+1,:) = paraCoordinates;
-			vonMisesStressList(end+1,:) = vonMisesStress;
-			principalStressList(end+1,:) = principalStress;
+			phyCoordList(index,:) = nextPoint;
+			cartesianStressList(index,:) = cartesianStressOnGivenPoint;
+			eleIndexList(index,:) = elementIndex;
+			% paraCoordList(index,:) = paraCoordinates;
+			vonMisesStressList(index,:) = vonMisesStress;
+			principalStressList(index,:) = principalStress;			
 			nextPoint = nextPoint + tracingStepWidth_*iniDir;
 			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(elementIndex, nextPoint);
 		end		
 	else
-		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%==Inverse Distance Weight Interpolation
 		[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex, nextPoint);	
 		index = 0;	
 		while 1==bool1
-			index = index + 1; if index > limiSteps, break; end
+			index = index + 1; if index > limiSteps, index = index-1; break; end
 			NIdx = eNodMat_(elementIndex,:)';
 			vtxStress = cartesianStressField_(NIdx, :);
 			vtxCoords = nodeCoords_(NIdx,:); 
 			cartesianStressOnGivenPoint = ElementInterpolationIDW(vtxCoords, vtxStress, nextPoint); 
 			vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
 			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
-			switch typePSL					
-				case 'MINORPSL'
-					nextDir = IntegrationDirectionSelecting(iniDir, principalStress(2:4), -principalStress(2:4));
-				case 'MEDIUMPSL'
-					nextDir = IntegrationDirectionSelecting(iniDir, principalStress(6:8), -principalStress(6:8));			
-				case 'MAJORPSL'
-					nextDir = IntegrationDirectionSelecting(iniDir, principalStress(10:12), -principalStress(10:12));				
-				otherwise
-					error('Unexpected input type!');
-			end	
-			if 0 == AngleTerminationCondition3D(iniDir, nextDir), break; end
+			nextDir = IntegrationDirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));	
+			if 0 == AngleTerminationCondition3D(iniDir, nextDir), index = index-1; break; end
 			iniDir = nextDir;
-			phyCoordList(end+1,:) = nextPoint;
-			cartesianStressList(end+1,:) = cartesianStressOnGivenPoint;
-			eleIndexList(end+1,:) = elementIndex;
-			paraCoordList(end+1,:) = [0 0 0];
-			vonMisesStressList(end+1,:) = vonMisesStress;
-			principalStressList(end+1,:) = principalStress;
+			phyCoordList(index,:) = nextPoint;
+			cartesianStressList(index,:) = cartesianStressOnGivenPoint;
+			eleIndexList(index,:) = elementIndex;
+			% paraCoordList(index,:) = [0 0 0];
+			vonMisesStressList(index,:) = vonMisesStress;
+			principalStressList(index,:) = principalStress;				
 			nextPoint = nextPoint + tracingStepWidth_*iniDir;
 			[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex, nextPoint);
 		end		
 	end
+	phyCoordList = phyCoordList(1:index,:);
+	cartesianStressList = cartesianStressList(1:index,:);
+	eleIndexList = eleIndexList(1:index,:);
+	% paraCoordList = paraCoordList(1:index,:);
+	vonMisesStressList = vonMisesStressList(1:index,:);
+	principalStressList = principalStressList(1:index,:);	
 end
 
 function val = AngleTerminationCondition3D(dirct1, dirct2)
@@ -449,35 +189,25 @@ function targetDirection = IntegrationDirectionSelecting(originalVec, Vec1, Vec2
 end
 
 function [nextElementIndex, paraCoordinates, opt] = FindAdjacentElement(oldElementIndex, physicalCoordinates)
-	global domainType_; global nodeCoords_; global eleCentroidList_; 
+	global nodeCoords_; global eleCentroidList_; 
 	global eNodMat_; global nodStruct_;
 	global meshType_; global meshState_; global eleMapBack_;
 	global boundaryElements_;
-	global vtxLowerBound_; 
+	global nelx_; global nely_; global nelz_; global eleSize_;
+	global vtxLowerBound_;
+	
 	nextElementIndex = 0; paraCoordinates = []; opt = 0;
 	
 	if strcmp(meshType_, 'CARTESIAN_GRID')
-		global nelx_; global nely_; global nelz_; global eleSize_;
-		physicalCoordinates = physicalCoordinates(:)'-vtxLowerBound_;
-		physicalCoordinates = double(single(physicalCoordinates));
-		if 0==physicalCoordinates(1)
-			eleX = 1;				
-		else
-			eleX = ceil(physicalCoordinates(1)/eleSize_);
-			if eleX<1 || eleX>nelx_, return; end
-		end
-		if 0==physicalCoordinates(2)
-			eleY = 1;
-		else
-			eleY = ceil(physicalCoordinates(2)/eleSize_);
-			if eleY<1 || eleY>nely_, return; end
-		end
-		if 0==physicalCoordinates(3)
-			eleZ = 1;
-		else
-			eleZ = ceil(physicalCoordinates(3)/eleSize_);
-			if eleZ<1 || eleZ>nelz_, return; end
-		end				
+		relaxingFac = 1.0e-12;
+		physicalCoordinates = physicalCoordinates - vtxLowerBound_ + relaxingFac;
+		eleX = ceil(physicalCoordinates(1)/eleSize_);
+		if eleX<1 || eleX>nelx_, return; end
+		eleY = ceil(physicalCoordinates(2)/eleSize_);
+		if eleY<1 || eleY>nely_, return; end
+		eleZ = ceil(physicalCoordinates(3)/eleSize_);
+		if eleZ<1 || eleZ>nelz_, return; end
+		
 		tarEle = nelx_*nely_*(eleZ-1) + nely_*(eleX-1)+(nely_-eleY+1);
 		if meshState_(tarEle)
 			nextElementIndex = eleMapBack_(tarEle);
@@ -492,7 +222,7 @@ function [nextElementIndex, paraCoordinates, opt] = FindAdjacentElement(oldEleme
 		tarNodes = eNodMat_(potentialElements,:); 
 		potentialElements = unique([nodStruct_(tarNodes(:)).adjacentEles]); %% balance between safety and efficiency
 		disList = vecnorm(physicalCoordinates-eleCentroidList_(potentialElements,:), 2, 2);
-		[minVal, nextElementIndex] = min(disList); nextElementIndex = potentialElements(nextElementIndex);
+		[~, nextElementIndex] = min(disList); nextElementIndex = potentialElements(nextElementIndex);
 		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% safe but low efficiency version
 		% disList = vecnorm(physicalCoordinates-eleCentroidList_, 2, 2);
 		% [minVal, nextElementIndex] = min(disList); 
@@ -579,44 +309,41 @@ function N = ShapeFunction(s, t, p)
 	%			*1			*2
 	%
 	%			LINEAR:	8-nodes
-	%--------------------------------------------------------------------------------
-	s = s(:); t = t(:); p = p(:);
-	N = repmat(s,1,8);
-	N(:,1) = 0.125*(1-s).*(1-t).*(1-p);
-	N(:,2) = 0.125*(1+s).*(1-t).*(1-p);
-	N(:,3) = 0.125*(1+s).*(1+t).*(1-p);
-	N(:,4) = 0.125*(1-s).*(1+t).*(1-p);
-	N(:,5) = 0.125*(1-s).*(1-t).*(1+p);
-	N(:,6) = 0.125*(1+s).*(1-t).*(1+p);
-	N(:,7) = 0.125*(1+s).*(1+t).*(1+p);
-	N(:,8) = 0.125*(1-s).*(1+t).*(1+p);		
+	%--------------------------------------------------------------------------------		
+	N = zeros(1,8);
+	N(1) = 0.125*(1-s)*(1-t)*(1-p);
+	N(2) = 0.125*(1+s)*(1-t)*(1-p);
+	N(3) = 0.125*(1+s)*(1+t)*(1-p);
+	N(4) = 0.125*(1-s)*(1+t)*(1-p);
+	N(5) = 0.125*(1-s)*(1-t)*(1+p);
+	N(6) = 0.125*(1+s)*(1-t)*(1+p);
+	N(7) = 0.125*(1+s)*(1+t)*(1+p);
+	N(8) = 0.125*(1-s)*(1+t)*(1+p);			
 end
 
-function dShape = DeShapeFunction(s, t, p)	
-	s = s(:); t = t(:); p = p(:);
-	dN1ds = -0.125*(1-t).*(1-p); dN2ds = 0.125*(1-t).*(1-p); 
-	dN3ds = 0.125*(1+t).*(1-p);  dN4ds = -0.125*(1+t).*(1-p);
-	dN5ds = -0.125*(1-t).*(1+p); dN6ds = 0.125*(1-t).*(1+p); 
-	dN7ds = 0.125*(1+t).*(1+p);  dN8ds = -0.125*(1+t).*(1+p);
+function dShape = DeShapeFunction(s, t, p)		
+	dN1ds = -0.125*(1-t)*(1-p); dN2ds = 0.125*(1-t)*(1-p); 
+	dN3ds = 0.125*(1+t)*(1-p);  dN4ds = -0.125*(1+t)*(1-p);
+	dN5ds = -0.125*(1-t)*(1+p); dN6ds = 0.125*(1-t)*(1+p); 
+	dN7ds = 0.125*(1+t)*(1+p);  dN8ds = -0.125*(1+t)*(1+p);
 	
-	dN1dt = -0.125*(1-s).*(1-p); dN2dt = -0.125*(1+s).*(1-p); 
-	dN3dt = 0.125*(1+s).*(1-p);  dN4dt = 0.125*(1-s).*(1-p);
-	dN5dt = -0.125*(1-s).*(1+p); dN6dt = -0.125*(1+s).*(1+p); 
-	dN7dt = 0.125*(1+s).*(1+p);  dN8dt = 0.125*(1-s).*(1+p);
+	dN1dt = -0.125*(1-s)*(1-p); dN2dt = -0.125*(1+s)*(1-p); 
+	dN3dt = 0.125*(1+s)*(1-p);  dN4dt = 0.125*(1-s)*(1-p);
+	dN5dt = -0.125*(1-s)*(1+p); dN6dt = -0.125*(1+s)*(1+p); 
+	dN7dt = 0.125*(1+s)*(1+p);  dN8dt = 0.125*(1-s)*(1+p);
 	
-	dN1dp = -0.125*(1-s).*(1-t); dN2dp = -0.125*(1+s).*(1-t); 
-	dN3dp = -0.125*(1+s).*(1+t); dN4dp = -0.125*(1-s).*(1+t);
-	dN5dp = 0.125*(1-s).*(1-t);  dN6dp = 0.125*(1+s).*(1-t); 
-	dN7dp = 0.125*(1+s).*(1+t);  dN8dp = 0.125*(1-s).*(1+t);
+	dN1dp = -0.125*(1-s)*(1-t); dN2dp = -0.125*(1+s)*(1-t); 
+	dN3dp = -0.125*(1+s)*(1+t); dN4dp = -0.125*(1-s)*(1+t);
+	dN5dp = 0.125*(1-s)*(1-t);  dN6dp = 0.125*(1+s)*(1-t); 
+	dN7dp = 0.125*(1+s)*(1+t);  dN8dp = 0.125*(1-s)*(1+t);
 	
-	dShape = repmat(s,3,8);
-	dShape(1:3:end,:) = [dN1ds dN2ds dN3ds dN4ds dN5ds dN6ds dN7ds dN8ds];
-	dShape(2:3:end,:) = [dN1dt dN2dt dN3dt dN4dt dN5dt dN6dt dN7dt dN8dt];
-	dShape(3:3:end,:) = [dN1dp dN2dp dN3dp dN4dp dN5dp dN6dp dN7dp dN8dp];	
+	dShape = [
+		dN1ds dN2ds dN3ds dN4ds dN5ds dN6ds dN7ds dN8ds
+		dN1dt dN2dt dN3dt dN4dt dN5dt dN6dt dN7dt dN8dt
+		dN1dp dN2dp dN3dp dN4dp dN5dp dN6dp dN7dp dN8dp ];	
 end
 
 function d2Shape = De2ShapeFunction(s, t, p)	
-	s = s(:); t = t(:); p = p(:);
 	dN1dss = 0; dN2dss = 0; dN3dss = 0;  dN4dss = 0;	
 	dN5dss = 0; dN6dss = 0; dN7dss = 0;  dN8dss = 0;
 	
@@ -635,41 +362,29 @@ function d2Shape = De2ShapeFunction(s, t, p)
 	dN1dtp = 1-s;		dN2dtp = 1+s;			dN3dtp = -(1+s);	dN4dtp = -(1-s);
 	dN5dtp = -(1-s);	dN6dtp = -(1+s);		dN7dtp = 1+s;		dN8dtp = 1-s;
 				
-	d2Shape = repmat(s,6,8);
-	d2Shape(1:6:end) = [dN1dss dN2dss dN3dss dN4dss dN5dss dN6dss dN7dss dN8dss];
-	d2Shape(2:6:end) = [dN1dtt dN2dtt dN3dtt dN4dtt dN5dtt dN6dtt dN7dtt dN8dtt];
-	d2Shape(3:6:end) = [dN1dpp dN2dpp dN3dpp dN4dpp dN5dpp dN6dpp dN7dpp dN8dpp];
-	d2Shape(4:6:end) = [dN1dtp dN2dtp dN3dtp dN4dtp dN5dtp dN6dtp dN7dtp dN8dtp];
-	d2Shape(5:6:end) = [dN1dsp dN2dsp dN3dsp dN4dsp dN5dsp dN6dsp dN7dsp dN8dsp];
-	d2Shape(6:6:end) = [dN1dst dN2dst dN3dst dN4dst dN5dst dN6dst dN7dst dN8dsp];
-	d2Shape = 0.125 * d2Shape;
+	d2Shape = [
+		dN1dss dN2dss dN3dss dN4dss dN5dss dN6dss dN7dss dN8dss
+		dN1dtt dN2dtt dN3dtt dN4dtt dN5dtt dN6dtt dN7dtt dN8dtt
+		dN1dpp dN2dpp dN3dpp dN4dpp dN5dpp dN6dpp dN7dpp dN8dpp
+		dN1dtp dN2dtp dN3dtp dN4dtp dN5dtp dN6dtp dN7dtp dN8dtp
+		dN1dsp dN2dsp dN3dsp dN4dsp dN5dsp dN6dsp dN7dsp dN8dsp
+		dN1dst dN2dst dN3dst dN4dst dN5dst dN6dst dN7dst dN8dsp ];
+	d2Shape = 0.125 * d2Shape;	
 end
 
 function principalStress = ComputePrincipalStress(cartesianStress)
-	principalStress = zeros(size(cartesianStress,1), 1+3+1+3+1+3);
-	for ii=1:size(cartesianStress,1)
-		A = zeros(3);
-		A(1,1) = cartesianStress(ii,1);
-		A(1,2) = cartesianStress(ii,6);
-		A(1,3) = cartesianStress(ii,5);
-		A(2,1) = A(1,2);
-		A(2,2) = cartesianStress(ii,2);
-		A(2,3) = cartesianStress(ii,4);
-		A(3,1) = A(1,3);
-		A(3,2) = A(2,3);
-		A(3,3) = cartesianStress(ii,3);		
-		[eigenVec, eigenVal] = eig(A);
-		principalStress(ii,1) = eigenVal(1,1); principalStress(ii,2:4) = eigenVec(:,1);
-		principalStress(ii,5) = eigenVal(2,2); principalStress(ii,6:8) = eigenVec(:,2);
-		principalStress(ii,9) = eigenVal(3,3); principalStress(ii,10:12) = eigenVec(:,3);
-	end			
+	principalStress = zeros(1, 12);
+	A = cartesianStress([1 6 5; 6 2 4; 5 4 3]);
+	[eigenVec, eigenVal] = eig(A);
+	principalStress([1 5 9]) = diag(eigenVal);
+	principalStress([2 3 4 6 7 8 10 11 12]) = reshape(eigenVec,1,9);
 end
 
 function val = ComputeVonMisesStress(cartesianStress)
-	val = sqrt( 0.5*( (cartesianStress(:,1)-cartesianStress(:,2)).^2 + ...
-		(cartesianStress(:,2)-cartesianStress(:,3)).^2 + (cartesianStress(:,3)...
-			-cartesianStress(:,1)).^2 ) + 3*( cartesianStress(:,6).^2 + ...
-				cartesianStress(:,4).^2 + cartesianStress(:,5).^2 ) );		
+	val = sqrt( 0.5*( (cartesianStress(1)-cartesianStress(2))^2 + ...
+		(cartesianStress(2)-cartesianStress(3))^2 + (cartesianStress(3)...
+			-cartesianStress(1))^2 ) + 3*( cartesianStress(6)^2 + ...
+				cartesianStress(4)^2 + cartesianStress(5)^2 ) );						
 end
 
 function val = ElementInterpolationIDW(coords, vtxVals, ips)

@@ -162,12 +162,12 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
 			if 0==numTarMajorPSLs
 				colormap('Winter');
-				t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
-				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);		
+				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v1, v2, 5)}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v1, v2, 5)),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0==numTarMinorPSLs
 				colormap('Autumn');
-				t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
-				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);
+				set(cb,'Ticks',[0 50 100 150 200],'TickLabels', {linspace(v5, v6, 5)}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v5, v6, 5)),'Un',0); set(cb,'xticklabel',L);					
 			else
 				colormap([BlueRGB(); RedRGB()]);
 				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
