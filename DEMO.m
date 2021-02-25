@@ -1,7 +1,7 @@
 clc;
 addpath('./src');
 % fileName = 'D:/MyProjects/StressField3D-PSLs-Investigator/data/Vis2021_femur3D.vtk';
-global tPool_;
+
 %% PSLs Generation
 %% ======Syntax======
 %% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);

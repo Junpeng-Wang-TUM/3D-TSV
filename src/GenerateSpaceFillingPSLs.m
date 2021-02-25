@@ -5,7 +5,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	global majorCoordList_; global minorCoordList_;
 	global mergeTrigger_; global relaxedFactor_;
 	global startCoord_;
-global tPool_; tPool_ = [0 0 0];
+
 	%% Pre-process Seed Points
 	mergeTrigger_ = iEpsilon*tracingStepWidth_;
     seedPoints_ = seedPointsHistory_;
@@ -20,7 +20,6 @@ global tPool_; tPool_ = [0 0 0];
 		its = its + 1;
 		valenceMetric = sum(seedPointsValence_,2);
 		unFinishedSpps = find(valenceMetric<2);
-% 		spp = unFinishedSpps(1);
 		if 0==looper
 			lowerBound = min(seedPoints_); upperBound = max(seedPoints_);
 			startCoord_ = zeros(1,3);
@@ -41,9 +40,7 @@ global tPool_; tPool_ = [0 0 0];
 		
 		if 0==valences(1)
 			seedPointsValence_(spp,1) = 1;
-tStart1 = tic;			
-			majorPSL = GridGrowthTrigger(seed, 'MAJORPSL');	
-tPool_(1) = tPool_(1) + toc(tStart1);	
+			majorPSL = GridGrowthTrigger(seed, 'MAJORPSL');		
 			if 0==majorPSL.length
 				looper = sum(sum(seedPointsValence_)); 
 				disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -53,29 +50,23 @@ tPool_(1) = tPool_(1) + toc(tStart1);
 			majorPSLpool_(end+1,1) = majorPSL;
 			majorCoordList_(end+1:end+majorPSL.length,:) = majorPSL.phyCoordList;
 			sppsEmptyMajorValence = find(0==seedPointsValence_(:,1));
-			if length(sppsEmptyMajorValence)>0
-tStart1 = tic;			
+			if length(sppsEmptyMajorValence)>0		
 				[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(seedPoints_(...
-						sppsEmptyMajorValence,:), majorPSL.phyCoordList);
-tPool_(2) = tPool_(2) + toc(tStart1);						
+						sppsEmptyMajorValence,:), majorPSL.phyCoordList);					
 				potentialSolidSppsMajor = find(potentialDisListMajor<relaxedFactor_);
 				if ~isempty(potentialSolidSppsMajor)
 					spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);
 					seedPoints_(spps2BeMerged,:) = potentialPosListMajor(potentialSolidSppsMajor,:);								
-					seedPointsValence_(spps2BeMerged,1) = 1;
-tStart1 = tic;					
-					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');
-tPool_(3) = tPool_(3) + toc(tStart1);						
+					seedPointsValence_(spps2BeMerged,1) = 1;				
+					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');				
 					seedPointsValence_(modifiedMinorValences,2) = 1;	
 				end
 			end				
 		end
 		
 		if 0==valences(2)
-			seedPointsValence_(spp,2) = 1;
-tStart1 = tic;				
-			minorPSL = GridGrowthTrigger(seed, 'MINORPSL');
-tPool_ = tPool_+toc(tStart1);				
+			seedPointsValence_(spp,2) = 1;			
+			minorPSL = GridGrowthTrigger(seed, 'MINORPSL');			
 			if 0==minorPSL.length
 				looper = sum(sum(seedPointsValence_)); 
 				disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -85,19 +76,15 @@ tPool_ = tPool_+toc(tStart1);
 			minorPSLpool_(end+1,1) = minorPSL;
 			minorCoordList_(end+1:end+minorPSL.length,:) = minorPSL.phyCoordList;										
 			sppsEmptyMinorValence = find(0==seedPointsValence_(:,2));
-			if length(sppsEmptyMinorValence)>0
-tStart1 = tic;			
+			if length(sppsEmptyMinorValence)>0			
 				[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(seedPoints_(...
-						sppsEmptyMinorValence,:), minorPSL.phyCoordList);
-tPool_(2) = tPool_(2) + toc(tStart1);							
+						sppsEmptyMinorValence,:), minorPSL.phyCoordList);					
 				potentialSolidSppsMinor = find(potentialDisListMinor<relaxedFactor_);
 				if ~isempty(potentialSolidSppsMinor)
 					spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
 					seedPoints_(spps2BeMerged,:) = potentialPosListMinor(potentialSolidSppsMinor,:);
-					seedPointsValence_(spps2BeMerged,2) = 1;
-tStart1 = tic;					
-					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');
-tPool_(3) = tPool_(3) + toc(tStart1);						
+					seedPointsValence_(spps2BeMerged,2) = 1;				
+					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');					
 					seedPointsValence_(modifiedMajorValences,1) = 1;									
 				end
 			end					
@@ -108,7 +95,6 @@ tPool_(3) = tPool_(3) + toc(tStart1);
 			' Total.: ' sprintf('%6i',2*numSamplings)]);			
 	end
 	CompactPSLs();
-tPool_(4) = sum(tPool_(1:3));	
 end
 
 function PreprocessSeedPoints()
