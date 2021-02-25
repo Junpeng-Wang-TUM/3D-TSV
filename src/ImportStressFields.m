@@ -157,7 +157,7 @@ function ImportStressFields(fileName)
 		tmp = nodState_(faceIndex');
 		tmp = sum(tmp,2);
 		BoundaryEleFace = faceIndex(:,find(4==tmp)');
-		silhouetteStruct_ = PatchStruct();
+		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
 		xPatchs = nodeCoords_(:,1); 
 		silhouetteStruct_.xPatchs = xPatchs(BoundaryEleFace);
 		yPatchs = nodeCoords_(:,2); 
