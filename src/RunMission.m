@@ -60,9 +60,8 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 
     %%4. building hierarchy
     BuildPSLs4Hierarchy();
-	
 	%%5. write results
-	pslDataNameOutput = erase(dataName_,'.vtk');
+	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');;
 	ExportResult(pslDataNameOutput);
 	opt = 1;
 end

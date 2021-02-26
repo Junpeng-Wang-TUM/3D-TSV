@@ -1,5 +1,4 @@
-function ExportResult(fileName)
-	pslDataPath = strcat(fileName, '_psl.dat');
+function ExportResult(fileName)	
 	global majorPSLpool_;
 	global minorPSLpool_;
 	global majorHierarchy_; 
@@ -9,7 +8,7 @@ function ExportResult(fileName)
 	global tracingStepWidth_;
 	lineWidthTube = 4*tracingStepWidth_;
 	
-	fid = fopen(pslDataPath, 'w');
+	fid = fopen(fileName, 'w');
 	outPutFormat1 = '%16.6e';
 	outPutFormat2 = ' %.6e';
 	outPutFormat3 = ' %.6f';
