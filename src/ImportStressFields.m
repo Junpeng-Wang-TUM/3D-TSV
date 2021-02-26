@@ -74,7 +74,7 @@ function ImportStressFields(fileName)
 		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
 		eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;
 			
-		%%extract silhouette
+		%%extract and Re-organize silhouette into quad-mesh for exporting
 		[nodPosX nodPosY nodPosZ] = NodalizeDesignDomain([nelx_ nely_ nelz_], ...
 			[vtxLowerBound_; vtxUpperBound_], 'inGrid');	
 		valForExtctBoundary = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
@@ -86,7 +86,6 @@ function ImportStressFields(fileName)
 		silhouetteStruct_ = fv;
 		silhouetteStruct_(2) = fvc;	
 		
-		%%Re-organize Silhouette into quad-mesh for exporting
 		faceIndex = zeros(4,6*numEles_);
 		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
 		for ii=1:numEles_
@@ -146,7 +145,7 @@ function ImportStressFields(fileName)
 		vtxUpperBound_ = [max(nodeCoords_(:,1)) max(nodeCoords_(:,2)) ...
 			max(nodeCoords_(:,3))];
 		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;	
-		%%extract silhouette
+		%%extract and Re-organize silhouette into quad-mesh for exporting
 		faceIndex = zeros(4,6*numEles_);
 		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
 		for ii=1:numEles_
@@ -157,15 +156,6 @@ function ImportStressFields(fileName)
 		tmp = nodState_(faceIndex');
 		tmp = sum(tmp,2);
 		BoundaryEleFace = faceIndex(:,find(4==tmp)');
-		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
-		xPatchs = nodeCoords_(:,1); 
-		silhouetteStruct_.xPatchs = xPatchs(BoundaryEleFace);
-		yPatchs = nodeCoords_(:,2); 
-		silhouetteStruct_.yPatchs = yPatchs(BoundaryEleFace);
-		zPatchs = nodeCoords_(:,3); 
-		silhouetteStruct_.zPatchs = zPatchs(BoundaryEleFace);
-		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.xPatchs));	
-		%%Re-organize Silhouette into quad-mesh for exporting
 		boundaryNode = find(1==nodState_);
 		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
 		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
@@ -178,6 +168,12 @@ function ImportStressFields(fileName)
 		surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
 		surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
 		
+		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
+		xPatchs = surfaceQuadMeshNodeCoords_(:,1); silhouetteStruct_.xPatchs = xPatchs(surfaceQuadMeshElements_');
+		yPatchs = surfaceQuadMeshNodeCoords_(:,2); silhouetteStruct_.yPatchs = yPatchs(surfaceQuadMeshElements_');
+		zPatchs = surfaceQuadMeshNodeCoords_(:,3); silhouetteStruct_.zPatchs = zPatchs(surfaceQuadMeshElements_');
+		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.zPatchs));		
+			
 		global nodStruct_; global boundaryElements_; 
 		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
 		for ii=1:numEles_
