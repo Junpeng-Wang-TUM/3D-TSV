@@ -14,10 +14,10 @@ fileName = './data/Vis2021_femur3D.vtk';
 [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 8, 3); 
 %% =======================================Bunny_HexMesh
 % fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
-% RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5); 
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5); 
 %% =======================================bridge
 % fileName = './data/Vis2021_bridge3D.vtk'; 
-% RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); 
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); 
 
 disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']); 
 
@@ -30,3 +30,4 @@ disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']);
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
 DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'Sigma', 1.0, 1);
+	

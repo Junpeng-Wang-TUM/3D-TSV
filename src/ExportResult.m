@@ -1,4 +1,5 @@
 function ExportResult(fileName)	
+	global meshType_;
 	global majorPSLpool_;
 	global minorPSLpool_;
 	global majorHierarchy_; 
@@ -58,7 +59,13 @@ function ExportResult(fileName)
 	%%2. write outline in quad mesh
 	numVtx = size(surfaceQuadMeshNodeCoords_,1);
 	numFace = size(surfaceQuadMeshElements_,1);
-	fprintf(fid, '%s', '#Outline'); fprintf(fid, '\n');
+	fprintf(fid, '%s', '#Outline'); 
+	if strcmp(meshType_, 'CARTESIAN_GRID')
+		fprintf(fid, '  %s', 'Cartesian'); 
+	else
+		fprintf(fid, '  %s', 'Unstructured'); 
+	end
+	fprintf(fid, '\n');
 	fprintf(fid, '%s', '#Vertices'); fprintf(fid, ' %d\n', numVtx);
 	fprintf(fid, strcat(outPutFormat, outPutFormat, outPutFormat, '\n'), surfaceQuadMeshNodeCoords_');
 	fprintf(fid, '%s', '#Faces'); fprintf(fid, ' %d\n', numFace);

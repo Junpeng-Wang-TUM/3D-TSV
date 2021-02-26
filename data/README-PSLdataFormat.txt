@@ -12,7 +12,7 @@ Write_PSL_info(2nd_PSL)
 :
 :
 Write_PSL_info(Nth__PSL)
-#Outline
+#Outline "Cartesian" or "Unstructured"
 #Vertices numVertices
 xx_1 yy_1 zz_1
 xx_2 yy_2 zz_2
@@ -72,7 +72,10 @@ IM: 'Importance Metirc'
 	p_2_new = P_1 + scalingFactor * (p_2-P_1);
 %%
 
-
+%% Comment 3
+	"Cartesian" == needs to be smoothed
+	"Unstructured" == no need to be smoothed
+%%
 
 
 
