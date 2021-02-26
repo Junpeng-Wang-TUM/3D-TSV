@@ -1,6 +1,6 @@
 % BSD 2-Clause License
 % 
-% Copyright (c) 2021, Christoph Neuhauser
+% Copyright (c) 2021, Christoph Neuhauser, Junpeng Wang
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ function zeromqReplier
 		if 0==opt, error('Failed to Generate PSLs!'); end
 		
         % Send a reply.
-        reply = struct('filenames', PSLdatasetFile);
+        reply = struct('fileName', PSLdatasetFile);
         reply_string = unicode2native(jsonencode(reply), 'UTF-8');
         %fprintf('Reply string: %s\n', reply_string);
         disp(reply);
