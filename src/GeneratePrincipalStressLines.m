@@ -84,19 +84,17 @@ function [eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, princi
 end
 
 function [tarSeed, opt] = LocateSeedPoint(srcSeed)
+	global meshType_;
 	global eleCentroidList_;
 	opt = 1;
-	if 3==length(srcSeed)
-		disList = vecnorm(srcSeed-eleCentroidList_, 2, 2);
-		[~, targetEleIndex] = min(disList);	
-		[targetEleIndex, paraCoordinates, opt] = FindAdjacentElement(targetEleIndex, srcSeed);
-		%if 0==opt, error('Seed is outside of the domain!'); end
-		tarSeed = [double(targetEleIndex), paraCoordinates];		
-	elseif 4==length(srcSeed)
-		tarSeed = srcSeed;
+	if strcmp(meshType_, 'CARTESIAN_GRID')
+		[targetEleIndex, paraCoordinates, opt] = FindAdjacentElement(srcSeed);	
 	else
-		error('Wrong seed form!')
+		disList = vecnorm(srcSeed-eleCentroidList_, 2, 2);
+		[~, targetEleIndex] = min(disList); 
+		[targetEleIndex, paraCoordinates, opt] = FindAdjacentElement(targetEleIndex, srcSeed);
 	end
+	tarSeed = [double(targetEleIndex), paraCoordinates];
 end
 
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
@@ -114,7 +112,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	vonMisesStressList = zeros(limiSteps,1);
 	principalStressList = zeros(limiSteps,12);		
 	if strcmp(meshType_, 'CARTESIAN_GRID')
-		[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(elementIndex, nextPoint);	
+		[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);	
 		index = 0;	
 		while 1==bool1
 			index = index + 1; if index > limiSteps, index = index-1; break; end	
@@ -133,7 +131,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			vonMisesStressList(index,:) = vonMisesStress;
 			principalStressList(index,:) = principalStress;			
 			nextPoint = nextPoint + tracingStepWidth_*iniDir;
-			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(elementIndex, nextPoint);
+			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
 		end		
 	else
 		[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex, nextPoint);	
@@ -188,17 +186,18 @@ function targetDirection = IntegrationDirectionSelecting(originalVec, Vec1, Vec2
 	end
 end
 
-function [nextElementIndex, paraCoordinates, opt] = FindAdjacentElement(oldElementIndex, physicalCoordinates)
+function [nextElementIndex, paraCoordinates, opt] = FindAdjacentElement(varargin)
 	global nodeCoords_; global eleCentroidList_; 
 	global eNodMat_; global nodStruct_;
-	global meshType_; global meshState_; global eleMapBack_;
+	global meshState_; global eleMapBack_;
 	global boundaryElements_;
 	global nelx_; global nely_; global nelz_; global eleSize_;
 	global vtxLowerBound_;
 	
 	nextElementIndex = 0; paraCoordinates = []; opt = 0;
-	
-	if strcmp(meshType_, 'CARTESIAN_GRID')
+
+	if 1==nargin
+		physicalCoordinates = varargin{1};
 		relaxingFac = 1.0e-12;
 		physicalCoordinates = physicalCoordinates - vtxLowerBound_ + relaxingFac;
 		eleX = ceil(physicalCoordinates(1)/eleSize_);
@@ -216,7 +215,9 @@ function [nextElementIndex, paraCoordinates, opt] = FindAdjacentElement(oldEleme
 			relatedNodeCoords = nodeCoords_(relatedNodes',:)-vtxLowerBound_;
 			paraCoordinates = 2*(physicalCoordinates - relatedNodeCoords(1,:)) / eleSize_ - 1;
 		end				
-	else				
+	elseif 2==nargin
+		oldElementIndex = varargin{1};
+		physicalCoordinates = varargin{2};
 		tarNodes = eNodMat_(oldElementIndex,:); 
 		potentialElements = unique([nodStruct_(tarNodes(:)).adjacentEles]);
 		tarNodes = eNodMat_(potentialElements,:); 

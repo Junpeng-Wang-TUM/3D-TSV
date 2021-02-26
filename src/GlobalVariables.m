@@ -2,7 +2,6 @@
 
 %% 1. Dataset info.
 global dataName_; 
-global GPU_; GPU_ = 'OFF';
 global meshType_; 
 global vtxLowerBound_; global vtxUpperBound_; 
 global nelx_; global nely_; global nelz_; 

@@ -170,8 +170,7 @@ function ImportStressFields(fileName)
 		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
 		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
 		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
-		
-		global nodStruct_; global boundaryElements_;
+		global nodStruct_; global boundaryElements_; 
 		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
 		for ii=1:numEles_
 			for jj=1:8

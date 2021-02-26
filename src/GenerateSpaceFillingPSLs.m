@@ -72,7 +72,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
 					' Total.: ' sprintf('%6i',2*numSamplings)]);
 				continue; 
-			end
+			end		
 			minorPSLpool_(end+1,1) = minorPSL;
 			minorCoordList_(end+1:end+minorPSL.length,:) = minorPSL.phyCoordList;										
 			sppsEmptyMinorValence = find(0==seedPointsValence_(:,2));
@@ -114,11 +114,9 @@ function PreprocessSeedPoints()
 				potentialSolidSppsMajor = find(potentialDisListMajor<=relaxedFactor_);
 				if ~isempty(potentialSolidSppsMajor)
 					spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);							
-					seedPoints_(spps2BeMerged,:) = ...
-						potentialPosListMajor(potentialSolidSppsMajor,:);
+					seedPoints_(spps2BeMerged,:) = potentialPosListMajor(potentialSolidSppsMajor,:);
 					seedPointsValence_(spps2BeMerged,1) = 1;						
-					modifiedMinorValences = HighCurvatureModification(...
-						spps2BeMerged, 'MINORPSL');
+					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');
 					seedPointsValence_(modifiedMinorValences,2) = 1;							
 				end
 			end
@@ -136,11 +134,9 @@ function PreprocessSeedPoints()
 				potentialSolidSppsMinor = find(potentialDisListMinor<=relaxedFactor_);
 				if ~isempty(potentialSolidSppsMinor)
 					spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
-					seedPoints_(spps2BeMerged,:) = ...
-						potentialPosListMinor(potentialSolidSppsMinor,:);
+					seedPoints_(spps2BeMerged,:) = potentialPosListMinor(potentialSolidSppsMinor,:);
 					seedPointsValence_(spps2BeMerged,2) = 1;
-					modifiedMajorValences = HighCurvatureModification(...
-						spps2BeMerged, 'MAJORPSL');
+					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');
 					seedPointsValence_(modifiedMajorValences,1) = 1;													
 				end
 			end
@@ -157,21 +153,12 @@ function iPSL = GridGrowthTrigger(seed, psDir)
 end
 
 function [potentialDisList, potentialPosList] = GetDisListOfPointList2Curve(pointList, curveLine)
-	global GPU_;
 	global mergeTrigger_;
-	if strcmp(GPU_, 'ON')
-		pointList = gpuArray(pointList);
-		curveLine = gpuArray(curveLine);	
-	end
 	disT = (curveLine(:,1) - pointList(:,1)').^2;
 	disT = disT + (curveLine(:,2) - pointList(:,2)').^2;
 	disT = disT + (curveLine(:,3) - pointList(:,3)').^2;
 	disT = sqrt(disT);	
 	[minVal, minValPos] = min(disT,[],1);
-	if strcmp(GPU_, 'ON')
-		minVal = gather(minVal);
-		minValPos = gather(minValPos);	
-	end
 	potentialDisList = minVal';
 	potentialDisList = potentialDisList/mergeTrigger_;
 	potentialPosList = curveLine(minValPos,:);	
@@ -180,31 +167,28 @@ end
 function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 	global majorCoordList_; global minorCoordList_;
 	global seedPoints_;
+	global seedPointsValence_;
 	global mergeTrigger_;
 	global relaxedFactor_;
-	global GPU_;
-	pointList = seedPoints_(spps2BeMerged,:);
+	
 	coordList = [];
 	switch psDir
 		case 'MAJORPSL'
 			if isempty(majorCoordList_), modifiedValences = []; return; end
 			coordList = majorCoordList_;
+			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,1)));
 		case 'MINORPSL'
 			if isempty(minorCoordList_), modifiedValences = []; return; end
-			coordList = minorCoordList_;				
-	end	
-
-	if strcmp(GPU_, 'ON')
-		coordList = gpuArray(coordList);
-		pointList = gpuArray(pointList);
+			coordList = minorCoordList_;
+			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,2)));
 	end
+	pointList = seedPoints_(spps2BeMerged,:);
 	disT = (coordList(:,1) - pointList(:,1)').^2;
 	disT = disT + (coordList(:,2) - pointList(:,2)').^2;
 	disT = disT + (coordList(:,3) - pointList(:,3)').^2;
 	disT = sqrt(disT);		
 	minVal = min(disT);
 	minVal = minVal/mergeTrigger_;
-	if strcmp(GPU_, 'ON'), minVal = gather(minVal); end
 	modifiedValences = find(minVal<relaxedFactor_);	
 	modifiedValences = spps2BeMerged(modifiedValences);
 end
@@ -232,7 +216,6 @@ function CompactPSLs()
 end
 
 function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
-	global GPU_;
 	global mergeTrigger_;
 	global majorCoordList_; global minorCoordList_;
 	tarPSL = srcPSL;
@@ -251,10 +234,6 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 	if srcPSL.midPointPosition == srcPSL.length || srcPSL.midPointPosition == 1
 		if 1==srcPSL.midPointPosition
 			tarCoordList = tarPSL.phyCoordList;
-			if strcmp(GPU_, 'ON')
-				srcCoordList = gpuArray(srcCoordList);
-				tarCoordList = gpuArray(tarCoordList);
-			end
 			disT = (srcCoordList(:,1) - tarCoordList(:,1)').^2;
 			disT = disT + (srcCoordList(:,2) - tarCoordList(:,2)').^2;	
 			disT = disT + (srcCoordList(:,3) - tarCoordList(:,3)').^2;
@@ -267,10 +246,6 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 			startPos = 1; endPos = min(tarPositions);
 		else
 			tarCoordList = flip(tarPSL.phyCoordList,1);
-			if strcmp(GPU_, 'ON')
-				srcCoordList = gpuArray(srcCoordList);
-				tarCoordList = gpuArray(tarCoordList);
-			end
 			disT = (srcCoordList(:,1) - tarCoordList(:,1)').^2;
 			disT = disT + (srcCoordList(:,2) - tarCoordList(:,2)').^2;	
 			disT = disT + (srcCoordList(:,3) - tarCoordList(:,3)').^2;
@@ -284,10 +259,6 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 		end	
 	else
 		tarCoordList = tarPSL.phyCoordList(srcPSL.midPointPosition:srcPSL.length,:);
-		if strcmp(GPU_, 'ON')
-			srcCoordList = gpuArray(srcCoordList);
-			tarCoordList = gpuArray(tarCoordList);
-		end
 		disT = (srcCoordList(:,1) - tarCoordList(:,1)').^2;
 		disT = disT + (srcCoordList(:,2) - tarCoordList(:,2)').^2;	
 		disT = disT + (srcCoordList(:,3) - tarCoordList(:,3)').^2;
@@ -304,10 +275,6 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 		end
 		
 		tarCoordList = flip(tarPSL.phyCoordList(1:srcPSL.midPointPosition,:),1);
-		if strcmp(GPU_, 'ON')
-			srcCoordList = gpuArray(srcCoordList);
-			tarCoordList = gpuArray(tarCoordList);
-		end
 		disT = (srcCoordList(:,1) - tarCoordList(:,1)').^2;
 		disT = disT + (srcCoordList(:,2) - tarCoordList(:,2)').^2;	
 		disT = disT + (srcCoordList(:,3) - tarCoordList(:,3)').^2;
@@ -326,7 +293,6 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 	tarPSL.eleIndexList = srcPSL.eleIndexList(startPos:endPos,:);
 	tarPSL.phyCoordList = srcPSL.phyCoordList(startPos:endPos,:);
 	tarPSL.cartesianStressList = srcPSL.cartesianStressList(startPos:endPos,:);
-	tarPSL.paraCoordList = srcPSL.paraCoordList(startPos:endPos,:);
 	tarPSL.vonMisesStressList = srcPSL.vonMisesStressList(startPos:endPos,:);
 	tarPSL.principalStressList = srcPSL.principalStressList(startPos:endPos,:);
 	tarPSL.length = length(tarPSL.eleIndexList);

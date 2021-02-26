@@ -27,7 +27,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	if ~(4==nargin || 8==nargin), error('Wrong Input!'); end
 	GlobalVariables;
 	global majorPSLindexList_;
-	global minorPSLindexList_;		
+	global minorPSLindexList_;
 	if ~strcmp(dataName_, fileName)		
 		ImportStressFields(fileName);
 		dataName_ = fileName;
