@@ -170,6 +170,14 @@ function ImportStressFields(fileName)
 		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
 		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
 		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
+		%% in case there are some "fake" surface node
+		maxSurMeshNodeIndex = max(max(surfaceQuadMeshElements_));
+		tmp = zeros(maxSurMeshNodeIndex,1);
+		surfMeshNodeReal = unique(surfaceQuadMeshElements_);
+		tmp(surfMeshNodeReal) = (1:length(surfMeshNodeReal))';
+		surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
+		surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
+		
 		global nodStruct_; global boundaryElements_; 
 		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
 		for ii=1:numEles_
@@ -177,7 +185,7 @@ function ImportStressFields(fileName)
 				nodStruct_(eNodMat_(ii,jj)).adjacentEles(1,end+1) = ii;
 			end
 		end		
-		boundaryElements_ = unique([nodStruct_(1==nodState_).adjacentEles]);		
+		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);		
 	end
 
 end
