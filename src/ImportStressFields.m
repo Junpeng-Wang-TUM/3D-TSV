@@ -88,7 +88,7 @@ function ImportStressFields(fileName)
 		
 		%%Re-organize Silhouette into quad-mesh for exporting
 		faceIndex = zeros(4,6*numEles_);
-		mapEle2patch = [1 2 3 4; 5 6 7 8; 1 2 6 5; 4 3 7 8; 1 4 8 5; 2 3 7 6]';
+		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
 		for ii=1:numEles_
 			index = (ii-1)*6;
 			iEleVtx = eNodMat_(ii,:)';
@@ -148,7 +148,7 @@ function ImportStressFields(fileName)
 		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;	
 		%%extract silhouette
 		faceIndex = zeros(4,6*numEles_);
-		mapEle2patch = [1 2 3 4; 5 6 7 8; 1 2 6 5; 4 3 7 8; 1 4 8 5; 2 3 7 6]';
+		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
 		for ii=1:numEles_
 			index = (ii-1)*6;
 			iEleVtx = eNodMat_(ii,:)';
