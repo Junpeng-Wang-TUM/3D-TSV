@@ -165,6 +165,7 @@ function ImportStressFields(fileName)
 		tmp = zeros(maxSurMeshNodeIndex,1);
 		surfMeshNodeReal = unique(surfaceQuadMeshElements_);
 		tmp(surfMeshNodeReal) = (1:length(surfMeshNodeReal))';
+		nodState_ = zeros(size(nodState_)); nodState_(boundaryNode(surfMeshNodeReal)) = 1;
 		surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
 		surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
 		

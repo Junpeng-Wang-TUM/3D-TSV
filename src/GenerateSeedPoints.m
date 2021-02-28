@@ -24,16 +24,16 @@ function GenerateSeedPoints(seedStrategy)
 				global eNodMat_;
 				global numNodes_;
 				allNodes = (1:numNodes_)';
-				dis2Boundary = 1;
+				dis2Boundary = 2;
 				if dis2Boundary <= 0
-					seedPointsHistory_ = nodeCoords_(1:dis2Boundary:end,:);
+					seedPointsHistory_ = nodeCoords_(1:3:end,:);
 				else
 					boundaryNods = find(1==nodState_);
 					tmp0 = boundaryNods;
 					index = 2;
 					while index <=dis2Boundary
 						tmp = [];
-						for ii=1:1:length(tmp0)
+						for ii=1:length(tmp0)
 							iEles = nodStruct_(tmp0(ii)).adjacentEles;
 							nEles = length(iEles);
 							tmp(end+1:end+nEles) = iEles;
@@ -46,7 +46,7 @@ function GenerateSeedPoints(seedStrategy)
 					end
 					passiveNodes = tmp0;
 					sampledNodes = setdiff(allNodes, passiveNodes);
-					seedPointsHistory_ = nodeCoords_(sampledNodes,:);
+					seedPointsHistory_ = nodeCoords_(sampledNodes(1:dis2Boundary:end),:);
 				end			
 			end
 		case 'Surface'
@@ -58,7 +58,7 @@ function GenerateSeedPoints(seedStrategy)
 				seedPointsHistory_ = GetDegenerateElements();
 			else
 				warning('This Seed Strategy only Works with Cartesian Mesh, back to all Mesh Vertices Seeding!');
-				seedPointsHistory_ = nodeCoords_;
+				seedPointsHistory_ = nodeCoords_(1:2:end,:);;
 			end
 	end
 end
