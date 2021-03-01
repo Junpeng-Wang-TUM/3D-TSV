@@ -12,6 +12,7 @@ function GenerateSeedPoints(seedStrategy)
 				global nelx_; global nely_; global nelz_;
 				global seedSpan4VolumeOptCartesianMesh_;
 				step = seedSpan4VolumeOptCartesianMesh_;
+				if 0==step, step = 10; end %% in case 0==minimumEpsilon and volumeSeedingOpt is not defined
 				validNodesVolume = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
 				validNodesVolume(originalValidNodeIndex_) = (1:length(originalValidNodeIndex_))';
 				validNodesVolume = reshape(validNodesVolume, nely_+1, nelx_+1, nelz_+1);
@@ -52,7 +53,7 @@ function GenerateSeedPoints(seedStrategy)
 		case 'Surface'
 			seedPointsHistory_ = nodeCoords_(1==nodState_,:);
 		case 'LoadingArea'			
-			seedPointsHistory_ = nodeCoords_(nodeLoadVec_(:,1),:);			
+			seedPointsHistory_ = nodeCoords_(nodeLoadVec_(:,1),:);
 		case 'ApproxTopology' %% only Work Cartesian Mesh
 			if strcmp(meshType_, 'CARTESIAN_GRID')
 				seedPointsHistory_ = GetDegenerateElements();

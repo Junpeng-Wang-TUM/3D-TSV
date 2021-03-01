@@ -72,14 +72,12 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 		coords2 = midPots - dirVecs;
 		iCoordList(1:2:end,:) = coords1;
 		iCoordList(2:2:end,:) = coords2;
-		
-		coordList(end+1:end+2*iPSLength,:) = iCoordList;
-		
+			
 		if 4==nargin
 			%%2.2 create quad patches
 			numExistingNodes = size(coordList,1);
 			numNewlyGeneratedNodes = 2*iPSLength;
-			newGeneratedNodes = numExistingNodes + (1:1:numNewlyGeneratedNodes);
+			newGeneratedNodes = numExistingNodes + (1:numNewlyGeneratedNodes);
 			newGeneratedNodes = reshape(newGeneratedNodes, 2, iPSLength);
 			iQuadMapFace = [newGeneratedNodes(1,1:end-1); newGeneratedNodes(2,1:end-1); ...
 				newGeneratedNodes(2,2:end); newGeneratedNodes(1,2:end)];
@@ -97,6 +95,7 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 			quadMapOutline(:,end+1:end+2*iPSLength) = iQuadMapOutline;
 			quadMapFace(:,end+1:end+iPSLength-1) = iQuadMapFace;
 		end
+		coordList(end+1:end+2*iPSLength,:) = iCoordList;
 	end
 	if 4==nargin
 		global axHandle_; axHandle_ = gca;

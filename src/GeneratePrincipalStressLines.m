@@ -197,15 +197,26 @@ function [nextElementIndex, paraCoordinates, opt] = FindAdjacentElement(varargin
 	nextElementIndex = 0; paraCoordinates = []; opt = 0;
 
 	if 1==nargin
-		physicalCoordinates = varargin{1};
-		relaxingFac = 1.0e-12;
-		physicalCoordinates = physicalCoordinates - vtxLowerBound_ + relaxingFac;
-		eleX = ceil(physicalCoordinates(1)/eleSize_);
-		if eleX<1 || eleX>nelx_, return; end
-		eleY = ceil(physicalCoordinates(2)/eleSize_);
-		if eleY<1 || eleY>nely_, return; end
-		eleZ = ceil(physicalCoordinates(3)/eleSize_);
-		if eleZ<1 || eleZ>nelz_, return; end
+		physicalCoordinates = varargin{1};		
+		physicalCoordinates = physicalCoordinates - vtxLowerBound_;
+		if 0==physicalCoordinates(1)
+			eleX = 1;				
+		else
+			eleX = ceil(physicalCoordinates(1)/eleSize_);
+			if eleX<1 || eleX>nelx_, return; end
+		end
+		if 0==physicalCoordinates(2)
+			eleY = 1;
+		else
+			eleY = ceil(physicalCoordinates(2)/eleSize_);
+			if eleY<1 || eleY>nely_, return; end
+		end
+		if 0==physicalCoordinates(3)
+			eleZ = 1;
+		else
+			eleZ = ceil(physicalCoordinates(3)/eleSize_);
+			if eleZ<1 || eleZ>nelz_, return; end
+		end			
 		
 		tarEle = nelx_*nely_*(eleZ-1) + nely_*(eleX-1)+(nely_-eleY+1);
 		if meshState_(tarEle)

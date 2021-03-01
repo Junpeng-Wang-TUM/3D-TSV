@@ -1,6 +1,6 @@
 clc;
 addpath('./src');
-% fileName = 'D:/MyProjects/StressField3D-PSLs-Investigator/data/Vis2021_femur3D.vtk';
+% fileName = 'D:/MyDataSets/StressFields4LLGP/euroVis2020_case8_carGrid.vtk';
 
 %% PSLs Generation
 %% ======Syntax======
@@ -20,7 +20,6 @@ fileName = './data/Vis2021_femur3D.vtk';
 % [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3); 
 
 disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']); 
-
 %%Vis
 % imOpt = ["Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
 % imVal = [1,0.5]; %% PSLs with IM>=imVal shown
@@ -30,4 +29,3 @@ disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']);
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
 DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'Sigma', 1.0, 1);
-	

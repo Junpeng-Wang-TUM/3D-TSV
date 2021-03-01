@@ -45,19 +45,18 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	GenerateSeedPoints(seedStrategy);
 	
 	%%3. PSL generation
-	tracingStepWidth_ = eleSize_*1;	
-    majorPSLindexList_ = struct('arr', []); majorPSLindexList_ = repmat(majorPSLindexList_, 1, numLevels);        
-    minorPSLindexList_ = struct('arr', []); minorPSLindexList_ = repmat(minorPSLindexList_, 1, numLevels);	
-    index = 1;
-    while index<=numLevels
-        % mergeTrigger_ = minimumEpsilon * 2^(numLevels-index) * tracingStepWidth_;
+	tracingStepWidth_ = eleSize_*1;
+	majorPSLindexList_ = struct('arr', []); majorPSLindexList_ = repmat(majorPSLindexList_, 1, numLevels);        
+	minorPSLindexList_ = struct('arr', []); minorPSLindexList_ = repmat(minorPSLindexList_, 1, numLevels);	
+	index = 1;
+	while index<=numLevels
 		iEpsilon = minimumEpsilon * 2^(numLevels-index);
-        GenerateSpaceFillingPSLs(iEpsilon);
-        majorPSLindexList_(index).arr = 1:length(majorPSLpool_);
-        minorPSLindexList_(index).arr = 1:length(minorPSLpool_);
+		GenerateSpaceFillingPSLs(iEpsilon);
+		majorPSLindexList_(index).arr = 1:length(majorPSLpool_);
+		minorPSLindexList_(index).arr = 1:length(minorPSLpool_);
 		index = index + 1;
-    end
-
+	end	
+	
     %%4. building hierarchy
     BuildPSLs4Hierarchy();
 	%%5. write results
