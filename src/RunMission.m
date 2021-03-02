@@ -2,7 +2,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	%%1. Global Variable Statement and Import Dataset
 	%% Syntax:
 	%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);
-	%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
+	%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt, traceAlgorithm);
 	
 	%% arg1: "fileName", char array
 	%% path + fullname of dataset, e.g., 'D:/data/name.vtk'
@@ -20,11 +20,13 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	%% Generally ranging from 5 to 20, PSLs with more "minPSLength" integrating points can only be shown
 	%% arg8: "volumeSeedingOpt", Scalar var in double float/integer
 	%% Generally ranging from 2 to 10, Seed Point Density Control for "Volume" Seeding Strategy of Cartesian Mesh
+	%% arg9: "traceAlgorithm"
+	%% can be 'Euler', 'RK2', 'RK4'
 	
 	%% NOTE: Regarding arguments "minimumEpsilon" and "numLevels",
 	%% Generally NOT Recommend minimumEpsilon*2^(numLevels-1) > min([resX, resY, resZ]) for Common Use
 	opt = 0; pslDataNameOutput = [];
-	if ~(4==nargin || 8==nargin), error('Wrong Input!'); end
+	if ~(4==nargin || 9==nargin), error('Wrong Input!'); end
 	GlobalVariables;
 	global majorPSLindexList_;
 	global minorPSLindexList_;
@@ -32,11 +34,12 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 		ImportStressFields(fileName);
 		dataName_ = fileName;
 	end
-	if 8==nargin
+	if 9==nargin
 		permittedMaxAdjacentTangentAngleDeviation_ = varargin{1};
 		snappingOpt_ = varargin{2};
 		minLengthVisiblePSLs_ = varargin{3};
 		seedSpan4VolumeOptCartesianMesh_ = varargin{4};
+		traceAlg_ = varargin{5};
 	else
 		seedSpan4VolumeOptCartesianMesh_ = ceil(minimumEpsilon/1.7);
 	end

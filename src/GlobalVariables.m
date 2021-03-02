@@ -21,10 +21,12 @@ global surfaceQuadMeshNodeCoords_;
 global surfaceQuadMeshElements_;	
 
 %% 2. Algorithm Control
+%% 2.0 PSL Tracing Algorithm
+global traceAlg_; traceAlg_ = 'Euler'; %% 'Euler', 'RK2', 'RK4'
 %% 2.1 Integrating Step Size = element Size * tracingStepWidth_
 global tracingStepWidth_; 
 %% 2.2 %% Tracing PSL stops when the angle deviation between the neighboring tangents is larger than 180/permittedMaxAdjacentTangentAngleDeviation_
-global permittedMaxAdjacentTangentAngleDeviation_; permittedMaxAdjacentTangentAngleDeviation_ = 20; 
+global permittedMaxAdjacentTangentAngleDeviation_; permittedMaxAdjacentTangentAngleDeviation_ = 6; 
 %% 2.3 Store the Original Seed Points
 global seedPointsHistory_; seedPointsHistory_ = [];
 %% 2.4 Control Seed Point Density under 'Volume' Seeding Strategy

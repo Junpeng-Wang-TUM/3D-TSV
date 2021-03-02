@@ -1,5 +1,6 @@
 function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps)
 	global tracingStepWidth_;
+	global traceAlg_;
 	iPSL = PrincipalStressLineStruct();
 	switch tracingType
 		case 'MAJORPSL', psDir = [10 11 12];
@@ -19,8 +20,17 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 	PSLprincipalStressList = principalStress;			
 	%%2.1 tracing the major PSL along first direction (v1)		
 	nextPoint = phyCoord + tracingStepWidth_*principalStress(1,psDir);
-	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
-		TracingPSL(nextPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);
+	switch traceAlg_
+		case 'Euler'
+			[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+				TracingPSL_Euler(nextPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);
+		case 'RK2'
+			[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+				TracingPSL_RK2(nextPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);			
+		case 'RK4'
+			[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+				TracingPSL_RK4(nextPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);		
+	end	
 	PSLphyCoordList = [PSLphyCoordList; phyCoordList];
 	PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
 	PSLeleIndexList = [PSLeleIndexList; eleIndexList];
@@ -28,8 +38,17 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
 	%%2.2 tracing the major PSL along second direction (-v1)	
 	nextPoint = phyCoord - tracingStepWidth_*principalStress(1,psDir);
-	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
-		TracingPSL(nextPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);
+	switch traceAlg_
+		case 'Euler'
+			[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+				TracingPSL_Euler(nextPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);
+		case 'RK2'
+			[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+				TracingPSL_RK2(nextPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);		
+		case 'RK4'
+			[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
+				TracingPSL_RK4(nextPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);			
+	end		
 	if size(phyCoordList,1) > 1
 		phyCoordList = flip(phyCoordList);
 		cartesianStressList = flip(cartesianStressList);
@@ -98,7 +117,7 @@ function [tarSeed, opt] = LocateSeedPoint(srcSeed)
 end
 
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-			TracingPSL(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+			TracingPSL_Euler(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
 	global eNodMat_;
 	global nodeCoords_;
 	global cartesianStressField_;
@@ -121,13 +140,12 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
 			vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);	
 			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);				
-			nextDir = IntegrationDirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));	
-			if 0 == AngleTerminationCondition3D(iniDir, nextDir), index = index-1; break; end
+			[nextDir, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));
+			if ~terminationCond, index = index-1; break; end			
 			iniDir = nextDir;
 			phyCoordList(index,:) = nextPoint;
 			cartesianStressList(index,:) = cartesianStressOnGivenPoint;
 			eleIndexList(index,:) = elementIndex;
-			% paraCoordList(index,:) = paraCoordinates;
 			vonMisesStressList(index,:) = vonMisesStress;
 			principalStressList(index,:) = principalStress;			
 			nextPoint = nextPoint + tracingStepWidth_*iniDir;
@@ -144,13 +162,12 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			cartesianStressOnGivenPoint = ElementInterpolationIDW(vtxCoords, vtxStress, nextPoint); 
 			vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
 			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
-			nextDir = IntegrationDirectionSelecting(iniDir, principalStress(typePSL), -principalStress(typePSL));	
-			if 0 == AngleTerminationCondition3D(iniDir, nextDir), index = index-1; break; end
+			[nextDir, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));
+			if ~terminationCond, index = index-1; break; end		
 			iniDir = nextDir;
 			phyCoordList(index,:) = nextPoint;
 			cartesianStressList(index,:) = cartesianStressOnGivenPoint;
 			eleIndexList(index,:) = elementIndex;
-			% paraCoordList(index,:) = [0 0 0];
 			vonMisesStressList(index,:) = vonMisesStress;
 			principalStressList(index,:) = principalStress;				
 			nextPoint = nextPoint + tracingStepWidth_*iniDir;
@@ -160,29 +177,332 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	phyCoordList = phyCoordList(1:index,:);
 	cartesianStressList = cartesianStressList(1:index,:);
 	eleIndexList = eleIndexList(1:index,:);
-	% paraCoordList = paraCoordList(1:index,:);
 	vonMisesStressList = vonMisesStressList(1:index,:);
 	principalStressList = principalStressList(1:index,:);	
 end
 
-function val = AngleTerminationCondition3D(dirct1, dirct2)
-	global permittedMaxAdjacentTangentAngleDeviation_;
-	angle = acos((dirct1*dirct2') / (norm(dirct1)*norm(dirct2)));
-	if angle > pi/permittedMaxAdjacentTangentAngleDeviation_
-		val = 0;
+function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
+			TracingPSL_RK2(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+	global eNodMat_;
+	global nodeCoords_;
+	global cartesianStressField_;
+	global tracingStepWidth_;
+	global meshType_; 
+	
+	phyCoordList = zeros(limiSteps,3);
+	cartesianStressList = zeros(limiSteps,6);
+	eleIndexList = zeros(limiSteps,1);
+	paraCoordList = [];
+	vonMisesStressList = zeros(limiSteps,1);
+	principalStressList = zeros(limiSteps,12);	
+
+	%%initialize initial k1 and k2
+	k1 = iniDir;
+	iniPot = nextPoint - k1*tracingStepWidth_;
+	midPot = nextPoint - k1*tracingStepWidth_/2;
+	index = 0;	
+	
+	if strcmp(meshType_, 'CARTESIAN_GRID')
+		[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(midPot);	
+		if bool1
+			cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
+			shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2), paraCoordinates(3));
+			cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
+			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
+			[k2, terminationCond] = IntegrationDirectionSelecting(k1, principalStress(typePSL));
+			nextPoint = iniPot + tracingStepWidth_*k2;
+			[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
+			while bool1
+				index = index + 1; if index > limiSteps, index = index-1; break; end
+				%%k1
+				cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
+				shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2), paraCoordinates(3));
+				cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
+				vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
+				principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
+				[k1, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));
+				if ~terminationCond, index = index-1; break; end
+				%%k2
+				midPot = nextPoint + k1*tracingStepWidth_/2;
+				[elementIndex2, paraCoordinates2, bool1] = FindAdjacentElement(midPot);
+				if ~bool1, index = index-1; break; end
+				cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
+				shapeFuncs = ShapeFunction(paraCoordinates2(1), paraCoordinates2(2), paraCoordinates2(3));
+				cartesianStressOnGivenPoint2 = shapeFuncs*cartesianStress2;
+				principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+				[k2, terminationCond] = IntegrationDirectionSelecting(k1, principalStress2(typePSL));
+				%%store	
+				iniDir = k1;
+				phyCoordList(index,:) = nextPoint;
+				cartesianStressList(index,:) = cartesianStressOnGivenPoint;
+				eleIndexList(index,:) = elementIndex;			
+				vonMisesStressList(index,:) = vonMisesStress;
+				principalStressList(index,:) = principalStress;
+				%%next point
+				nextPoint = nextPoint + tracingStepWidth_*k2;		
+				[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);				
+			end
+		end	
 	else
-		val = 1;
+		[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex, midPot);
+		NIdx = eNodMat_(elementIndex,:)';
+		vtxStress = cartesianStressField_(NIdx, :);
+		vtxCoords = nodeCoords_(NIdx,:); 
+		cartesianStressOnGivenPoint = ElementInterpolationIDW(vtxCoords, vtxStress, midPot);
+		principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
+		[k2, terminationCond] = IntegrationDirectionSelecting(k1, principalStress(typePSL));
+		nextPoint = iniPot + tracingStepWidth_*k2;
+		[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(elementIndex, nextPoint);
+		while bool1
+			index = index + 1; if index > limiSteps, index = index-1; break; end
+			NIdx = eNodMat_(elementIndex,:)';
+			vtxStress = cartesianStressField_(NIdx, :);
+			vtxCoords = nodeCoords_(NIdx,:); 
+			cartesianStressOnGivenPoint = ElementInterpolationIDW(vtxCoords, vtxStress, nextPoint); 
+			vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
+			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);						
+			%%k1
+			[k1, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));	
+			if ~terminationCond, index = index-1; break; end
+			%%k2
+			midPot = nextPoint + k1*tracingStepWidth_/2;
+			[elementIndex2, ~, bool1] = FindAdjacentElement(elementIndex, midPot);
+			if ~bool1, index = index-1; break; end
+			NIdx2 = eNodMat_(elementIndex2,:)';	
+			vtxStress2 = cartesianStressField_(NIdx2,:);
+			vtxCoords2 = nodeCoords_(NIdx2,:);
+			cartesianStressOnGivenPoint2 = ElementInterpolationIDW(vtxCoords2, vtxStress2, midPot);
+			principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+			[k2, terminationCond] = IntegrationDirectionSelecting(k1, principalStress2(typePSL));	
+			%%store	
+			iniDir = k1;
+			phyCoordList(index,:) = nextPoint;
+			cartesianStressList(index,:) = cartesianStressOnGivenPoint;
+			eleIndexList(index,:) = elementIndex;
+			vonMisesStressList(index,:) = vonMisesStress;
+			principalStressList(index,:) = principalStress;
+			%%next point
+			nextPoint = nextPoint + tracingStepWidth_*k2;
+			[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex2, nextPoint);			
+		end	
 	end
+	phyCoordList = phyCoordList(1:index,:);
+	cartesianStressList = cartesianStressList(1:index,:);
+	eleIndexList = eleIndexList(1:index,:);
+	vonMisesStressList = vonMisesStressList(1:index,:);
+	principalStressList = principalStressList(1:index,:);	
 end
 
-function targetDirection = IntegrationDirectionSelecting(originalVec, Vec1, Vec2)
-	normOriVec = norm(originalVec); normVec1 = norm(Vec1); normVec2 = norm(Vec2);
-	angle1 = acos( originalVec*Vec1' / (normOriVec*normVec1) );
-	angle2 = acos( originalVec*Vec2' / (normOriVec*normVec2) );
-	if angle1 < angle2
-		targetDirection = Vec1;
+function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
+			TracingPSL_RK4(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+	global eNodMat_;
+	global nodeCoords_;
+	global cartesianStressField_;
+	global tracingStepWidth_;
+	global meshType_; 
+	
+	phyCoordList = zeros(limiSteps,3);
+	cartesianStressList = zeros(limiSteps,6);
+	eleIndexList = zeros(limiSteps,1);
+	paraCoordList = [];
+	vonMisesStressList = zeros(limiSteps,1);
+	principalStressList = zeros(limiSteps,12);
+
+	%%initialize initial k1, k2, k3 and k4
+	k1 = iniDir;
+	iniPot = nextPoint - k1*tracingStepWidth_;
+	midPot1 = nextPoint - k1*tracingStepWidth_/2;
+	index = 0;
+	
+	if strcmp(meshType_, 'CARTESIAN_GRID')
+		[elementIndex2, paraCoordinates2, bool1] = FindAdjacentElement(midPot1);
+		if bool1
+			%%k2
+			cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
+			shapeFuncs2 = ShapeFunction(paraCoordinates2(1), paraCoordinates2(2), paraCoordinates2(3));
+			cartesianStressOnGivenPoint2 = shapeFuncs2*cartesianStress2;
+			principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+			[k2, terminationCond] = IntegrationDirectionSelecting(k1, principalStress2(typePSL));
+			midPot2 = iniPot + tracingStepWidth_*k2/2;
+			%%k3
+			[elementIndex3, paraCoordinates3, bool1] = FindAdjacentElement(midPot2);
+			if bool1
+				cartesianStress3 = cartesianStressField_(eNodMat_(elementIndex3,:)', :);
+				shapeFuncs3 = ShapeFunction(paraCoordinates3(1), paraCoordinates3(2), paraCoordinates3(3));
+				cartesianStressOnGivenPoint3 = shapeFuncs3*cartesianStress3;
+				principalStress3 = ComputePrincipalStress(cartesianStressOnGivenPoint3);
+				[k3, terminationCond] = IntegrationDirectionSelecting(k1, principalStress3(typePSL));
+				midPot3 = iniPot + tracingStepWidth_*k3;
+				%%k4
+				[elementIndex4, paraCoordinates4, bool1] = FindAdjacentElement(midPot3);
+				if bool1
+					cartesianStress4 = cartesianStressField_(eNodMat_(elementIndex4,:)', :);
+					shapeFuncs4 = ShapeFunction(paraCoordinates4(1), paraCoordinates4(2), paraCoordinates4(3));
+					cartesianStressOnGivenPoint4 = shapeFuncs4*cartesianStress4;
+					principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
+					[k4, terminationCond] = IntegrationDirectionSelecting(k1, principalStress4(typePSL));
+					nextPoint = iniPot + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
+					[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);
+					while bool1
+						index = index + 1; if index > limiSteps, index = index-1; break; end						
+						cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
+						shapeFuncs = ShapeFunction(paraCoordinates(1), paraCoordinates(2), paraCoordinates(3));
+						cartesianStressOnGivenPoint = shapeFuncs*cartesianStress;
+						vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
+						principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);						
+						%%k1
+						[k1, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));
+						if ~terminationCond, index = index-1; break; end
+						midPot1 = nextPoint + k1*tracingStepWidth_/2;
+						%%k2
+						[elementIndex2, paraCoordinates2, bool1] = FindAdjacentElement(midPot1);
+						if ~bool1, index = index-1; break; end
+						cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
+						shapeFuncs2 = ShapeFunction(paraCoordinates2(1), paraCoordinates2(2), paraCoordinates2(3));
+						cartesianStressOnGivenPoint2 = shapeFuncs2*cartesianStress2;
+						principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+						[k2, ~] = IntegrationDirectionSelecting(iniDir, principalStress2(typePSL));						
+						midPot2 = nextPoint + k2*tracingStepWidth_/2;
+						%%k3
+						[elementIndex3, paraCoordinates3, bool1] = FindAdjacentElement(midPot2);
+						if ~bool1, index = index-1; break; end
+						cartesianStress3 = cartesianStressField_(eNodMat_(elementIndex3,:)', :);
+						shapeFuncs3 = ShapeFunction(paraCoordinates3(1), paraCoordinates3(2), paraCoordinates3(3));
+						cartesianStressOnGivenPoint3 = shapeFuncs3*cartesianStress3;
+						principalStress3 = ComputePrincipalStress(cartesianStressOnGivenPoint3);
+						[k3, ~] = IntegrationDirectionSelecting(iniDir, principalStress3(typePSL));						
+						midPot3 = nextPoint + k3*tracingStepWidth_;
+						%%k4
+						[elementIndex4, paraCoordinates4, bool1] = FindAdjacentElement(midPot3);
+						if ~bool1, index = index-1; break; end
+						cartesianStress4 = cartesianStressField_(eNodMat_(elementIndex4,:)', :);
+						shapeFuncs4 = ShapeFunction(paraCoordinates4(1), paraCoordinates4(2), paraCoordinates4(3));
+						cartesianStressOnGivenPoint4 = shapeFuncs4*cartesianStress4;
+						principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
+						[k4, ~] = IntegrationDirectionSelecting(iniDir, principalStress4(typePSL));
+						%%store	
+						iniDir = k1;
+						phyCoordList(index,:) = nextPoint;
+						cartesianStressList(index,:) = cartesianStressOnGivenPoint;
+						eleIndexList(index,:) = elementIndex;			
+						vonMisesStressList(index,:) = vonMisesStress;
+						principalStressList(index,:) = principalStress;
+						%%next point
+						nextPoint = nextPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;		
+						[elementIndex, paraCoordinates, bool1] = FindAdjacentElement(nextPoint);							
+					end
+				end
+			end
+		end
 	else
-		targetDirection = Vec2;
+		[elementIndex2, ~, bool1] = FindAdjacentElement(elementIndex, midPot1);
+		if bool1
+			%%k2
+			NIdx2 = eNodMat_(elementIndex2,:)';
+			vtxStress2 = cartesianStressField_(NIdx2, :);
+			vtxCoords2 = nodeCoords_(NIdx2,:); 		
+			cartesianStressOnGivenPoint2 = ElementInterpolationIDW(vtxCoords2, vtxStress2, midPot1);
+			principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+			[k2, ~] = IntegrationDirectionSelecting(k1, principalStress2(typePSL));
+			midPot2 = iniPot + tracingStepWidth_*k2/2;
+			%%k3
+			[elementIndex3, ~, bool1] = FindAdjacentElement(elementIndex2, midPot2);
+			if bool1
+				NIdx3 = eNodMat_(elementIndex3,:)';
+				vtxStress3 = cartesianStressField_(NIdx3, :);
+				vtxCoords3 = nodeCoords_(NIdx3,:); 			
+				cartesianStressOnGivenPoint3 = ElementInterpolationIDW(vtxCoords3, vtxStress3, midPot2);
+				principalStress3 = ComputePrincipalStress(cartesianStressOnGivenPoint3);
+				[k3, ~] = IntegrationDirectionSelecting(k1, principalStress3(typePSL));
+				midPot3 = iniPot + tracingStepWidth_*k3;
+				%%k4
+				[elementIndex4, ~, bool1] = FindAdjacentElement(elementIndex3, midPot3);
+				if bool1
+					NIdx4 = eNodMat_(elementIndex4,:)';
+					vtxStress4 = cartesianStressField_(NIdx4, :);
+					vtxCoords4 = nodeCoords_(NIdx4,:);
+					cartesianStressOnGivenPoint4 = ElementInterpolationIDW(vtxCoords4, vtxStress4, midPot3);
+					principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
+					[k4, ~] = IntegrationDirectionSelecting(k1, principalStress4(typePSL));
+
+					nextPoint = iniPot + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
+					[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex, nextPoint);
+					while bool1
+						index = index + 1; if index > limiSteps, index = index-1; break; end
+						NIdx = eNodMat_(elementIndex,:)';
+						vtxStress = cartesianStressField_(NIdx, :);
+						vtxCoords = nodeCoords_(NIdx,:); 		
+						cartesianStressOnGivenPoint = ElementInterpolationIDW(vtxCoords, vtxStress, midPot1);
+						vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
+						principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+						%%k1						
+						[k1, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));
+						if ~terminationCond, index = index-1; break; end
+						midPot1 = nextPoint + tracingStepWidth_*k1/2;
+						%%k2
+						[elementIndex2, ~, bool1] = FindAdjacentElement(elementIndex, midPot1);
+						if ~bool1, index = index-1; break; end
+						NIdx2 = eNodMat_(elementIndex2,:)';
+						vtxStress2 = cartesianStressField_(NIdx2, :);
+						vtxCoords2 = nodeCoords_(NIdx2,:); 		
+						cartesianStressOnGivenPoint2 = ElementInterpolationIDW(vtxCoords2, vtxStress2, midPot1);
+						principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+						[k2, ~] = IntegrationDirectionSelecting(iniDir, principalStress2(typePSL));
+						midPot2 = nextPoint + tracingStepWidth_*k2/2;
+						%%k3
+						[elementIndex3, ~, bool1] = FindAdjacentElement(elementIndex2, midPot2);
+						if ~bool1, index = index-1; break; end
+						NIdx3 = eNodMat_(elementIndex3,:)';
+						vtxStress3 = cartesianStressField_(NIdx3, :);
+						vtxCoords3 = nodeCoords_(NIdx3,:); 		
+						cartesianStressOnGivenPoint3 = ElementInterpolationIDW(vtxCoords3, vtxStress3, midPot2);
+						principalStress3 = ComputePrincipalStress(cartesianStressOnGivenPoint3);
+						[k3, ~] = IntegrationDirectionSelecting(iniDir, principalStress3(typePSL));
+						midPot3 = nextPoint + tracingStepWidth_*k3;	
+						%%k4
+						[elementIndex4, ~, bool1] = FindAdjacentElement(elementIndex3, midPot3);
+						if ~bool1, index = index-1; break; end
+						NIdx4 = eNodMat_(elementIndex4,:)';
+						vtxStress4 = cartesianStressField_(NIdx4, :);
+						vtxCoords4 = nodeCoords_(NIdx4,:); 		
+						cartesianStressOnGivenPoint4 = ElementInterpolationIDW(vtxCoords4, vtxStress4, midPot3);
+						principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
+						[k4, ~] = IntegrationDirectionSelecting(iniDir, principalStress4(typePSL));
+						%%store	
+						iniDir = k1;
+						phyCoordList(index,:) = nextPoint;
+						cartesianStressList(index,:) = cartesianStressOnGivenPoint;
+						eleIndexList(index,:) = elementIndex;			
+						vonMisesStressList(index,:) = vonMisesStress;
+						principalStressList(index,:) = principalStress;						
+						%%next point
+						nextPoint = nextPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;		
+						[elementIndex, ~, bool1] = FindAdjacentElement(elementIndex, nextPoint);						
+					end
+				end
+			end
+		end
+	end
+
+	phyCoordList = phyCoordList(1:index,:);
+	cartesianStressList = cartesianStressList(1:index,:);
+	eleIndexList = eleIndexList(1:index,:);
+	vonMisesStressList = vonMisesStressList(1:index,:);
+	principalStressList = principalStressList(1:index,:);	
+end
+
+function [targetDirection, terminationCond] = IntegrationDirectionSelecting(originalVec, Vec)
+	global permittedMaxAdjacentTangentAngleDeviation_;
+	terminationCond = 1;
+	normOriVec = norm(originalVec); normVec = norm(Vec);
+	angle1 = acos( originalVec*Vec' / (normOriVec*normVec) );
+	angle2 = acos( -originalVec*Vec' / (normOriVec*normVec) );
+	if angle1 < angle2
+		targetDirection = Vec;
+		if angle1 > pi/permittedMaxAdjacentTangentAngleDeviation_, terminationCond = 0; end
+	else
+		targetDirection = -Vec;
+		if angle2 > pi/permittedMaxAdjacentTangentAngleDeviation_, terminationCond = 0; end
 	end
 end
 

@@ -70,8 +70,9 @@ function zeromqReplier
 		snappingOpt = request.snappingOpt;
 		minPSLength = request.minPSLength;
 		volumeSeedingOpt = request.volumeSeedingOpt;
+		traceAlgorithm = request.traceAlgorithm;
 		[opt, PSLdatasetFile] = RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, ...
-			maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
+			maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt, traceAlgorithm);
 		if 0==opt, error('Failed to Generate PSLs!'); end
 		
         % Send a reply.
