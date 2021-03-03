@@ -11,7 +11,7 @@ tStart = tic;
 %% Some Examples for Test
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk'; 
-[opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 8, 3); 
+[opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 3); 
 %% =======================================Bunny_HexMesh
 % fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
 % [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5, 'Euler'); 
