@@ -3,16 +3,18 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 	%% [hdFace, hdOutline] = ExpandPSLs2Ribbon(PSLs, colorSrc, lw, smoothingOpt);
 	%% coordList = ExpandPSLs2Ribbon(PSLs, lw, smoothingOpt); Just Exporting Ribbon Vertices
 	if 4==nargin
-		PSLs = varargin{1};
+		PSLs = varargin{1}; numPSLs = length(PSLs);
 		colorSrc = varargin{2};
 		lw = varargin{3};
 		smoothingOpt = varargin{4};
 		nargout = 2;
+		if 0==numPSLs, varargout{1} = []; varargout{2} = []; return; end
 	elseif 3==nargin
-		PSLs = varargin{1};
+		PSLs = varargin{1}; numPSLs = length(PSLs);
 		lw = varargin{2};
 		smoothingOpt = varargin{3};	
 		nargout = 1;
+		if 0==numPSLs, varargout{1} = []; return; end
 	else
 		error('Wrong Input!');
 	end
