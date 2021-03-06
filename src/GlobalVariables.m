@@ -22,7 +22,7 @@ global surfaceQuadMeshElements_;
 
 %% 2. Algorithm Control
 %% 2.0 PSL Tracing Algorithm
-global traceAlg_; traceAlg_ = 'Euler'; %% 'Euler', 'RK2', 'RK4'
+global traceAlg_; traceAlg_ = 'RK2'; %% 'Euler', 'RK2', 'RK4'
 %% 2.1 Integrating Step Size = element Size * tracingStepWidth_
 global tracingStepWidth_; 
 %% 2.2 %% Tracing PSL stops when the angle deviation between the neighboring tangents is larger than 180/permittedMaxAdjacentTangentAngleDeviation_

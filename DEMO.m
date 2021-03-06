@@ -11,7 +11,7 @@ tStart = tic;
 %% Some Examples for Test
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk'; 
-[opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 8, 3); 
+[opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3); 
 %% =======================================Bunny_HexMesh
 % fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
 % [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5, 'Euler'); 
@@ -28,4 +28,4 @@ disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']);
 % lw = 2; %% tubeRadius = lw, ribbonWidth = 4*lw
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 1.0, 1);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1);

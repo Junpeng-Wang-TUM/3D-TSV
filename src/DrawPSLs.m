@@ -238,7 +238,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			end
 			colorbar off
 		else
-			colormap('jet'); cb = colorbar('Location', 'east');
+			colormap('pink'); cb = colorbar('Location', 'east');
 			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
 			L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);	
 		end
@@ -249,6 +249,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	if 1
 		% view(-1.108713692790638e+00, 1.972962667454830e+01); %%femur 
 		% view(7.067303146269593e+01, 1.240029108758532e+00); %%femur 
+		% view(1.753841277974189e+01, 1.138333279761854e+01) %%femur
 		% view(-1.960848849982980e+02, 1.313055949258412e+01); %%bunny
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
