@@ -1,13 +1,15 @@
 function BuildPSLs4Hierarchy()
-	global majorPSLpool_; global minorPSLpool_;
-	global majorPSLindexList_; global minorPSLindexList_;
-	global majorHierarchy_; global minorHierarchy_;
+	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
+	global majorPSLindexList_; global mediumPSLindexList_; global minorPSLindexList_;
+	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
 	global numLevels_;
 		
 	%% IM: 'Pure PSLs Density Ctrl, 1' (Geo), 'Principal Stress, 2' (PS), 'von Mises Stress, 3' (vM), 'PSLs Length, 4' (Length)	
 	numItems = 4;
 	numMajorPSLs = length(majorPSLpool_);
 	majorHierarchy_ = zeros(numMajorPSLs,numItems);
+	numMediumPSLs = length(mediumPSLpool_);
+	mediumHierarchy_ = zeros(numMediumPSLs,numItems);	
 	numMinorPSLs = length(minorPSLpool_);
 	minorHierarchy_ = zeros(numMinorPSLs,numItems);
 	numLevels = length(majorPSLindexList_);
@@ -31,6 +33,26 @@ function BuildPSLs4Hierarchy()
 	majorHierarchy_(:,2) = majorHierarchy_(:,2) / max(majorHierarchy_(:,2));		
 	majorHierarchy_(:,3) = majorHierarchy_(:,3) / max(majorHierarchy_(:,3));
 	majorHierarchy_(:,4) = majorHierarchy_(:,4) / max(majorHierarchy_(:,4));
+
+	%% #Medium
+	for jj=1:numLevels
+		if 1==jj
+			iPSLs = mediumPSLindexList_(jj).arr;
+		else
+			iPSLs = setdiff(mediumPSLindexList_(jj).arr, mediumPSLindexList_(jj-1).arr);
+		end
+		mediumHierarchy_(iPSLs(:),1) = (numLevels-jj+1)/numLevels;
+	end	
+	for jj=1:numMediumPSLs
+		if mediumPSLpool_(jj).length > 0		
+			mediumHierarchy_(jj,2) = max(abs(mediumPSLpool_(jj).principalStressList(:,5)));
+			mediumHierarchy_(jj,3) = max(mediumPSLpool_(jj).vonMisesStressList);
+			mediumHierarchy_(jj,4) = mediumPSLpool_(jj).length;
+		end
+	end
+	mediumHierarchy_(:,2) = mediumHierarchy_(:,2) / max(mediumHierarchy_(:,2));		
+	mediumHierarchy_(:,3) = mediumHierarchy_(:,3) / max(mediumHierarchy_(:,3));
+	mediumHierarchy_(:,4) = mediumHierarchy_(:,4) / max(mediumHierarchy_(:,4));
 	
 	%% #Minor
 	for jj=1:numLevels

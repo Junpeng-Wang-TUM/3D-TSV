@@ -29,6 +29,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	if ~(4==nargin || 9==nargin), error('Wrong Input!'); end
 	GlobalVariables;
 	global majorPSLindexList_;
+	global mediumPSLindexList_;
 	global minorPSLindexList_;
 	if ~strcmp(dataName_, fileName)		
 		ImportStressFields(fileName);
@@ -49,13 +50,15 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	
 	%%3. PSL generation
 	tracingStepWidth_ = eleSize_*1;
-	majorPSLindexList_ = struct('arr', []); majorPSLindexList_ = repmat(majorPSLindexList_, 1, numLevels);        
+	majorPSLindexList_ = struct('arr', []); majorPSLindexList_ = repmat(majorPSLindexList_, 1, numLevels);
+	mediumPSLindexList_ = struct('arr', []); mediumPSLindexList_ = repmat(mediumPSLindexList_, 1, numLevels);     
 	minorPSLindexList_ = struct('arr', []); minorPSLindexList_ = repmat(minorPSLindexList_, 1, numLevels);	
 	index = 1;
 	while index<=numLevels
 		iEpsilon = minimumEpsilon * 2^(numLevels-index);
 		GenerateSpaceFillingPSLs(iEpsilon);
 		majorPSLindexList_(index).arr = 1:length(majorPSLpool_);
+		mediumPSLindexList_(index).arr = 1:length(mediumPSLpool_);
 		minorPSLindexList_(index).arr = 1:length(minorPSLpool_);
 		index = index + 1;
 	end	

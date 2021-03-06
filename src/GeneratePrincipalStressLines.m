@@ -12,13 +12,13 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 		PreparingForTracing(initialSeed);
 	if 0==opt, return; end
 	
-	%%2. tracing the major PSL
+	%%2. tracing PSL
 	PSLphyCoordList = phyCoord;
 	PSLcartesianStressList = cartesianStress;
 	PSLeleIndexList = eleIndex;
 	PSLvonMisesStressList = vonMisesStress;
 	PSLprincipalStressList = principalStress;			
-	%%2.1 tracing the major PSL along first direction (v1)		
+	%%2.1 along first direction (v1)		
 	nextPoint = phyCoord + tracingStepWidth_*principalStress(1,psDir);
 	switch traceAlg_
 		case 'Euler'
@@ -36,7 +36,7 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 	PSLeleIndexList = [PSLeleIndexList; eleIndexList];
 	PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
 	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
-	%%2.2 tracing the major PSL along second direction (-v1)	
+	%%2.2 along second direction (-v1)	
 	nextPoint = phyCoord - tracingStepWidth_*principalStress(1,psDir);
 	switch traceAlg_
 		case 'Euler'

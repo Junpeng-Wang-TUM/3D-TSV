@@ -2,24 +2,27 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 	%%Syntax:
 	%% [hdFace, hdOutline] = ExpandPSLs2Ribbon(PSLs, colorSrc, lw, smoothingOpt);
 	%% coordList = ExpandPSLs2Ribbon(PSLs, lw, smoothingOpt); Just Exporting Ribbon Vertices
-	if 4==nargin
-		PSLs = varargin{1};
-		colorSrc = varargin{2};
+	%%1. initialize arguments
+	if 5==nargin
+		PSLs = varargin{1}; numPSLs = length(PSLs);
+		widthDir = varargin{2};
+		colorSrc = varargin{3};
+		lw = varargin{4};
+		smoothingOpt = varargin{5};	
+		nargout = 2;
+		if 0==numPSLs, varargout{1} = []; varargout{2} = []; return; end
+	elseif 4==nargin
+		PSLs = varargin{1}; numPSLs = length(PSLs);
+		widthDir = varargin{2};
 		lw = varargin{3};
 		smoothingOpt = varargin{4};
-		nargout = 2;
-	elseif 3==nargin
-		PSLs = varargin{1};
-		lw = varargin{2};
-		smoothingOpt = varargin{3};	
 		nargout = 1;
+		if 0==numPSLs, varargout{1} = []; return; end
 	else
 		error('Wrong Input!');
 	end
-	%%1. initialize arguments
-	if isempty(PSLs), return; end
-	numPSLs = length(PSLs);
-	if 0==numPSLs, return; end
+	
+	
 	%%2. Expand PSL to ribbon
 	%%			RIBBON
 	%%	===========================
@@ -41,7 +44,7 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 		iDirConsistencyMetric = zeros(iPSLength,3);
 		midPots = PSLs(ii).phyCoordList;
 		
-		dirVecs = PSLs(ii).principalStressList(:,[6 7 8]);
+		dirVecs = PSLs(ii).principalStressList(:,widthDir);
 		angList = zeros(iPSLength-1,1);
 		for jj=2:iPSLength
 			vec0 = dirVecs(jj-1,:);
@@ -73,7 +76,7 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 		iCoordList(1:2:end,:) = coords1;
 		iCoordList(2:2:end,:) = coords2;
 			
-		if 4==nargin
+		if 5==nargin
 			%%2.2 create quad patches
 			numExistingNodes = size(coordList,1);
 			numNewlyGeneratedNodes = 2*iPSLength;
@@ -97,7 +100,7 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 		end
 		coordList(end+1:end+2*iPSLength,:) = iCoordList;
 	end
-	if 4==nargin
+	if 5==nargin
 		global axHandle_; axHandle_ = gca;
 		%%draw ribbon
 		xCoord = coordList(:,1); 

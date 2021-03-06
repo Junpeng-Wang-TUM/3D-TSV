@@ -21,11 +21,11 @@ fileName = './data/Vis2021_femur3D.vtk';
 
 disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']); 
 %%Vis
-% imOpt = ["Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
-% imVal = [1,0.5]; %% PSLs with IM>=imVal shown
-% pslGeo = ["TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
+% imOpt = ["Geo", "Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
+% imVal = [1,0.5, 0.3]; %% PSLs with IM>=imVal shown
+% pslGeo = ["TUBE", "TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
 % stressComponentOpt = 'None'; %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 % lw = 2; %% tubeRadius = lw, ribbonWidth = 4*lw
 % smoothingOpt = 1; %% smoothing ribbon or not (0)
 % DrawSeedPoints();
-DrawPSLs(["Geo", "Geo"], [0,0], ["TUBE", "TUBE"], 'Sigma', 0.5, 1);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1);

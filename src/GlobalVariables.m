@@ -40,8 +40,11 @@ global minLengthVisiblePSLs_; minLengthVisiblePSLs_ = 20;
 
 %% 3. Result
 global majorPSLpool_; majorPSLpool_ = PrincipalStressLineStruct();
+global mediumPSLpool_; mediumPSLpool_ = PrincipalStressLineStruct();
 global minorPSLpool_; minorPSLpool_ = PrincipalStressLineStruct();
 global majorCoordList_; majorCoordList_ = [];
+global mediumCoordList_; mediumCoordList_ = [];
 global minorCoordList_; minorCoordList_ = [];
 global majorHierarchy_; majorHierarchy_ = [];
+global mediumHierarchy_; mediumHierarchy_ = [];
 global minorHierarchy_; minorHierarchy_ = [];
