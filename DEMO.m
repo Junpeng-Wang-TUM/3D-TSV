@@ -1,14 +1,16 @@
 clc;
 addpath('./src');
-% fileName = 'D:/MyDataSets/StressFields4LLGP/euroVis2020_case8_carGrid.vtk';
 
 %% PSLs Generation
 %% ======Syntax======
 %% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels);
-%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt);
+%% RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt, tracingAlg);
 tStart = tic;
 
 %% Some Examples for Test
+%% =======================================cantilever1
+% fileName = './data/Vis2021_cantilever3D_1.vtk'; 
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 4, 20, 0, 5, 2, 'Euler'); 
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk'; 
 [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 3); 
