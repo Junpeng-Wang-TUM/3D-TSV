@@ -184,8 +184,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	
 	%%Lighting, Reflection
 	if 1
-		%view(4.94e+01,2.31e+01); %%cantilever1
+		% view(4.94e+01,2.31e+01); %%cantilever1
 		% view(-7.65e+01, 1.08e+01); %%cantilever1-2
+		% view(6.43e+01, 1.61e+01); %%cantilever1-3
 		% view(-1.11e+00, 1.97e+01); %%femur 
 		% view(7.07e+01, 1.24e+00); %%femur 
 		% view(0, 0); %% bracket
