@@ -161,15 +161,16 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			v1 = min(cValOnMinor); v2 = max(cValOnMinor);
 			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
 			if 0==numTarMajorPSLs
-				colormap('Winter');
+				colormap('winter');
 				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v1, v2, 5)}, 'AxisLocation','out');
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v1, v2, 5)),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0==numTarMinorPSLs
-				colormap('Autumn');
+				colormap('autumn');
 				set(cb,'Ticks',[0 50 100 150 200],'TickLabels', {linspace(v5, v6, 5)}, 'AxisLocation','out');
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v5, v6, 5)),'Un',0); set(cb,'xticklabel',L);					
 			else
-				colormap([BlueRGB(); RedRGB()]);
+				%colormap([BlueRGB(); RedRGB()]);
+				colormap([winter; flip(autumn)]);
 				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);
 			end
@@ -183,10 +184,15 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	
 	%%Lighting, Reflection
 	if 1
-		% view(4.939879211296373e+01,2.313740415670133e+01); %%cantilever1
-		% view(-1.108713692790638e+00, 1.972962667454830e+01); %%femur 
-		% view(7.067303146269593e+01, 1.240029108758532e+00); %%femur 
-		% view(-1.960848849982980e+02, 1.313055949258412e+01); %%bunny
+		%view(4.94e+01,2.31e+01); %%cantilever1
+		% view(-7.65e+01, 1.08e+01); %%cantilever1-2
+		% view(-1.11e+00, 1.97e+01); %%femur 
+		% view(7.07e+01, 1.24e+00); %%femur 
+		% view(0, 0); %% bracket
+		% view(-1.96e+02, 1.31e+01); %%bunny
+		% view(-5.32e+00,3.77e+00); %%kitten
+		% view(-2.05e+02,1.69e+01) %%parts
+		% view(-2.44e+01, 1.24e+01); %%bridge
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'

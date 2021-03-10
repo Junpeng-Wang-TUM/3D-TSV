@@ -147,7 +147,7 @@ end
 function iPSL = GridGrowthTrigger(seed, psDir)
 	global vtxLowerBound_; global vtxUpperBound_; global tracingStepWidth_;
 	global snappingOpt_;
-	stopCond = 2*ceil(norm(vtxUpperBound_-vtxLowerBound_)/tracingStepWidth_);	
+	stopCond = ceil(1.5*norm(vtxUpperBound_-vtxLowerBound_)/tracingStepWidth_);	
 	iPSL = GeneratePrincipalStressLines(seed, psDir, stopCond);
 	if snappingOpt_, iPSL = CroppingPSLifNeeded(iPSL, psDir); end	
 end
