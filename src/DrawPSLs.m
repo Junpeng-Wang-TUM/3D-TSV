@@ -4,7 +4,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	global tracingStepWidth_;
 	
 	lineWidthTube = lw*tracingStepWidth_;
-	lineWidthRibbon = 2*lineWidthTube;
+	lineWidthRibbon = 3*lineWidthTube;
 	
 	%% Get Target PSLs to Draw
 	%% Major
@@ -222,19 +222,27 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			v3 = min(cValOnMedium); v4 = max(cValOnMedium);
 			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
 			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
-				colormap([RedRGB()]);
+				%colormap([RedRGB()]);
+				colormap('autumn');
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
-				colormap([GreenRGB();]);
+				%colormap([GreenRGB();]);
+				colormap('copper');
 			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
-				colormap([BlueRGB();]);
+				%colormap([BlueRGB();]);
+				colormap('winter');
 			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
-				colormap([GreenRGB(); RedRGB()]);
+				% colormap([GreenRGB(); RedRGB()]);
+				colormap([pink; flip(autumn)]);
 			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
-				colormap([BlueRGB(); RedRGB()]);		
+				% colormap([BlueRGB(); RedRGB()]);
+				% colormap([winter; flip(autumn)]);
+				colormap([winter; pink; flip(autumn)]);
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
-				colormap([BlueRGB(); GreenRGB();]);	
+				% colormap([BlueRGB(); GreenRGB();]);
+				colormap([winter; pink]);
 			else
-				colormap([BlueRGB(); GreenRGB(); RedRGB()]);
+				%colormap([BlueRGB(); GreenRGB(); RedRGB()]);
+				colormap([winter; pink; flip(autumn)]);
 			end
 			colorbar off
 		else
@@ -247,10 +255,10 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	
 	%%Lighting, Reflection
 	if 1
-		% view(-1.108713692790638e+00, 1.972962667454830e+01); %%femur 
-		% view(7.067303146269593e+01, 1.240029108758532e+00); %%femur 
-		% view(1.753841277974189e+01, 1.138333279761854e+01) %%femur
-		% view(-1.960848849982980e+02, 1.313055949258412e+01); %%bunny
+		% view(2.05e+01, 9.72e+00); %%femur 
+		% view(7.07e+01, 1.24e+00); %%femur 	
+		% view(1.75e+01, 1.14e+01) %%femur
+		% view(-1.96e+02, 1.31e+01); %%bunny
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
