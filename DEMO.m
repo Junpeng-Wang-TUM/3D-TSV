@@ -10,8 +10,8 @@ tStart = tic;
 %% Some Examples for Test
 %% =======================================cantilever
 % fileName = './data/Vis2021_cantilever3D.vtk'; 
-% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 4, 20, 0, 5, 2, 'Euler');
-% DrawPSLs(["Geo", "Geo"], [0.7,0.7], ["RIBBON", "RIBBON"], 'Sigma', 0.75, 1); colorbar off; 
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 3, 20, 0, 5, 2, 'RK2');
+% DrawPSLs(["Geo", "Geo"], [1,1], ["RIBBON", "RIBBON"], 'Sigma', 0.75, 1); colorbar off; 
 %% view(4.94e+01,2.31e+01); view(-7.65e+01, 1.08e+01);
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk'; 
