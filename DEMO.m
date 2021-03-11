@@ -34,7 +34,7 @@ fileName = './data/Vis2021_femur3D.vtk';
 % % DrawPSLs(["vM", "vM"], [0.1,0.1], ["TUBE", "TUBE"], 'Sigma', 0.5, 1); colorbar off;
 %% =======================================kitten
 % fileName = './data/Vis2021_kitten3D.vtk'; 
-% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 4, 'RK2');
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 8, 3, 6, 0, 20, 5, 'RK2');
 % DrawPSLs(["Geo", "Geo"], [0.5,0], ["RIBBON", "TUBE"], 'Sigma', 0.75, 1); colorbar off;
 % view(-5.32e+00,3.77e+00);
 %% =======================================parts

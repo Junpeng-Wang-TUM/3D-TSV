@@ -221,7 +221,7 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 	tarPSL = srcPSL;
 	if 5>=srcPSL.length, return; end
 	disThreshold = 2;
-	relaxedThreshold = 0.2;
+	relaxedThreshold = 0.1;
 	switch psDir
 		case 'MAJORPSL'
 			if isempty(majorCoordList_), return; end
