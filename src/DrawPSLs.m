@@ -259,6 +259,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		% view(7.07e+01, 1.24e+00); %%femur 	
 		% view(1.75e+01, 1.14e+01); %%femur
 		% view(-1.96e+02, 1.31e+01); %%bunny
+		% view(-5.32e+00,3.77e+00); %%kitten
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'

@@ -12,12 +12,9 @@ tStart = tic;
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk'; 
 [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3, 'RK2'); 
-%% =======================================Bunny_HexMesh
-% fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
-% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 3, 4, 6, 0, 20, 5, 'Euler'); 
-%% =======================================bridge
-% fileName = './data/Vis2021_bridge3D.vtk'; 
-% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3, 6, 0, 20, 3, 'Euler'); 
+%% =======================================Kitten_HexMesh
+% fileName = './data/Vis2021_kitten3D.vtk'; 
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 8, 1, 20, 0, 20, 20, 'RK2');
 
 disp(['Done! It Costs: ' sprintf('%10.3g',toc(tStart)) 's']); 
 %%Vis
