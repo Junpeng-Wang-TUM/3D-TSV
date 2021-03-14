@@ -14,16 +14,16 @@ tStart = tic;
 % RunMission(fileName, 10, 3);
 % RunMission(fileName, 10, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 10, 'Euler');
 %% =======================================femur
-fileName = './data/Vis2021_femur3D.vtk';
-RunMission(fileName, 18, 3); 
+% fileName = './data/Vis2021_femur3D.vtk';
+% RunMission(fileName, 18, 3); 
 % RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 20, 'RK2');
 %% =======================================Bunny
 % fileName = './data/Vis2021_bunny3D.vtk'; 
 % RunMission(fileName, 26, 3); 
 % RunMission(fileName, 26, 3, 'Volume', 4, ["MAJOR", "MINOR"], 1, 0, 6, 20, 'RK2');
 %% =======================================Bunny_HexMesh
-% fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
-% RunMission(fileName, 26, 3); 
+fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
+RunMission(fileName, 10, 1); 
 % RunMission(fileName, 26, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 6, 10, 'RK2');
 %% =======================================bridge
 % fileName = './data/Vis2021_bridge3D.vtk'; 

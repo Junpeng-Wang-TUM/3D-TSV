@@ -49,7 +49,7 @@ function iPSL = GeneratePrincipalStressLines(startPoint, tracingType, limiSteps)
 	iPSL.principalStressList = PSLprincipalStressList;	
 end
 
-function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(initialSeed)
+function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(startPoint)
 	global nodeCoords_; global eNodMat_;
 	global cartesianStressField_;
 	global eleCentroidList_;
@@ -59,7 +59,7 @@ function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = Pre
 	vonMisesStress = 0; 
 	principalStress = 0;	
 	if strcmp(meshType_, 'CARTESIAN_GRID')	
-		[targetEleIndex, paraCoordinates, opt] = PositioningOnCartesianMesh(initialSeed);	
+		[targetEleIndex, paraCoordinates, opt] = PositioningOnCartesianMesh(startPoint);	
 		if 0==opt, return; end
 		eleIndex = double(targetEleIndex);
 		NIdx = eNodMat_(eleIndex,:)';
@@ -67,19 +67,36 @@ function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = Pre
 		eleCartesianStress = cartesianStressField_(NIdx,:);				
 		cartesianStress = ElementInterpolationTrilinear(eleCartesianStress, paraCoordinates);
 	else
-		disList = vecnorm(initialSeed-eleCentroidList_, 2, 2);
-		[~, targetEleIndex] = min(disList);
-		%%% Plan A
-		[targetEleIndex, opt] = PositioningOnUnstructuredMesh_old(targetEleIndex, initialSeed);	
-		%%% Plan B
-		
-		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		if 0==opt, return; end
-		eleIndex = targetEleIndex;
+		disList = vecnorm(startPoint-eleCentroidList_, 2, 2);
+		[~, targetEleIndex0] = min(disList);	
+		if 1
+			%%% Plan A
+			[targetEleIndex, opt] = PositioningOnUnstructuredMesh_old(targetEleIndex0, startPoint);
+			if ~opt, return; end
+			eleIndex = targetEleIndex;			
+		else
+			%%% Plan B
+			opt = IsThisPointWithinThatElement(targetEleIndex0, startPoint);
+			if opt
+				eleIndex = targetEleIndex0;		
+			else %% Search the Adjacent Elements
+				tarNodes = eNodMat_(targetEleIndex0,:); 
+				potentialAdjacentElements = unique([nodStruct_(tarNodes(:)).adjacentEles]);
+				potentialAdjacentElements = setdiff(potentialAdjacentElements, targetEleIndex0);
+				for ii=1:length(potentialAdjacentElements)
+					iEle = potentialAdjacentElements(ii);
+					opt = IsThisPointWithinThatElement(iEle, startPoint);
+					if opt
+						eleIndex = iEle; break;
+					end
+				end
+				if ~opt, return; end
+			end					
+		end
 		NIdx = eNodMat_(eleIndex,:)';
 		eleNodeCoords = nodeCoords_(NIdx,:);
 		eleCartesianStress = cartesianStressField_(NIdx,:);			
-		cartesianStress = ElementInterpolationInverseDistanceWeighting(eleNodeCoords, eleCartesianStress, initialSeed); 		
+		cartesianStress = ElementInterpolationInverseDistanceWeighting(eleNodeCoords, eleCartesianStress, startPoint);			
 	end
 	vonMisesStress = ComputeVonMisesStress(cartesianStress);
 	principalStress = ComputePrincipalStress(cartesianStress);
