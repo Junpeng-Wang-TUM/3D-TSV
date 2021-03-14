@@ -161,13 +161,13 @@ function ImportStressFields(fileName)
 		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
 		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
 		%% in case there are some "fake" surface node
-		maxSurMeshNodeIndex = max(max(surfaceQuadMeshElements_));
-		tmp = zeros(maxSurMeshNodeIndex,1);
-		surfMeshNodeReal = unique(surfaceQuadMeshElements_);
-		tmp(surfMeshNodeReal) = (1:length(surfMeshNodeReal))';
-		nodState_ = zeros(size(nodState_)); nodState_(boundaryNode(surfMeshNodeReal)) = 1;
-		surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
-		surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
+		% maxSurMeshNodeIndex = max(max(surfaceQuadMeshElements_));
+		% tmp = zeros(maxSurMeshNodeIndex,1);
+		% surfMeshNodeReal = unique(surfaceQuadMeshElements_);
+		% tmp(surfMeshNodeReal) = (1:length(surfMeshNodeReal))';
+		% nodState_ = zeros(size(nodState_)); nodState_(boundaryNode(surfMeshNodeReal)) = 1;
+		% surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
+		% surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
 		
 		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
 		xPatchs = surfaceQuadMeshNodeCoords_(:,1); silhouetteStruct_.xPatchs = xPatchs(surfaceQuadMeshElements_');

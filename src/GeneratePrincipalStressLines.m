@@ -434,7 +434,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 						vtxCoords = nodeCoords_(NIdx,:); 		
 						cartesianStressOnGivenPoint = ElementInterpolationIDW(vtxCoords, vtxStress, midPot1);
 						vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
-						principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+						principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
 						%%k1						
 						[k1, terminationCond] = IntegrationDirectionSelecting(iniDir, principalStress(typePSL));
 						if ~terminationCond, index = index-1; break; end
