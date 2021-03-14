@@ -69,7 +69,7 @@ function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = Pre
 	else
 		disList = vecnorm(startPoint-eleCentroidList_, 2, 2);
 		[~, targetEleIndex0] = min(disList);	
-		if 1
+		if 0
 			%%% Plan A
 			[targetEleIndex, opt] = PositioningOnUnstructuredMesh_old(targetEleIndex0, startPoint);
 			if ~opt, return; end

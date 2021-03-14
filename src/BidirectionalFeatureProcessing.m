@@ -1,9 +1,8 @@
 function [targetDirection, terminationCond] = BidirectionalFeatureProcessing(originalVec, Vec)
 	global permittedMaxAdjacentTangentAngleDeviation_;
 	terminationCond = 1;
-	normOriVec = norm(originalVec); normVec = norm(Vec);
-	angle1 = acos( originalVec*Vec' / (normOriVec*normVec) );
-	angle2 = acos( -originalVec*Vec' / (normOriVec*normVec) );
+	angle1 = acos(originalVec*Vec');
+	angle2 = acos(-originalVec*Vec');	
 	if angle1 < angle2
 		targetDirection = Vec;
 		if angle1 > pi/permittedMaxAdjacentTangentAngleDeviation_, terminationCond = 0; end

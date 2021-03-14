@@ -25,9 +25,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 	%% Snapping PSLs (=='TRUE') or not (=='FALSE') when they are too close
 	%% arg9: "maxAngleDevi", Scalar var in double float
 	%% Permitted Maximum Adjacent Tangent Angle Deviation, Generally ranging from 6 to 20
-	%% arg10: "minPSLength", Scalar var in double float/integer
-	%% Generally ranging from 5 to 20, PSLs with more "minPSLength" integrating points can only be shown
-	%% arg11: "traceAlgorithm"
+	%% arg10: "traceAlgorithm"
 	%% can be 'Euler', 'RK2', 'RK4'
 	
 	%%1. Initialize Experiment Environment
@@ -46,13 +44,12 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 	end
 	%%1.3 Decode input arguments
 	minimumEpsilon_ = minFeatureSize_/minimumEpsilonCtrl;
-	if 11==nargin	
+	if 10==nargin	
 		seedStrategy = varargin{1};
 		seedResCtrl = varargin{2};
 		selectedPrincipalStressField_ = varargin{3};
 		mergingOpt_ = varargin{4};
 		snappingOpt_ = varargin{5};
-		permittedMaxAdjacentTangentAngleDeviation_ = varargin{6};
 		minLengthVisiblePSLs_ = varargin{7};
 		traceAlg_ = varargin{8};
 	else

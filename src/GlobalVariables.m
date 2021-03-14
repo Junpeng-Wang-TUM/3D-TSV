@@ -38,7 +38,7 @@ global relaxedFactor_; relaxedFactor_ = 1;
 %% 2.6 Snapping PSLs (1) or not (0) when they are too close
 global snappingOpt_; snappingOpt_ = 0;
 %% 2.7 Excluding PSLs with less than 'minLengthVisiblePSLs_' Integrating Steps
-global minLengthVisiblePSLs_; minLengthVisiblePSLs_ = 20;
+global minLengthVisiblePSLs_; minLengthVisiblePSLs_ = 5;
 %% 2.9 PSL Tracing Algorithm
 global traceAlg_; traceAlg_ = 'RK2'; %% 'Euler', 'RK2', 'RK4'
 %% 2.9 Minimum Merging Threshold 

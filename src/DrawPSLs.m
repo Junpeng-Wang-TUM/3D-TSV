@@ -1,8 +1,10 @@
-function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt)
+function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
 	global minimumEpsilon_;
-	
+	global minLengthVisiblePSLs_;
+	miniPSLength = minLengthVisiblePSLs_;
+	if 7==nargin, miniPSLength = varargin{1}; end
 	lineWidthTube = lw*minimumEpsilon_/5;
 	lineWidthRibbon = 3*lineWidthTube;
 	%% Get Target PSLs to Draw
@@ -20,6 +22,11 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			error('Wrong Input!');
 	end
 	tarMajorPSLs = majorPSLpool_(tarMajorPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMajorPSLs)
+		if tarMajorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMajorPSLs = tarMajorPSLs(tarIndice);	
 	numTarMajorPSLs = length(tarMajorPSLs);
 	
 	%% Medium
@@ -36,6 +43,11 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			error('Wrong Input!');
 	end
 	tarMediumPSLs = mediumPSLpool_(tarMediumPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMediumPSLs)
+		if tarMediumPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMediumPSLs = tarMediumPSLs(tarIndice);		
 	numTarMediumPSLs = length(tarMediumPSLs);	
 	
 	%% Minor
@@ -52,6 +64,11 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			error('Wrong Input!');
 	end
 	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMinorPSLs)
+		if tarMinorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMinorPSLs = tarMinorPSLs(tarIndice);	
 	numTarMinorPSLs = length(tarMinorPSLs);
 	
 	if 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs, return; end
