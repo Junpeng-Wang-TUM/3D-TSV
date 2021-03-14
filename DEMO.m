@@ -15,8 +15,8 @@ tStart = tic;
 % RunMission(fileName, 10, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 10, 'Euler');
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk';
-% RunMission(fileName, 18, 3); 
-RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 20, 'RK2');
+RunMission(fileName, 18, 3); 
+% RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 20, 'RK2');
 %% =======================================Bunny
 % fileName = './data/Vis2021_bunny3D.vtk'; 
 % RunMission(fileName, 26, 3); 

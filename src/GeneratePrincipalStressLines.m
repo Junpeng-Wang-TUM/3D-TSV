@@ -1,4 +1,4 @@
-function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps)
+function iPSL = GeneratePrincipalStressLines(startPoint, tracingType, limiSteps)
 	global tracingFuncHandle_;
 	iPSL = PrincipalStressLineStruct();
 	switch tracingType
@@ -7,18 +7,18 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 		case 'MINOR', psDir = [2 3 4];
 	end
 	%%1. prepare for tracing			
-	[eleIndex, ~, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(initialSeed);
+	[eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(startPoint);
 	if 0==opt, return; end
 	
 	%%2. tracing PSL
-	PSLphyCoordList = phyCoord;
+	PSLphyCoordList = startPoint;
 	PSLcartesianStressList = cartesianStress;
 	PSLeleIndexList = eleIndex;
 	PSLvonMisesStressList = vonMisesStress;
 	PSLprincipalStressList = principalStress;			
 	%%2.1 along first direction (v1)		
 	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
-		tracingFuncHandle_(phyCoord, principalStress(1,psDir), eleIndex, psDir, limiSteps);		
+		tracingFuncHandle_(startPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);		
 	PSLphyCoordList = [PSLphyCoordList; phyCoordList];
 	PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
 	PSLeleIndexList = [PSLeleIndexList; eleIndexList];
@@ -26,7 +26,7 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
 	%%2.2 along second direction (-v1)	
 	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
-		tracingFuncHandle_(phyCoord, -principalStress(1,psDir), eleIndex, psDir, limiSteps);		
+		tracingFuncHandle_(startPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);		
 	if size(phyCoordList,1) > 1
 		phyCoordList = flip(phyCoordList);
 		cartesianStressList = flip(cartesianStressList);
@@ -49,47 +49,38 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 	iPSL.principalStressList = PSLprincipalStressList;	
 end
 
-function [eleIndex, paraCoord, phyCoord, cartesianStress, vonMisesStress, principalStress, varargout] = PreparingForTracing(initialSeed)
+function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(initialSeed)
 	global nodeCoords_; global eNodMat_;
 	global cartesianStressField_;
+	global eleCentroidList_;
 	global meshType_;
 	eleIndex = 0;
-	paraCoord = 0; 
-	phyCoord = 0; 
 	cartesianStress = 0;
 	vonMisesStress = 0; 
-	principalStress = 0;
-	[formatedSeed, opt] = LocateSeedPoint(initialSeed);
-	varargout{1} = opt;
-	if 0==opt, return; end
-	eleIndex = formatedSeed(1,1);
-	NIdx = eNodMat_(eleIndex,:)';
-	eleNodeCoords = nodeCoords_(NIdx,:);
-	eleCartesianStress = cartesianStressField_(NIdx,:);				
+	principalStress = 0;	
 	if strcmp(meshType_, 'CARTESIAN_GRID')	
-		paraCoord = formatedSeed(1, 2:4);
-		[phyCoord, shapeFuncs] = ElementInterpolationTrilinear(eleNodeCoords, paraCoord);
-		cartesianStress = shapeFuncs*eleCartesianStress;
+		[targetEleIndex, paraCoordinates, opt] = PositioningOnCartesianMesh(initialSeed);	
+		if 0==opt, return; end
+		eleIndex = double(targetEleIndex);
+		NIdx = eNodMat_(eleIndex,:)';
+		eleNodeCoords = nodeCoords_(NIdx,:);
+		eleCartesianStress = cartesianStressField_(NIdx,:);				
+		cartesianStress = ElementInterpolationTrilinear(eleCartesianStress, paraCoordinates);
 	else
-		paraCoord = [0 0 0];
-		phyCoord = initialSeed(1,end-2:end);
-		cartesianStress = ElementInterpolationInverseDistanceWeighting(eleNodeCoords, eleCartesianStress, phyCoord); 		
+		disList = vecnorm(initialSeed-eleCentroidList_, 2, 2);
+		[~, targetEleIndex] = min(disList);
+		%%% Plan A
+		[targetEleIndex, opt] = PositioningOnUnstructuredMesh_old(targetEleIndex, initialSeed);	
+		%%% Plan B
+		
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		if 0==opt, return; end
+		eleIndex = targetEleIndex;
+		NIdx = eNodMat_(eleIndex,:)';
+		eleNodeCoords = nodeCoords_(NIdx,:);
+		eleCartesianStress = cartesianStressField_(NIdx,:);			
+		cartesianStress = ElementInterpolationInverseDistanceWeighting(eleNodeCoords, eleCartesianStress, initialSeed); 		
 	end
 	vonMisesStress = ComputeVonMisesStress(cartesianStress);
 	principalStress = ComputePrincipalStress(cartesianStress);
-end
-
-function [tarSeed, opt] = LocateSeedPoint(srcSeed)
-	global meshType_;
-	global eleCentroidList_;
-	opt = 1;
-	if strcmp(meshType_, 'CARTESIAN_GRID')	
-		[targetEleIndex, paraCoordinates, opt] = PositioningOnCartesianMesh(srcSeed);
-		tarSeed = [double(targetEleIndex), paraCoordinates];
-	else
-		disList = vecnorm(srcSeed-eleCentroidList_, 2, 2);
-		[~, targetEleIndex] = min(disList); 
-		[targetEleIndex, opt] = PositioningOnUnstructuredMesh_old(targetEleIndex, srcSeed);
-		tarSeed = targetEleIndex;
-	end
 end
