@@ -44,6 +44,20 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	else
 		seedSpan4VolumeOptCartesianMesh_ = ceil(minimumEpsilon/1.7);
 	end
+	
+	if strcmp(meshType_, 'CARTESIAN_GRID')
+		switch traceAlg_
+			case 'Euler', tracingFuncHandle_ = @TracingPSL_Euler_CartesianMesh;
+			case 'RK2', tracingFuncHandle_ = @TracingPSL_RK2_CartesianMesh;
+			case 'RK4', tracingFuncHandle_ = @TracingPSL_RK4_CartesianMesh;
+		end	
+	else
+		switch traceAlg_
+			case 'Euler', tracingFuncHandle_ = @TracingPSL_Euler_UnstructuredMesh;
+			case 'RK2', tracingFuncHandle_ = @TracingPSL_RK2_UnstructuredMesh;
+			case 'RK4', tracingFuncHandle_ = @TracingPSL_RK4_UnstructuredMesh;
+		end		
+	end
 
 	%%2. Seeding
 	GenerateSeedPoints(seedStrategy);

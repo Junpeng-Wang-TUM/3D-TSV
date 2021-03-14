@@ -1,6 +1,5 @@
 clc;
 addpath('./src');
-% fileName = 'D:/MyDataSets/StressFields4LLGP/euroVis2020_case8_carGrid.vtk';
 
 %% PSLs Generation
 %% ======Syntax======
@@ -11,7 +10,7 @@ tStart = tic;
 %% Some Examples for Test
 %% =======================================cantilever
 fileName = './data/Vis2021_cantilever3D.vtk'; 
-[opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 3, 20, 0, 10, 2, 'Euler');
+[opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 3, 20, 0, 10, 2, 'Euler');
 % DrawPSLs(["Geo", "Geo"], [1,1], ["RIBBON", "RIBBON"], 'Sigma', 0.75, 1); colorbar off; 
 %% view(4.94e+01,2.31e+01); view(-7.65e+01, 1.08e+01);
 %% =======================================femur
@@ -22,7 +21,7 @@ fileName = './data/Vis2021_cantilever3D.vtk';
 % [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 6, 3, 6, 0, 30, 4, 'RK2'); 
 %% =======================================Bunny_HexMesh
 % fileName = './data/Vis2021_bunny3D_HexMesh.vtk'; 
-% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 3, 3, 6, 0, 20, 5, 'RK2'); 
+% [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 5, 1, 6, 0, 20, 5, 'RK2'); 
 %% =======================================bridge
 % fileName = './data/Vis2021_bridge3D.vtk'; 
 % [opt, pslDataNameOutput] = RunMission(fileName, 'Volume', 4, 3, 6, 0, 20, 3, 'RK2'); 

@@ -19,6 +19,7 @@ global silhouetteStruct_; %% Patches for Draw Silhoutte of Stress Field
 global originalValidNodeIndex_; %% Only for Cartesian Mesh
 global surfaceQuadMeshNodeCoords_;
 global surfaceQuadMeshElements_;	
+global tracingFuncHandle_;
 
 %% 2. Algorithm Control
 %% 2.0 PSL Tracing Algorithm
