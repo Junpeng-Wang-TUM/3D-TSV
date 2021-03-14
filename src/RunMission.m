@@ -28,6 +28,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, seedStrategy, minimumEp
 	opt = 0; pslDataNameOutput = [];
 	if ~(4==nargin || 9==nargin), error('Wrong Input!'); end
 	GlobalVariables;
+	global tracingFuncHandle_;
 	global majorPSLindexList_;
 	global mediumPSLindexList_;
 	global minorPSLindexList_;

@@ -19,18 +19,16 @@ function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps
 	PSLvonMisesStressList = vonMisesStress;
 	PSLprincipalStressList = principalStress;			
 	%%2.1 along first direction (v1)		
-	nextPoint = phyCoord + tracingStepWidth_*principalStress(1,psDir);
 	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
-		tracingFuncHandle_(nextPoint, principalStress(1,psDir), eleIndex, psDir, limiSteps);	
+		tracingFuncHandle_(phyCoord, principalStress(1,psDir), eleIndex, psDir, limiSteps);		
 	PSLphyCoordList = [PSLphyCoordList; phyCoordList];
 	PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
 	PSLeleIndexList = [PSLeleIndexList; eleIndexList];
 	PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
 	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
 	%%2.2 along second direction (-v1)	
-	nextPoint = phyCoord - tracingStepWidth_*principalStress(1,psDir);
 	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
-		tracingFuncHandle_(nextPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);	
+		tracingFuncHandle_(phyCoord, -principalStress(1,psDir), eleIndex, psDir, limiSteps);		
 	if size(phyCoordList,1) > 1
 		phyCoordList = flip(phyCoordList);
 		cartesianStressList = flip(cartesianStressList);

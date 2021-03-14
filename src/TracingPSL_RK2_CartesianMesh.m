@@ -1,5 +1,5 @@
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-			TracingPSL_RK2_CartesianMesh(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+			TracingPSL_RK2_CartesianMesh(startPoint, iniDir, elementIndex, typePSL, limiSteps)
 	global eNodMat_;
 	global nodeCoords_;
 	global cartesianStressField_;
@@ -14,8 +14,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 
 	%%initialize initial k1 and k2
 	k1 = iniDir;
-	iniPot = nextPoint - k1*tracingStepWidth_;
-	midPot = nextPoint - k1*tracingStepWidth_/2;
+	midPot = startPoint + k1*tracingStepWidth_/2;
 	index = 0;	
 	[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(midPot);		
 	if bool1
@@ -23,7 +22,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		cartesianStressOnGivenPoint = ElementInterpolationTrilinear(cartesianStress, paraCoordinates);
 		principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
 		[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress(typePSL));
-		nextPoint = iniPot + tracingStepWidth_*k2;
+		nextPoint = startPoint + tracingStepWidth_*k2;
 		[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(nextPoint);
 		while bool1
 			index = index + 1; if index > limiSteps, index = index-1; break; end

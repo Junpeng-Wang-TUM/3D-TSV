@@ -1,5 +1,5 @@
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-			TracingPSL_RK2_UnstructuredMesh(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+			TracingPSL_RK2_UnstructuredMesh(startPoint, iniDir, elementIndex, typePSL, limiSteps)
 	global eNodMat_;
 	global nodeCoords_;
 	global cartesianStressField_;
@@ -14,8 +14,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 
 	%%initialize initial k1 and k2
 	k1 = iniDir;
-	iniPot = nextPoint - k1*tracingStepWidth_;
-	midPot = nextPoint - k1*tracingStepWidth_/2;
+	midPot = startPoint + k1*tracingStepWidth_/2;
 	index = 0;	
 	[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, midPot);
 	NIdx = eNodMat_(elementIndex,:)';
@@ -24,7 +23,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	cartesianStressOnGivenPoint = ElementInterpolationInverseDistanceWeighting(vtxCoords, vtxStress, midPot);
 	principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
 	[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress(typePSL));
-	nextPoint = iniPot + tracingStepWidth_*k2;
+	nextPoint = startPoint + tracingStepWidth_*k2;
 	[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);
 	while bool1
 		index = index + 1; if index > limiSteps, index = index-1; break; end

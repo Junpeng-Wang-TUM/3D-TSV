@@ -1,5 +1,5 @@
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-			TracingPSL_RK4_CartesianMesh(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+			TracingPSL_RK4_CartesianMesh(startPoint, iniDir, elementIndex, typePSL, limiSteps)
 	global eNodMat_;
 	global nodeCoords_;
 	global cartesianStressField_;
@@ -14,8 +14,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 
 	%%initialize initial k1, k2, k3 and k4
 	k1 = iniDir;
-	iniPot = nextPoint - k1*tracingStepWidth_;
-	midPot1 = nextPoint - k1*tracingStepWidth_/2;
+	midPot1 = startPoint + k1*tracingStepWidth_/2;
 	index = 0;
 	[elementIndex2, paraCoordinates2, bool1] = PositioningOnCartesianMesh(midPot1);
 	if bool1
@@ -24,7 +23,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		cartesianStressOnGivenPoint2 = ElementInterpolationTrilinear(cartesianStress2, paraCoordinates2);
 		principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
 		[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress2(typePSL));
-		midPot2 = iniPot + tracingStepWidth_*k2/2;
+		midPot2 = startPoint + tracingStepWidth_*k2/2;
 		%%k3
 		[elementIndex3, paraCoordinates3, bool1] = PositioningOnCartesianMesh(midPot2);
 		if bool1
@@ -32,7 +31,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			cartesianStressOnGivenPoint3 = ElementInterpolationTrilinear(cartesianStress3, paraCoordinates3);
 			principalStress3 = ComputePrincipalStress(cartesianStressOnGivenPoint3);
 			[k3, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress3(typePSL));
-			midPot3 = iniPot + tracingStepWidth_*k3;
+			midPot3 = startPoint + tracingStepWidth_*k3;
 			%%k4
 			[elementIndex4, paraCoordinates4, bool1] = PositioningOnCartesianMesh(midPot3);
 			if bool1
@@ -40,7 +39,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 				cartesianStressOnGivenPoint4 = ElementInterpolationTrilinear(cartesianStress4, paraCoordinates4);
 				principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
 				[k4, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress4(typePSL));
-				nextPoint = iniPot + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
+				nextPoint = startPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
 				[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(nextPoint);
 				while bool1
 					index = index + 1; if index > limiSteps, index = index-1; break; end						

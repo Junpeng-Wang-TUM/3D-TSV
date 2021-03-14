@@ -1,5 +1,5 @@
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-			TracingPSL_RK4(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+			TracingPSL_RK4_UnstructuredMesh(startPoint, iniDir, elementIndex, typePSL, limiSteps)
 	global eNodMat_;
 	global nodeCoords_;
 	global cartesianStressField_;
@@ -14,8 +14,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 
 	%%initialize initial k1, k2, k3 and k4
 	k1 = iniDir;
-	iniPot = nextPoint - k1*tracingStepWidth_;
-	midPot1 = nextPoint - k1*tracingStepWidth_/2;
+	midPot1 = startPoint + k1*tracingStepWidth_/2;
 	index = 0;
 	[elementIndex2, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, midPot1);
 	if bool1
@@ -26,7 +25,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		cartesianStressOnGivenPoint2 = ElementInterpolationInverseDistanceWeighting(vtxCoords2, vtxStress2, midPot1);
 		principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
 		[k2, ~] = BidirectionalFeatureProcessing(k1, principalStress2(typePSL));
-		midPot2 = iniPot + tracingStepWidth_*k2/2;
+		midPot2 = startPoint + tracingStepWidth_*k2/2;
 		%%k3
 		[elementIndex3, bool1] = PositioningOnUnstructuredMesh_old(elementIndex2, midPot2);
 		if bool1
@@ -36,7 +35,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			cartesianStressOnGivenPoint3 = ElementInterpolationInverseDistanceWeighting(vtxCoords3, vtxStress3, midPot2);
 			principalStress3 = ComputePrincipalStress(cartesianStressOnGivenPoint3);
 			[k3, ~] = BidirectionalFeatureProcessing(k1, principalStress3(typePSL));
-			midPot3 = iniPot + tracingStepWidth_*k3;
+			midPot3 = startPoint + tracingStepWidth_*k3;
 			%%k4
 			[elementIndex4, bool1] = PositioningOnUnstructuredMesh_old(elementIndex3, midPot3);
 			if bool1
@@ -46,8 +45,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 				cartesianStressOnGivenPoint4 = ElementInterpolationInverseDistanceWeighting(vtxCoords4, vtxStress4, midPot3);
 				principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
 				[k4, ~] = BidirectionalFeatureProcessing(k1, principalStress4(typePSL));
-
-				nextPoint = iniPot + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
+				nextPoint = startPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
 				[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);
 				while bool1
 					index = index + 1; if index > limiSteps, index = index-1; break; end

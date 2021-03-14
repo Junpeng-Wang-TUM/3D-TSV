@@ -1,5 +1,5 @@
 function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMisesStressList, principalStressList] = ...
-			TracingPSL_Euler_UnstructuredMesh(nextPoint, iniDir, elementIndex, typePSL, limiSteps)
+			TracingPSL_Euler_UnstructuredMesh(startPoint, iniDir, elementIndex, typePSL, limiSteps)
 	global eNodMat_;
 	global nodeCoords_;
 	global cartesianStressField_;
@@ -10,7 +10,8 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	eleIndexList = zeros(limiSteps,1);
 	paraCoordList = [];
 	vonMisesStressList = zeros(limiSteps,1);
-	principalStressList = zeros(limiSteps,12);		
+	principalStressList = zeros(limiSteps,12);
+	nextPoint = startPoint + tracingStepWidth_*iniDir;
 	[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);		
 	index = 0;	
 	while 1==bool1
