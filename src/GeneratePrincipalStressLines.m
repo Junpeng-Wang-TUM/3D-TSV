@@ -1,12 +1,10 @@
 function iPSL = GeneratePrincipalStressLines(initialSeed, tracingType, limiSteps)
-	global tracingStepWidth_;
-	global traceAlg_;
 	global tracingFuncHandle_;
 	iPSL = PrincipalStressLineStruct();
 	switch tracingType
-		case 'MAJORPSL', psDir = [10 11 12];
-		case 'MEDIUMPSL', psDir = [6 7 8];		
-		case 'MINORPSL', psDir = [2 3 4];
+		case 'MAJOR', psDir = [10 11 12];
+		case 'MEDIUM', psDir = [6 7 8];		
+		case 'MINOR', psDir = [2 3 4];
 	end
 	%%1. prepare for tracing			
 	[eleIndex, ~, phyCoord, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(initialSeed);

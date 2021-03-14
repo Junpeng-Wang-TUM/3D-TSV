@@ -1,5 +1,5 @@
 function ImportStressFields(fileName)
-	global vtxLowerBound_; global vtxUpperBound_;
+	global vtxLowerBound_; global vtxUpperBound_; global minFeatureSize_; 
 	global numNodes_;
 	global nodeCoords_;
 	global numEles_;
@@ -69,6 +69,7 @@ function ImportStressFields(fileName)
 		eleState_ = 12*ones(1, numEles_);
 		
 		%% element centroids
+		minFeatureSize_ = min(vtxUpperBound_-vtxLowerBound_);
 		eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
 		eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
 		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
@@ -134,7 +135,7 @@ function ImportStressFields(fileName)
 		cartesianStressField_ = tmp';
 		fclose(fid);
 		
-		%% element centroids and size
+		%% element centroids and size	
 		eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
 		eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
 		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
@@ -144,7 +145,8 @@ function ImportStressFields(fileName)
 			min(nodeCoords_(:,3))];
 		vtxUpperBound_ = [max(nodeCoords_(:,1)) max(nodeCoords_(:,2)) ...
 			max(nodeCoords_(:,3))];
-		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;	
+		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;
+		minFeatureSize_ = min(vtxUpperBound_-vtxLowerBound_);
 		%%extract and Re-organize silhouette into quad-mesh for exporting
 		faceIndex = zeros(4,6*numEles_);
 		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';

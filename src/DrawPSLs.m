@@ -1,11 +1,10 @@
 function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt)
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
-	global tracingStepWidth_;
+	global minimumEpsilon_;
 	
-	lineWidthTube = lw*tracingStepWidth_;
+	lineWidthTube = lw*minimumEpsilon_/5;
 	lineWidthRibbon = 3*lineWidthTube;
-	
 	%% Get Target PSLs to Draw
 	%% Major
 	switch imOpt(1)
@@ -235,7 +234,6 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 				colormap([pink; flip(autumn)]);
 			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
 				% colormap([BlueRGB(); RedRGB()]);
-				% colormap([winter; flip(autumn)]);
 				colormap([winter; pink; flip(autumn)]);
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
 				% colormap([BlueRGB(); GreenRGB();]);

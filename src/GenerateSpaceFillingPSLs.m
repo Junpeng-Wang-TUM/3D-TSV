@@ -1,57 +1,52 @@
 function GenerateSpaceFillingPSLs(iEpsilon)
 	global seedPoints_; global seedPointsHistory_;
 	global seedPointsValence_; global tracingStepWidth_;
+	global selectedPrincipalStressField_;
+	global mergingOpt_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
 	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
 	global mergeTrigger_; global relaxedFactor_;
 	global startCoord_;
-
+	
+	%%Taking the geometrical center as the start seed point 
+	lowerBound = min(seedPointsHistory_); upperBound = max(seedPointsHistory_);
+	startCoord_ = zeros(1,3);
+	startCoord_(1) = (lowerBound(1)+upperBound(1))/2;
+	startCoord_(2) = (lowerBound(2)+upperBound(2))/2;
+	startCoord_(3) = (lowerBound(3)+upperBound(3))/2;
+	
 	%% Pre-process Seed Points
-	mergeTrigger_ = iEpsilon*tracingStepWidth_;
+	% mergeTrigger_ = iEpsilon*tracingStepWidth_;
+	mergeTrigger_ = iEpsilon;
     seedPoints_ = seedPointsHistory_;
 	numSamplings = size(seedPoints_,1);	
-    seedPointsValence_ = zeros(numSamplings, 3);	
+    seedPointsValence_ = ones(numSamplings, 3);
+	%% Exclude the irrelated Principal Stress Fields 
+	for ii=1:length(selectedPrincipalStressField_)
+		iPSF = selectedPrincipalStressField_(ii);
+		switch iPSF
+			case 'MAJOR', seedPointsValence_(:,1) = 0;
+			case 'MEDIUM', seedPointsValence_(:,2) = 0;
+			case 'MINOR', seedPointsValence_(:,3) = 0;
+		end
+	end
 	PreprocessSeedPoints();
 	
 	%% Iteration
-	if 1
+	if mergingOpt_
 		its = 0;
 		looper = sum(sum(seedPointsValence_));	
 		while looper<3*numSamplings
 			its = its + 1;
 			valenceMetric = sum(seedPointsValence_,2);
 			unFinishedSpps = find(valenceMetric<3);
-			if 0==looper
-				lowerBound = min(seedPoints_); upperBound = max(seedPoints_);
-				startCoord_ = zeros(1,3);
-				%%Start from the geometrical center of stress field
-				startCoord_(1) = (lowerBound(1)+upperBound(1))/2;
-				startCoord_(2) = (lowerBound(2)+upperBound(2))/2;
-				startCoord_(3) = (lowerBound(3)+upperBound(3))/2;
-				[~, spp] = min(vecnorm(startCoord_-seedPoints_,2,2));
-			else
-				tmp0 = unFinishedSpps;
-				tmp	= seedPointsValence_(unFinishedSpps,:);
-				tmp = find(1==sum(tmp,2));
-				if ~isempty(tmp), tmp0 = unFinishedSpps(tmp); end
-				tmp = find(2==sum(tmp,2));
-				if ~isempty(tmp), tmp0 = unFinishedSpps(tmp); end
-				unFinishedSpps = tmp0;
-				[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSpps,:),2,2));				
-				spp = unFinishedSpps(tarPos);			
-				%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-				% tmp	= seedPointsValence_(unFinishedSpps,:);
-				% tmp = find(1==sum(tmp,2));
-				% if ~isempty(tmp), unFinishedSpps = unFinishedSpps(tmp); end
-				% [~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSpps,:),2,2));					
-				% spp = unFinishedSpps(tarPos);
-			end
+			[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSpps,:),2,2));				
+			spp = unFinishedSpps(tarPos);			
 			valences = seedPointsValence_(spp,:);
 			seed = seedPoints_(spp,:);
-			
 			if 0==valences(1)
 				seedPointsValence_(spp,1) = 1;
-				majorPSL = GridGrowthTrigger(seed, 'MAJORPSL');		
+				majorPSL = GridGrowthTrigger(seed, 'MAJOR');		
 				if 0==majorPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -69,9 +64,9 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 						spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);
 						seedPoints_(spps2BeMerged,:) = potentialPosListMajor(potentialSolidSppsMajor,:);								
 						seedPointsValence_(spps2BeMerged,1) = 1;
-						modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUMPSL');
+						modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUM');
 						seedPointsValence_(modifiedMediumValences,2) = 1;					
-						modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');				
+						modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINOR');				
 						seedPointsValence_(modifiedMinorValences,3) = 1;	
 					end
 				end				
@@ -79,7 +74,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			
 			if 0==valences(2)
 				seedPointsValence_(spp,2) = 1;
-				mediumPSL = GridGrowthTrigger(seed, 'MEDIUMPSL');		
+				mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');		
 				if 0==mediumPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -97,9 +92,9 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 						spps2BeMerged = sppsEmptyMediumValence(potentialSolidSppsMedium);
 						seedPoints_(spps2BeMerged,:) = potentialPosListMedium(potentialSolidSppsMedium,:);								
 						seedPointsValence_(spps2BeMerged,2) = 1;
-						modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');
+						modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJOR');
 						samplingPointsValence_(modifiedMajorValences,1) = 1;
-						modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');
+						modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINOR');
 						samplingPointsValence_(modifiedMinorValences,3) = 1;
 					end
 				end				
@@ -107,7 +102,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			
 			if 0==valences(3)
 				seedPointsValence_(spp,3) = 1;			
-				minorPSL = GridGrowthTrigger(seed, 'MINORPSL');			
+				minorPSL = GridGrowthTrigger(seed, 'MINOR');			
 				if 0==minorPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -125,14 +120,14 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 						spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
 						seedPoints_(spps2BeMerged,:) = potentialPosListMinor(potentialSolidSppsMinor,:);
 						seedPointsValence_(spps2BeMerged,3) = 1;				
-						modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');					
+						modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJOR');					
 						seedPointsValence_(modifiedMajorValences,1) = 1;
-						modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUMPSL');
+						modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUM');
 						samplingPointsValence_(modifiedMediumValences,2) = 1;					
 					end
 				end					
 			end
-			
+			% if 1==its, CompactPSLs(); return; end
 			looper = sum(sum(seedPointsValence_));
 			disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
 				' Total.: ' sprintf('%6i',3*numSamplings)]);			
@@ -140,9 +135,9 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	else
 		for ii=1:numSamplings
 			seed = seedPoints_(ii,:);
-			majorPSL = GridGrowthTrigger(seed, 'MAJORPSL');
-			mediumPSL = GridGrowthTrigger(seed, 'MEDIUMPSL');
-			minorPSL = GridGrowthTrigger(seed, 'MINORPSL');
+			majorPSL = GridGrowthTrigger(seed, 'MAJOR');
+			mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');
+			minorPSL = GridGrowthTrigger(seed, 'MINOR');
 			majorPSLpool_(end+1,1) = majorPSL;
 			mediumPSLpool_(end+1,1) = mediumPSL;
 			minorPSLpool_(end+1,1) = minorPSL;
@@ -172,9 +167,9 @@ function PreprocessSeedPoints()
 					spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);							
 					seedPoints_(spps2BeMerged,:) = potentialPosListMajor(potentialSolidSppsMajor,:);
 					seedPointsValence_(spps2BeMerged,1) = 1;						
-					modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUMPSL');
+					modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUM');
 					seedPointsValence_(modifiedMediumValences,2) = 1;					
-					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');
+					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINOR');
 					seedPointsValence_(modifiedMinorValences,3) = 1;							
 				end
 			end
@@ -194,9 +189,9 @@ function PreprocessSeedPoints()
 					spps2BeMerged = sppsEmptyMediumValence(potentialSolidSppsMedium);							
 					seedPoints_(spps2BeMerged,:) = potentialPosListMedium(potentialSolidSppsMedium,:);
 					seedPointsValence_(spps2BeMerged,2) = 1;
-					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');
+					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJOR');
 					seedPointsValence_(modifiedMajorValences,1) = 1;						
-					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINORPSL');
+					modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINOR');
 					seedPointsValence_(modifiedMinorValences,3) = 1;							
 				end
 			end
@@ -216,9 +211,9 @@ function PreprocessSeedPoints()
 					spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
 					seedPoints_(spps2BeMerged,:) = potentialPosListMinor(potentialSolidSppsMinor,:);
 					seedPointsValence_(spps2BeMerged,3) = 1;
-					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJORPSL');
+					modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJOR');
 					seedPointsValence_(modifiedMajorValences,1) = 1;	
-					modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUMPSL');
+					modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUM');
 					seedPointsValence_(modifiedMediumValences,2) = 1;						
 				end
 			end
@@ -229,7 +224,7 @@ end
 function iPSL = GridGrowthTrigger(seed, psDir)
 	global vtxLowerBound_; global vtxUpperBound_; global tracingStepWidth_;
 	global snappingOpt_;
-	stopCond = 2*ceil(norm(vtxUpperBound_-vtxLowerBound_)/tracingStepWidth_);	
+	stopCond = ceil(1.5*norm(vtxUpperBound_-vtxLowerBound_)/tracingStepWidth_);	
 	iPSL = GeneratePrincipalStressLines(seed, psDir, stopCond);
 	if snappingOpt_, iPSL = CroppingPSLifNeeded(iPSL, psDir); end	
 end
@@ -255,15 +250,15 @@ function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 	
 	coordList = [];
 	switch psDir
-		case 'MAJORPSL'
+		case 'MAJOR'
 			if isempty(majorCoordList_), modifiedValences = []; return; end
 			coordList = majorCoordList_;
 			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,1)));
-		case 'MEDIUMPSL'
+		case 'MEDIUM'
 			if isempty(mediumCoordList_), modifiedValences = []; return; end
 			coordList = mediumCoordList_;
 			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,2)));			
-		case 'MINORPSL'
+		case 'MINOR'
 			if isempty(minorCoordList_), modifiedValences = []; return; end
 			coordList = minorCoordList_;
 			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,3)));
@@ -317,13 +312,13 @@ function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
 	disThreshold = 2;
 	relaxedThreshold = 0.2;
 	switch psDir
-		case 'MAJORPSL'
+		case 'MAJOR'
 			if isempty(majorCoordList_), return; end
 			srcCoordList = majorCoordList_;		
-		case 'MEDIUMPSL'
+		case 'MEDIUM'
 			if isempty(mediumCoordList_), return; end
 			srcCoordList = mediumCoordList_;					
-		case 'MINORPSL'
+		case 'MINOR'
 			if isempty(minorCoordList_), return; end
 			srcCoordList = minorCoordList_;		
 	end

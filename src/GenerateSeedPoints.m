@@ -1,18 +1,20 @@
-function GenerateSeedPoints(seedStrategy)
+function GenerateSeedPoints(seedStrategy, seedResCtrl)
 	global meshType_;
 	global nodeCoords_;
 	global nodState_;
 	global nodeLoadVec_;
+	global fixedNodes_;
 	global seedPointsHistory_;
-	
+	global originalValidNodeIndex_;
+	global nelx_; global nely_; global nelz_;
+	global nodStruct_;
+	global eNodMat_;
+	global numNodes_;
+	step = seedResCtrl;
+	if 0>=step, step = 2; end %% in case 0>=minimumEpsilon and volumeSeedingOpt is not defined
 	switch seedStrategy
 		case 'Volume'
 			if strcmp(meshType_, 'CARTESIAN_GRID')
-				global originalValidNodeIndex_;
-				global nelx_; global nely_; global nelz_;
-				global seedSpan4VolumeOptCartesianMesh_;
-				step = seedSpan4VolumeOptCartesianMesh_;
-				if 0==step, step = 10; end %% in case 0==minimumEpsilon and volumeSeedingOpt is not defined
 				validNodesVolume = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
 				validNodesVolume(originalValidNodeIndex_) = (1:length(originalValidNodeIndex_))';
 				validNodesVolume = reshape(validNodesVolume, nely_+1, nelx_+1, nelz_+1);
@@ -21,13 +23,11 @@ function GenerateSeedPoints(seedStrategy)
 				sampledNodes(0==sampledNodes) = [];
 				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
 			else
-				global nodStruct_;
-				global eNodMat_;
-				global numNodes_;
+
 				allNodes = (1:numNodes_)';
 				dis2Boundary = 2;
 				if dis2Boundary <= 0
-					seedPointsHistory_ = nodeCoords_(1:3:end,:);
+					seedPointsHistory_ = nodeCoords_(1:step:end,:);
 				else
 					boundaryNods = find(1==nodState_);
 					tmp0 = boundaryNods;
@@ -47,15 +47,16 @@ function GenerateSeedPoints(seedStrategy)
 					end
 					passiveNodes = tmp0;
 					sampledNodes = setdiff(allNodes, passiveNodes);
-					seedPointsHistory_ = nodeCoords_(sampledNodes(1:dis2Boundary:end),:);
+					seedPointsHistory_ = nodeCoords_(sampledNodes(1:step:end),:);
 				end			
 			end
 		case 'Surface'
 			seedPointsHistory_ = nodeCoords_(1==nodState_,:);
+			seedPointsHistory_ = seedPointsHistory_(1:step:end,:);
 		case 'LoadingArea'			
-			seedPointsHistory_ = nodeCoords_(nodeLoadVec_(:,1),:);
-		case 'ApproxTopology' %% only Work Cartesian Mesh
-			seedPointsHistory_ = GetDegenerateElements();
+			seedPointsHistory_ = nodeCoords_(nodeLoadVec_(1:step:end,1),:);
+		case 'FixedArea' 
+			seedPointsHistory_ = nodeCoords_(fixedNodes_(1:step:end,1),:);
 	end
 end
 
