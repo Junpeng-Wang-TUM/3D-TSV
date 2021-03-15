@@ -59,7 +59,7 @@ function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = Pre
 	vonMisesStress = 0; 
 	principalStress = 0;	
 	if strcmp(meshType_, 'CARTESIAN_GRID')	
-		[targetEleIndex, paraCoordinates, opt] = PositioningOnCartesianMesh(startPoint);	
+		[targetEleIndex, paraCoordinates, opt] = SearchNextIntegratingPointOnCartesianMesh(startPoint);	
 		if 0==opt, return; end
 		eleIndex = double(targetEleIndex);
 		NIdx = eNodMat_(eleIndex,:)';

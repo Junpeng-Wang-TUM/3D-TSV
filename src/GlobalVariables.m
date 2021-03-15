@@ -10,7 +10,8 @@ global nodeCoords_;
 global numEles_; 
 global eNodMat_;
 global nodState_; 
-global nodStruct_; %% Adjacent Elements for each Mesh Vertex (only for Unstructured Hex-mesh) 
+global nodStruct_; %% Adjacent Elements for each Mesh Vertex (only for Unstructured Hex-mesh)
+global eleStruct_; %% Element, face normals, adjacent element of each face 
 global cartesianStressField_; 
 global nodeLoadVec_; 
 global fixedNodes_; 	
@@ -19,7 +20,7 @@ global silhouetteStruct_; %% Patches for Draw Silhoutte of Stress Field
 global originalValidNodeIndex_; %% Only for Cartesian Mesh
 global surfaceQuadMeshNodeCoords_;
 global surfaceQuadMeshElements_;	
-
+global faceCentres_; global faceNormals_; global elementsSharingThisElementFaces_;
 %% 2. Algorithm Control
 %% 2.0 Selected Principal Stress Fields to be Visualized
 global selectedPrincipalStressField_; selectedPrincipalStressField_ = ["MAJOR", "MINOR"];

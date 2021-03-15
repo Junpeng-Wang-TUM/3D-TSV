@@ -16,14 +16,14 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	k1 = iniDir;
 	midPot = startPoint + k1*tracingStepWidth_/2;
 	index = 0;	
-	[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(midPot);		
+	[elementIndex, paraCoordinates, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot);		
 	if bool1
 		cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
 		cartesianStressOnGivenPoint = ElementInterpolationTrilinear(cartesianStress, paraCoordinates);
 		principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
 		[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress(typePSL));
 		nextPoint = startPoint + tracingStepWidth_*k2;
-		[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(nextPoint);
+		[elementIndex, paraCoordinates, bool1] = SearchNextIntegratingPointOnCartesianMesh(nextPoint);
 		while bool1
 			index = index + 1; if index > limiSteps, index = index-1; break; end
 			%%k1
@@ -35,7 +35,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			if ~terminationCond, index = index-1; break; end
 			%%k2
 			midPot = nextPoint + k1*tracingStepWidth_/2;
-			[elementIndex2, paraCoordinates2, bool1] = PositioningOnCartesianMesh(midPot);
+			[elementIndex2, paraCoordinates2, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot);
 			if ~bool1, index = index-1; break; end
 			cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
 			cartesianStressOnGivenPoint2 = ElementInterpolationTrilinear(cartesianStress2, paraCoordinates2);
@@ -50,7 +50,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			principalStressList(index,:) = principalStress;
 			%%next point
 			nextPoint = nextPoint + tracingStepWidth_*k2;		
-			[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(nextPoint);				
+			[elementIndex, paraCoordinates, bool1] = SearchNextIntegratingPointOnCartesianMesh(nextPoint);				
 		end
 	end
 	phyCoordList = phyCoordList(1:index,:);

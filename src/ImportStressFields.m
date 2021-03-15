@@ -176,15 +176,45 @@ function ImportStressFields(fileName)
 		yPatchs = surfaceQuadMeshNodeCoords_(:,2); silhouetteStruct_.yPatchs = yPatchs(surfaceQuadMeshElements_');
 		zPatchs = surfaceQuadMeshNodeCoords_(:,3); silhouetteStruct_.zPatchs = zPatchs(surfaceQuadMeshElements_');
 		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.zPatchs));		
-			
-		global nodStruct_; global boundaryElements_; 
-		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
+		
+		%% build element three
+		global nodStruct_; global eleStruct_; global boundaryElements_; 
+		iNodStruct = struct('adjacentEles', []); 
+		nodStruct_ = repmat(iNodStruct, numNodes_, 1);
 		for ii=1:numEles_
 			for jj=1:8
 				nodStruct_(eNodMat_(ii,jj)).adjacentEles(1,end+1) = ii;
 			end
 		end		
-		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);		
+		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);
+		eleFaces = mapEle2patch';	 
+		iEleStruct = struct('faceCentres', [], 'faceNormals', [], 'elementsSharingThisElementFaces', []); %%pure-Hex
+		eleStruct_ = repmat(iEleStruct, numEles_, 1);
+		parfor ii=1:numEles_
+			iNodes = eNodMat_(ii,:);
+			iEleVertices = nodeCoords_(iNodes, :);
+			iEleFacesX = iEleVertices(:,1); iEleFacesX = iEleFacesX(eleFaces);
+			iEleFacesY = iEleVertices(:,2); iEleFacesY = iEleFacesY(eleFaces);
+			iEleFacesZ = iEleVertices(:,3); iEleFacesZ = iEleFacesZ(eleFaces);				
+			ABs = [iEleFacesX(:,1)-iEleFacesX(:,2) iEleFacesY(:,1)-iEleFacesY(:,2) iEleFacesZ(:,1)-iEleFacesZ(:,2)];
+			ACs = [iEleFacesX(:,1)-iEleFacesX(:,4) iEleFacesY(:,1)-iEleFacesY(:,4) iEleFacesZ(:,1)-iEleFacesZ(:,4)];
+			iABxAC = cross(ABs,ACs);
+			iElementsSharingThisElementFaces = zeros(6,1);
+			for jj=1:6
+				nodesOnThisFace = iNodes(eleFaces(jj,:));
+				allPotentialElements = [nodStruct_(nodesOnThisFace).adjacentEles];
+				[GC,GR] = hist(allPotentialElements, unique(allPotentialElements));
+				[GC,sortMap] = sort(GC, 'descend'); GR = GR(sortMap);
+				if 4==GC(1) && 4==GC(2)
+					iElementsSharingThisElementFaces(jj) = setdiff(GR(1:2), ii);
+				end				
+			end
+			tmp = iEleStruct;		
+			tmp.faceCentres = [sum(iEleFacesX,2) sum(iEleFacesY,2) sum(iEleFacesZ,2)]/4;
+			tmp.faceNormals = iABxAC ./ vecnorm(iABxAC,2,2);
+			tmp.elementsSharingThisElementFaces = iElementsSharingThisElementFaces;
+			eleStruct_(ii) = tmp;
+		end
 	end
 
 end

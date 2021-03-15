@@ -1,4 +1,4 @@
-function [nextElementIndex, paraCoordinates, opt] = PositioningOnCartesianMesh(physicalCoordinates)
+function [nextElementIndex, paraCoordinates, opt] = SearchNextIntegratingPointOnCartesianMesh(physicalCoordinates)
 	global nodeCoords_;
 	global eNodMat_;
 	global meshState_; global eleMapBack_;

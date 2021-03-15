@@ -16,7 +16,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	k1 = iniDir;
 	midPot1 = startPoint + k1*tracingStepWidth_/2;
 	index = 0;
-	[elementIndex2, paraCoordinates2, bool1] = PositioningOnCartesianMesh(midPot1);
+	[elementIndex2, paraCoordinates2, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot1);
 	if bool1
 		%%k2
 		cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
@@ -25,7 +25,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress2(typePSL));
 		midPot2 = startPoint + tracingStepWidth_*k2/2;
 		%%k3
-		[elementIndex3, paraCoordinates3, bool1] = PositioningOnCartesianMesh(midPot2);
+		[elementIndex3, paraCoordinates3, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot2);
 		if bool1
 			cartesianStress3 = cartesianStressField_(eNodMat_(elementIndex3,:)', :);
 			cartesianStressOnGivenPoint3 = ElementInterpolationTrilinear(cartesianStress3, paraCoordinates3);
@@ -33,14 +33,14 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			[k3, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress3(typePSL));
 			midPot3 = startPoint + tracingStepWidth_*k3;
 			%%k4
-			[elementIndex4, paraCoordinates4, bool1] = PositioningOnCartesianMesh(midPot3);
+			[elementIndex4, paraCoordinates4, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot3);
 			if bool1
 				cartesianStress4 = cartesianStressField_(eNodMat_(elementIndex4,:)', :);
 				cartesianStressOnGivenPoint4 = ElementInterpolationTrilinear(cartesianStress4, paraCoordinates4);
 				principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
 				[k4, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress4(typePSL));
 				nextPoint = startPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
-				[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(nextPoint);
+				[elementIndex, paraCoordinates, bool1] = SearchNextIntegratingPointOnCartesianMesh(nextPoint);
 				while bool1
 					index = index + 1; if index > limiSteps, index = index-1; break; end						
 					cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
@@ -52,7 +52,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					if ~terminationCond, index = index-1; break; end
 					midPot1 = nextPoint + k1*tracingStepWidth_/2;
 					%%k2
-					[elementIndex2, paraCoordinates2, bool1] = PositioningOnCartesianMesh(midPot1);
+					[elementIndex2, paraCoordinates2, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot1);
 					if ~bool1, index = index-1; break; end
 					cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
 					cartesianStressOnGivenPoint2 = ElementInterpolationTrilinear(cartesianStress2, paraCoordinates2);
@@ -60,7 +60,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					[k2, ~] = BidirectionalFeatureProcessing(iniDir, principalStress2(typePSL));						
 					midPot2 = nextPoint + k2*tracingStepWidth_/2;
 					%%k3
-					[elementIndex3, paraCoordinates3, bool1] = PositioningOnCartesianMesh(midPot2);
+					[elementIndex3, paraCoordinates3, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot2);
 					if ~bool1, index = index-1; break; end
 					cartesianStress3 = cartesianStressField_(eNodMat_(elementIndex3,:)', :);
 					cartesianStressOnGivenPoint3 = ElementInterpolationTrilinear(cartesianStress3, paraCoordinates3);
@@ -68,7 +68,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					[k3, ~] = BidirectionalFeatureProcessing(iniDir, principalStress3(typePSL));						
 					midPot3 = nextPoint + k3*tracingStepWidth_;
 					%%k4
-					[elementIndex4, paraCoordinates4, bool1] = PositioningOnCartesianMesh(midPot3);
+					[elementIndex4, paraCoordinates4, bool1] = SearchNextIntegratingPointOnCartesianMesh(midPot3);
 					if ~bool1, index = index-1; break; end
 					cartesianStress4 = cartesianStressField_(eNodMat_(elementIndex4,:)', :);
 					cartesianStressOnGivenPoint4 = ElementInterpolationTrilinear(cartesianStress4, paraCoordinates4);
@@ -83,7 +83,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					principalStressList(index,:) = principalStress;
 					%%next point
 					nextPoint = nextPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;		
-					[elementIndex, paraCoordinates, bool1] = PositioningOnCartesianMesh(nextPoint);						
+					[elementIndex, paraCoordinates, bool1] = SearchNextIntegratingPointOnCartesianMesh(nextPoint);						
 				end
 			end
 		end
