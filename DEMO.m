@@ -4,8 +4,8 @@ addpath('./src');
 %% Space-filling PSLs Generation
 %% ======Syntax======
 %% RunMission(fileName); %% Easy-to-Run
-%% RunMission(fileName, minimumEpsilonCtrl, numLevels);
-%% RunMission(fileName, minimumEpsilonCtrl, numLevels, seedStrategy, seedResCtrl, selectedPrincipalStressField, ...
+%% RunMission(fileName, lineDensCtrl, numLevels);
+%% RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, selectedPrincipalStressField, ...
 %%	mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
 
 %% Some Examples for PSLs Generation

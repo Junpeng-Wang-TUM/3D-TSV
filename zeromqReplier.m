@@ -59,20 +59,18 @@ function zeromqReplier
         disp(request);
 
         % ... do something with the received request ...
-		%% Hope I understand this function correctly, below you may need to make some adjustment in terms of the 
-		%% variable names in case they don't fit.
-		%% You can go to check file "RunMission.m" for the data format of these arguments if needed. --- Junpeng
 		fileName = request.fileName;
-		seedStrategy = request.seedStrategy;
-		minimumEpsilon = request.minimumEpsilon;
+		lineDensCtrl = request.lineDensCtrl;
 		numLevels = request.numLevels;
-		maxAngleDevi = request.maxAngleDevi;
+		seedStrategy = request.seedStrategy;
+		seedDensCtrl = request.seedDensCtrl;
+		selectedPrincipalStressField = request.selectedPrincipalStressField;
+		mergingOpt = request.mergingOpt;
 		snappingOpt = request.snappingOpt;
-		minPSLength = request.minPSLength;
-		volumeSeedingOpt = request.volumeSeedingOpt;
+		maxAngleDevi = request.maxAngleDevi;
 		traceAlgorithm = request.traceAlgorithm;
-		[opt, PSLdatasetFile] = RunMission(fileName, seedStrategy, minimumEpsilon, numLevels, ...
-			maxAngleDevi, snappingOpt, minPSLength, volumeSeedingOpt, traceAlgorithm);
+		[opt, PSLdatasetFile] = RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, ...
+			selectedPrincipalStressField, mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
 		if 0==opt, error('Failed to Generate PSLs!'); end
 		
         % Send a reply.

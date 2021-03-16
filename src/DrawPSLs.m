@@ -281,11 +281,14 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	
 	%%Lighting, Reflection
 	if 1
+		% view(6.43e+01, 1.61e+01); %%cantilever - 1
 		% view(-1.11e+00, 1.97e+01); %%femur 
-		% view(7.07e+01, 1.24e+00); %%femur 	
-		% view(1.75e+01, 1.14e+01); %%femur
+		% view(7.07e+01, 1.24e+00); %%femur 
+		% view(0, 0); %% bracket
 		% view(-1.96e+02, 1.31e+01); %%bunny
 		% view(-5.32e+00,3.77e+00); %%kitten
+		% view(-2.05e+02,1.69e+01) %%parts
+		% view(-2.44e+01, 1.24e+01); %%bridge
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
