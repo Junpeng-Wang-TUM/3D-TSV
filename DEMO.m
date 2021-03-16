@@ -39,7 +39,9 @@ RunMission(fileName, 18, 1);
 %% =======================================kitten
 % fileName = './data/Vis2021_kitten3D.vtk'; 
 % RunMission(fileName, 15, 3);
-% RunMission(fileName, 15, 3, 'Volume', 5, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2'); 
+% RunMission(fileName, 15, 1, 'Volume', 25, ["MAJOR", "MINOR", "MEDIUM"], 0, 0, 6, 'RK2'); %%fig.2 left
+% RunMission(fileName, 15, 1, 'LoadingArea', 2, ["MAJOR", "MINOR", "MEDIUM"], 0, 0, 6, 'RK2'); %%fig.2 right
+% RunMission(fileName, 15, 3, 'Volume', 5, ["MAJOR", "MINOR"], 1, 1, 6, 'RK2'); %%fig.X 
 %% =======================================parts
 % fileName = './data/Vis2021_parts3D.vtk';
 % RunMission(fileName, 30, 3);

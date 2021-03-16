@@ -1,19 +1,19 @@
-function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, numLevels, varargin)	
+function [opt, pslDataNameOutput] = RunMission(fileName, lineDensCtrl, numLevels, varargin)	
 	%% Syntax:
-	%% RunMission(fileName, minimumEpsilonCtrl, numLevels);
-	%% RunMission(fileName, minimumEpsilonCtrl, numLevels, seedStrategy, seedResCtrl, selectedPrincipalStressField, ...
+	%% RunMission(fileName, lineDensCtrl, numLevels);
+	%% RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, selectedPrincipalStressField, ...
 	%%	mergingOpt, snappingOpt, maxAngleDevi, minPSLength, traceAlgorithm);
 	%% =====================================================================
 	%% arg1: "fileName", char array
 	%% path + fullname of dataset, e.g., 'D:/data/name.vtk'
-	%% arg2: "minimumEpsilonCtrl", Scalar var in double float
-	%% minimum feature size of the stress field divided by "minimumEpsilonCtrl" is used as the merging threshold Epsilon,
+	%% arg2: "lineDensCtrl", Scalar var in double float
+	%% minimum feature size of the stress field divided by "lineDensCtrl" is used as the merging threshold Epsilon,
 	%%	the smaller, the more PSLs to be generated	
 	%% arg3: "numLevels", Scalar var in double float
 	%% Generally ranging from 1 to 5		
 	%% arg4: "seedStrategy", char array 
 	%% can be 'Volume', 'Surface', 'LoadingArea', 'FixedArea'
-	%% arg5: "seedResCtrl", Scalar var in double float/integer & >=1
+	%% arg5: "seedDensCtrl", Scalar var in double float/integer & >=1
 	%% Seed Point Density Control for "Volume" Seeding Strategy of Cartesian Mesh, 
 	%% for meshType_ == 'CARTESIAN_GRID' & seedStrategy = 'Volume', it's the step size of sampling on vertices along X-, Y-, Z-directions 
 	%% 	else, it's the step size of sampling on the selected seed points. The smaller, the more seed points to be generated	
@@ -43,10 +43,10 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 		dataName_ = fileName;
 	end
 	%%1.3 Decode input arguments
-	minimumEpsilon_ = minFeatureSize_/minimumEpsilonCtrl;
+	minimumEpsilon_ = minFeatureSize_/lineDensCtrl;
 	if 10==nargin	
 		seedStrategy = varargin{1};
-		seedResCtrl = varargin{2};
+		seedDensCtrl = varargin{2};
 		selectedPrincipalStressField_ = varargin{3};
 		mergingOpt_ = varargin{4};
 		snappingOpt_ = varargin{5};
@@ -55,9 +55,9 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 	else
 		seedStrategy = 'Volume';
 		if strcmp(meshType_, 'CARTESIAN_GRID')
-			seedResCtrl = max(ceil(minimumEpsilon_/eleSize_/1.7), 2);
+			seedDensCtrl = max(ceil(minimumEpsilon_/eleSize_/1.7), 2);
 		else
-			seedResCtrl = 2;
+			seedDensCtrl = 2;
 		end
 	end
 	if ~mergingOpt_, numLevels = 1; end
@@ -77,7 +77,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 	end
 
 	%%2. Seeding
-	GenerateSeedPoints(seedStrategy, seedResCtrl);
+	GenerateSeedPoints(seedStrategy, seedDensCtrl);
 	
 	%%3. PSL generation
 	tracingStepWidth_ = eleSize_*1;

@@ -10,6 +10,6 @@ function [nextElementIndex, opt] = SearchNextIntegratingPointOnUnstructuredMesh(
 	if 0==opt && isempty(intersect(nextElementIndex, boundaryElements_)) 
 		disList = vecnorm(physicalCoordinates-eleCentroidList_, 2, 2);
 		[~, targetEleIndex0] = min(disList);	
-		[nextElementIndex, opt] = PositioningOnUnstructuredMesh(targetEleIndex0, physicalCoordinates);				
+		[nextElementIndex, opt] = PositioningOnUnstructuredMesh(targetEleIndex0, physicalCoordinates);
 	end
 end
