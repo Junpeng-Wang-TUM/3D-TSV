@@ -10,8 +10,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 	%% arg2: "lineDensCtrl", Scalar var in double float
 	%% minimum feature size of the stress field divided by "lineDensCtrl" is used as the merging threshold Epsilon,
 	%%	the smaller, the more PSLs to be generated	
-	%% arg3: "numLevels", Scalar var in double float
-	%% Generally ranging from 1 to 5		
+	%% arg3: "numLevels", Scalar var in double float, Generally lineDensCtrl/2^(numLevels-1) > 1	
 	%% arg4: "seedStrategy", char array 
 	%% can be 'Volume', 'Surface', 'LoadingArea', 'FixedArea'
 	%% arg5: "seedDensCtrl", Scalar var in double float/integer & >=1
@@ -25,7 +24,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 	%% arg8: "snappingOpt", Scalar var in any format
 	%% Snapping PSLs (=='TRUE') or not (=='FALSE') when they are too close
 	%% arg9: "maxAngleDevi", Scalar var in double float
-	%% Permitted Maximum Adjacent Tangent Angle Deviation, Generally ranging from 6 to 20
+	%% Permitted Maximum Adjacent Tangent Angle Deviation, default 6
 	%% arg10: "traceAlgorithm"
 	%% can be 'Euler', 'RK2', 'RK4'
 	
@@ -109,6 +108,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 	
     %%4. building hierarchy
     BuildPSLs4Hierarchy();
+	
 	%%5. write results
 	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');;
 	ExportResult(pslDataNameOutput);
