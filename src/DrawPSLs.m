@@ -1,4 +1,14 @@
 function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
+	%% Syntax:
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
+	%% imOpt: ["Geo", "Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
+	%% imVal: [1,0.5, 0.3]; %% PSLs with IM>=imVal shown
+	%% pslGeo: ["TUBE", "TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
+	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
+	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
+	%% smoothingOpt: %% smoothing ribbon or not (0)
+	%% minLength: minLengthVisiblePSLs_ or varargin{1} if exists, only PSLs with length larger than minLength can be shown
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
 	global minimumEpsilon_;
