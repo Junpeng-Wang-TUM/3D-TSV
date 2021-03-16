@@ -2,6 +2,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	%% Syntax:
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
+	%% =====================================================================
 	%% imOpt: ["Geo", "Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
 	%% imVal: [1,0.5, 0.3]; %% PSLs with IM>=imVal shown
 	%% pslGeo: ["TUBE", "TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
