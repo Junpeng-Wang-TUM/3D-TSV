@@ -21,11 +21,10 @@ global originalValidNodeIndex_; %% Only for Cartesian Mesh
 global surfaceQuadMeshNodeCoords_;
 global surfaceQuadMeshElements_;	
 global faceCentres_; global faceNormals_; global elementsSharingThisElementFaces_;
+
 %% 2. Algorithm Control
 %% 2.0 Selected Principal Stress Fields to be Visualized
 global selectedPrincipalStressField_; selectedPrincipalStressField_ = ["MAJOR", "MINOR"];
-%% 2.8 Merging or not. FALSE == Generating PSLs Brutally from Selected Seed Points 
-global mergingOpt_; mergingOpt_ = 1;
 %% 2.1 Integrating Step Size = element Size * tracingStepWidth_
 global tracingStepWidth_; 
 %% 2.2 %% Tracing PSL stops when the angle deviation between the neighboring tangents is larger than 180/permittedMaxAdjacentTangentAngleDeviation_
@@ -40,9 +39,11 @@ global relaxedFactor_; relaxedFactor_ = 1;
 global snappingOpt_; snappingOpt_ = 0;
 %% 2.7 Excluding PSLs with less than 'minLengthVisiblePSLs_' Integrating Steps
 global minLengthVisiblePSLs_; minLengthVisiblePSLs_ = 5;
+%% 2.8 Merging or not. FALSE == Generating PSLs Brutally from Selected Seed Points 
+global mergingOpt_; mergingOpt_ = 1;
 %% 2.9 PSL Tracing Algorithm
 global traceAlg_; traceAlg_ = 'RK2'; %% 'Euler', 'RK2', 'RK4'
-%% 2.9 Minimum Merging Threshold 
+%% 2.10 Minimum Merging Threshold 
 global minimumEpsilon_;
 
 %% 3. Result

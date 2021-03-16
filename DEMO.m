@@ -7,8 +7,6 @@ addpath('./src');
 %% RunMission(fileName, minimumEpsilonCtrl, numLevels, seedStrategy, seedResCtrl, selectedPrincipalStressField, ...
 %%	mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
 tStart = tic;
-global testArray1_; testArray1_ = [];
-global testArray2_; testArray2_ = [];
 %% Some Examples for Test
 %% =======================================cantilever
 % fileName = './data/Vis2021_cantilever3D.vtk'; 
