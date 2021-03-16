@@ -16,7 +16,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	k1 = iniDir;
 	midPot1 = startPoint + k1*tracingStepWidth_/2;
 	index = 0;
-	[elementIndex2, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, midPot1);
+	[elementIndex2, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, midPot1);
 	if bool1
 		%%k2
 		NIdx2 = eNodMat_(elementIndex2,:)';
@@ -27,7 +27,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		[k2, ~] = BidirectionalFeatureProcessing(k1, principalStress2(typePSL));
 		midPot2 = startPoint + tracingStepWidth_*k2/2;
 		%%k3
-		[elementIndex3, bool1] = PositioningOnUnstructuredMesh_old(elementIndex2, midPot2);
+		[elementIndex3, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex2, midPot2);
 		if bool1
 			NIdx3 = eNodMat_(elementIndex3,:)';
 			vtxStress3 = cartesianStressField_(NIdx3, :);
@@ -37,7 +37,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			[k3, ~] = BidirectionalFeatureProcessing(k1, principalStress3(typePSL));
 			midPot3 = startPoint + tracingStepWidth_*k3;
 			%%k4
-			[elementIndex4, bool1] = PositioningOnUnstructuredMesh_old(elementIndex3, midPot3);
+			[elementIndex4, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex3, midPot3);
 			if bool1
 				NIdx4 = eNodMat_(elementIndex4,:)';
 				vtxStress4 = cartesianStressField_(NIdx4, :);
@@ -46,7 +46,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 				principalStress4 = ComputePrincipalStress(cartesianStressOnGivenPoint4);
 				[k4, ~] = BidirectionalFeatureProcessing(k1, principalStress4(typePSL));
 				nextPoint = startPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
-				[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);
+				[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);
 				while bool1
 					index = index + 1; if index > limiSteps, index = index-1; break; end
 					NIdx = eNodMat_(elementIndex,:)';
@@ -60,7 +60,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					if ~terminationCond, index = index-1; break; end
 					midPot1 = nextPoint + tracingStepWidth_*k1/2;
 					%%k2
-					[elementIndex2, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, midPot1);
+					[elementIndex2, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, midPot1);
 					if ~bool1, index = index-1; break; end
 					NIdx2 = eNodMat_(elementIndex2,:)';
 					vtxStress2 = cartesianStressField_(NIdx2, :);
@@ -70,7 +70,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					[k2, ~] = BidirectionalFeatureProcessing(iniDir, principalStress2(typePSL));
 					midPot2 = nextPoint + tracingStepWidth_*k2/2;
 					%%k3
-					[elementIndex3, bool1] = PositioningOnUnstructuredMesh_old(elementIndex2, midPot2);
+					[elementIndex3, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex2, midPot2);
 					if ~bool1, index = index-1; break; end
 					NIdx3 = eNodMat_(elementIndex3,:)';
 					vtxStress3 = cartesianStressField_(NIdx3, :);
@@ -80,7 +80,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					[k3, ~] = BidirectionalFeatureProcessing(iniDir, principalStress3(typePSL));
 					midPot3 = nextPoint + tracingStepWidth_*k3;	
 					%%k4
-					[elementIndex4, bool1] = PositioningOnUnstructuredMesh_old(elementIndex3, midPot3);
+					[elementIndex4, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex3, midPot3);
 					if ~bool1, index = index-1; break; end
 					NIdx4 = eNodMat_(elementIndex4,:)';
 					vtxStress4 = cartesianStressField_(NIdx4, :);
@@ -97,7 +97,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					principalStressList(index,:) = principalStress;						
 					%%next point
 					nextPoint = nextPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;		
-					[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);						
+					[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);						
 				end
 			end
 		end

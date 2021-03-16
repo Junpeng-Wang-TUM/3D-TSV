@@ -23,12 +23,11 @@ function GenerateSeedPoints(seedStrategy, seedResCtrl)
 				sampledNodes(0==sampledNodes) = [];
 				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
 			else
-
-				allNodes = (1:numNodes_)';
-				dis2Boundary = 2;
-				if dis2Boundary <= 0
+				allNodes = (1:numNodes_)';		
+				if 0
 					seedPointsHistory_ = nodeCoords_(1:step:end,:);
 				else
+					dis2Boundary = 2;
 					boundaryNods = find(1==nodState_);
 					tmp0 = boundaryNods;
 					index = 2;
@@ -48,7 +47,7 @@ function GenerateSeedPoints(seedStrategy, seedResCtrl)
 					passiveNodes = tmp0;
 					sampledNodes = setdiff(allNodes, passiveNodes);
 					seedPointsHistory_ = nodeCoords_(sampledNodes(1:step:end),:);
-				end			
+				end
 			end
 		case 'Surface'
 			seedPointsHistory_ = nodeCoords_(1==nodState_,:);

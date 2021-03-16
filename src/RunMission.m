@@ -35,7 +35,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 	global mediumPSLindexList_;
 	global minorPSLindexList_;	
 	opt = 0; pslDataNameOutput = [];
-	if ~(3==nargin || 11==nargin), error('Wrong Input!'); end
+	if ~(3==nargin || 10==nargin), error('Wrong Input!'); end
 	GlobalVariables;
 	%%1.2 Import dataset if needed
 	if ~strcmp(dataName_, fileName)		
@@ -50,8 +50,8 @@ function [opt, pslDataNameOutput] = RunMission(fileName, minimumEpsilonCtrl, num
 		selectedPrincipalStressField_ = varargin{3};
 		mergingOpt_ = varargin{4};
 		snappingOpt_ = varargin{5};
-		minLengthVisiblePSLs_ = varargin{7};
-		traceAlg_ = varargin{8};
+		permittedMaxAdjacentTangentAngleDeviation_ = varargin{6};
+		traceAlg_ = varargin{7};
 	else
 		seedStrategy = 'Volume';
 		if strcmp(meshType_, 'CARTESIAN_GRID')

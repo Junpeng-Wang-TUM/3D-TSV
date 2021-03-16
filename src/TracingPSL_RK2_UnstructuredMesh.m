@@ -16,7 +16,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	k1 = iniDir;
 	midPot = startPoint + k1*tracingStepWidth_/2;
 	index = 0;	
-	[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, midPot);
+	[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, midPot);
 	NIdx = eNodMat_(elementIndex,:)';
 	vtxStress = cartesianStressField_(NIdx, :);
 	vtxCoords = nodeCoords_(NIdx,:); 
@@ -24,7 +24,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
 	[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress(typePSL));
 	nextPoint = startPoint + tracingStepWidth_*k2;
-	[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);
+	[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);
 	while bool1
 		index = index + 1; if index > limiSteps, index = index-1; break; end
 		NIdx = eNodMat_(elementIndex,:)';
@@ -38,7 +38,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		if ~terminationCond, index = index-1; break; end
 		%%k2
 		midPot = nextPoint + k1*tracingStepWidth_/2;
-		[elementIndex2, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, midPot);
+		[elementIndex2, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, midPot);
 		if ~bool1, index = index-1; break; end
 		NIdx2 = eNodMat_(elementIndex2,:)';	
 		vtxStress2 = cartesianStressField_(NIdx2,:);
@@ -55,7 +55,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		principalStressList(index,:) = principalStress;
 		%%next point
 		nextPoint = nextPoint + tracingStepWidth_*k2;
-		[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex2, nextPoint);	
+		[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex2, nextPoint);	
 	end	
 	phyCoordList = phyCoordList(1:index,:);
 	cartesianStressList = cartesianStressList(1:index,:);

@@ -1,4 +1,4 @@
-function [nextElementIndex, opt] = PositioningOnUnstructuredMesh_old(oldElementIndex, physicalCoordinates)
+function [nextElementIndex, opt] = SearchNextIntegratingPointOnUnstructuredMesh_old(oldElementIndex, physicalCoordinates)
 	global nodeCoords_; global eleCentroidList_; 
 	global eNodMat_; global nodStruct_;
 	global boundaryElements_;

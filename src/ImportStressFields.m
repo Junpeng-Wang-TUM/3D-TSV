@@ -162,15 +162,6 @@ function ImportStressFields(fileName)
 		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
 		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
 		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
-		%% in case there are some "fake" surface node
-		% maxSurMeshNodeIndex = max(max(surfaceQuadMeshElements_));
-		% tmp = zeros(maxSurMeshNodeIndex,1);
-		% surfMeshNodeReal = unique(surfaceQuadMeshElements_);
-		% tmp(surfMeshNodeReal) = (1:length(surfMeshNodeReal))';
-		% nodState_ = zeros(size(nodState_)); nodState_(boundaryNode(surfMeshNodeReal)) = 1;
-		% surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
-		% surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
-		
 		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
 		xPatchs = surfaceQuadMeshNodeCoords_(:,1); silhouetteStruct_.xPatchs = xPatchs(surfaceQuadMeshElements_');
 		yPatchs = surfaceQuadMeshNodeCoords_(:,2); silhouetteStruct_.yPatchs = yPatchs(surfaceQuadMeshElements_');
@@ -190,29 +181,34 @@ function ImportStressFields(fileName)
 		eleFaces = mapEle2patch';	 
 		iEleStruct = struct('faceCentres', [], 'faceNormals', [], 'elementsSharingThisElementFaces', []); %%pure-Hex
 		eleStruct_ = repmat(iEleStruct, numEles_, 1);
-		parfor ii=1:numEles_
+		%%parfor ii=1:numEles_
+		for ii=1:numEles_
 			iNodes = eNodMat_(ii,:);
 			iEleVertices = nodeCoords_(iNodes, :);
 			iEleFacesX = iEleVertices(:,1); iEleFacesX = iEleFacesX(eleFaces);
 			iEleFacesY = iEleVertices(:,2); iEleFacesY = iEleFacesY(eleFaces);
 			iEleFacesZ = iEleVertices(:,3); iEleFacesZ = iEleFacesZ(eleFaces);				
 			ABs = [iEleFacesX(:,1)-iEleFacesX(:,2) iEleFacesY(:,1)-iEleFacesY(:,2) iEleFacesZ(:,1)-iEleFacesZ(:,2)];
-			ACs = [iEleFacesX(:,1)-iEleFacesX(:,4) iEleFacesY(:,1)-iEleFacesY(:,4) iEleFacesZ(:,1)-iEleFacesZ(:,4)];
-			iABxAC = cross(ABs,ACs);
-			iElementsSharingThisElementFaces = zeros(6,1);
-			for jj=1:6
-				nodesOnThisFace = iNodes(eleFaces(jj,:));
-				allPotentialElements = [nodStruct_(nodesOnThisFace).adjacentEles];
-				[GC,GR] = hist(allPotentialElements, unique(allPotentialElements));
-				[GC,sortMap] = sort(GC, 'descend'); GR = GR(sortMap);
-				if 4==GC(1) && 4==GC(2)
-					iElementsSharingThisElementFaces(jj) = setdiff(GR(1:2), ii);
-				end				
-			end
+			ADs = [iEleFacesX(:,1)-iEleFacesX(:,4) iEleFacesY(:,1)-iEleFacesY(:,4) iEleFacesZ(:,1)-iEleFacesZ(:,4)];
+			iABxAC = cross(ABs,ADs); iABxAC = iABxAC ./ vecnorm(iABxAC,2,2);
+			CBs = -[iEleFacesX(:,3)-iEleFacesX(:,2) iEleFacesY(:,3)-iEleFacesY(:,2) iEleFacesZ(:,3)-iEleFacesZ(:,2)];
+			CDs = [iEleFacesX(:,3)-iEleFacesX(:,4) iEleFacesY(:,3)-iEleFacesY(:,4) iEleFacesZ(:,3)-iEleFacesZ(:,4)];
+			iCBxCD = cross(CBs,CDs); iCBxCD = iCBxCD ./ vecnorm(iCBxCD,2,2);
+			aveNormal = (iABxAC+iCBxCD)/2; aveNormal = aveNormal ./ vecnorm(aveNormal,2,2);
+			% iElementsSharingThisElementFaces = zeros(6,1);
+			% for jj=1:6
+				% nodesOnThisFace = iNodes(eleFaces(jj,:));
+				% allPotentialElements = [nodStruct_(nodesOnThisFace).adjacentEles];
+				% [GC,GR] = hist(allPotentialElements, unique(allPotentialElements));
+				% [GC,sortMap] = sort(GC, 'descend'); GR = GR(sortMap);
+				% if 4==GC(1) && 4==GC(2)
+					% iElementsSharingThisElementFaces(jj) = setdiff(GR(1:2), ii);
+				% end				
+			% end
 			tmp = iEleStruct;		
 			tmp.faceCentres = [sum(iEleFacesX,2) sum(iEleFacesY,2) sum(iEleFacesZ,2)]/4;
-			tmp.faceNormals = iABxAC ./ vecnorm(iABxAC,2,2);
-			tmp.elementsSharingThisElementFaces = iElementsSharingThisElementFaces;
+			tmp.faceNormals = aveNormal;
+			% tmp.elementsSharingThisElementFaces = iElementsSharingThisElementFaces;
 			eleStruct_(ii) = tmp;
 		end
 	end

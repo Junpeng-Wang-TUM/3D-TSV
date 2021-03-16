@@ -12,7 +12,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	vonMisesStressList = zeros(limiSteps,1);
 	principalStressList = zeros(limiSteps,12);
 	nextPoint = startPoint + tracingStepWidth_*iniDir;
-	[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);		
+	[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);
 	index = 0;	
 	while 1==bool1
 		index = index + 1; if index > limiSteps, index = index-1; break; end
@@ -31,7 +31,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		vonMisesStressList(index,:) = vonMisesStress;
 		principalStressList(index,:) = principalStress;				
 		nextPoint = nextPoint + tracingStepWidth_*iniDir;
-		[elementIndex, bool1] = PositioningOnUnstructuredMesh_old(elementIndex, nextPoint);
+		[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);
 	end		
 	phyCoordList = phyCoordList(1:index,:);
 	cartesianStressList = cartesianStressList(1:index,:);

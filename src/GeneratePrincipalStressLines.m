@@ -50,7 +50,7 @@ function iPSL = GeneratePrincipalStressLines(startPoint, tracingType, limiSteps)
 end
 
 function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = PreparingForTracing(startPoint)
-	global nodeCoords_; global eNodMat_;
+	global nodeCoords_; global eNodMat_; global nodStruct_;
 	global cartesianStressField_;
 	global eleCentroidList_;
 	global meshType_;
@@ -69,30 +69,8 @@ function [eleIndex, cartesianStress, vonMisesStress, principalStress, opt] = Pre
 	else
 		disList = vecnorm(startPoint-eleCentroidList_, 2, 2);
 		[~, targetEleIndex0] = min(disList);	
-		if 0
-			%%% Plan A
-			[targetEleIndex, opt] = PositioningOnUnstructuredMesh_old(targetEleIndex0, startPoint);
-			if ~opt, return; end
-			eleIndex = targetEleIndex;			
-		else
-			%%% Plan B
-			opt = IsThisPointWithinThatElement(targetEleIndex0, startPoint);
-			if opt
-				eleIndex = targetEleIndex0;		
-			else %% Search the Adjacent Elements
-				tarNodes = eNodMat_(targetEleIndex0,:); 
-				potentialAdjacentElements = unique([nodStruct_(tarNodes(:)).adjacentEles]);
-				potentialAdjacentElements = setdiff(potentialAdjacentElements, targetEleIndex0);
-				for ii=1:length(potentialAdjacentElements)
-					iEle = potentialAdjacentElements(ii);
-					opt = IsThisPointWithinThatElement(iEle, startPoint);
-					if opt
-						eleIndex = iEle; break;
-					end
-				end
-				if ~opt, return; end
-			end					
-		end
+		[eleIndex, opt] = PositioningOnUnstructuredMesh(targetEleIndex0, startPoint);
+		if ~opt, return; end
 		NIdx = eNodMat_(eleIndex,:)';
 		eleNodeCoords = nodeCoords_(NIdx,:);
 		eleCartesianStress = cartesianStressField_(NIdx,:);			
