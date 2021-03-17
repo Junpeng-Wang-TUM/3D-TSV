@@ -22,7 +22,8 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	numSamplings = size(seedPoints_,1);	
     seedPointsValence_ = ones(numSamplings, 3);
 	%% Exclude the irrelated Principal Stress Fields 
-	for ii=1:length(selectedPrincipalStressField_)
+	numPSF = length(selectedPrincipalStressField_);
+	for ii=1:numPSF
 		iPSF = selectedPrincipalStressField_(ii);
 		switch iPSF
 			case 'MAJOR', seedPointsValence_(:,1) = 0;
@@ -31,7 +32,6 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 		end
 	end
 	PreprocessSeedPoints();
-	
 	%% Iteration
 	if mergingOpt_
 		its = 0;
@@ -39,10 +39,36 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 		while looper<3*numSamplings
 			its = its + 1;
 			valenceMetric = sum(seedPointsValence_,2);
-			unFinishedSpps = find(valenceMetric<3);
-			[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSpps,:),2,2));				
-			spp = unFinishedSpps(tarPos);			
-			valences = seedPointsValence_(spp,:);
+			%% 1st Priority: semi-empty seeds > empty seeds, which helps get PSLs intersection
+			%% 2nd Priority: seeds with same valence, the one closest to the start point goes first
+			switch numPSF
+				case 1
+					unFinishedSppsValence2 = find(2==valenceMetric);
+					[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence2,:),2,2));
+					spp = unFinishedSppsValence2(tarPos);
+				case 2
+					unFinishedSppsValence2 = find(2==valenceMetric); 
+					if ~isempty(unFinishedSppsValence2) %% 1st Priority
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence2,:),2,2)); %% 2nd Priority
+						spp = unFinishedSppsValence2(tarPos);
+					else
+						unFinishedSppsValence1 = find(1==valenceMetric);
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence1,:),2,2)); %% 2nd Priority
+						spp = unFinishedSppsValence1(tarPos);			
+					end					
+				case 3
+					unFinishedSppsValence12 = find(3>valenceMetric); 
+					unFinishedSppsValence12 = unFinishedSppsValence12(valenceMetric(unFinishedSppsValence12)>0); 
+					if ~isempty(unFinishedSppsValence12) %% 1st Priority
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence12,:),2,2)); %% 2nd Priority
+						spp = unFinishedSppsValence12(tarPos);
+					else
+						unFinishedSppsValence0 = find(0==valenceMetric);
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence0,:),2,2)); %% 2nd Priority
+						spp = unFinishedSppsValence0(tarPos);		
+					end						
+			end
+			valences = seedPointsValence_(spp,:);						
 			seed = seedPoints_(spp,:);
 			if 0==valences(1)
 				seedPointsValence_(spp,1) = 1;
