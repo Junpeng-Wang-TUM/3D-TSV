@@ -3,7 +3,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 	%% RunMission(fileName);
 	%% RunMission(fileName, lineDensCtrl, numLevels);
 	%% RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, selectedPrincipalStressField, ...
-	%%	mergingOpt, snappingOpt, maxAngleDevi, minPSLength, traceAlgorithm);
+	%%	mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
 	%% =====================================================================
 	%% arg1: "fileName", char array
 	%% path + fullname of dataset, e.g., 'D:/data/name.vtk'
