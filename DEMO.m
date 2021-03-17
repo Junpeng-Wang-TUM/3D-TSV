@@ -10,13 +10,13 @@ addpath('./src');
 
 %% Some Examples for PSLs Generation
 %% =======================================cantilever
-% fileName = './data/Vis2021_cantilever3D.vtk'; 
+fileName = './data/Vis2021_cantilever3D.vtk'; 
 % RunMission(fileName, 10, 1);
-% RunMission(fileName, 10, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
+RunMission(fileName, 10, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
 %% =======================================femur
-fileName = './data/Vis2021_femur3D.vtk';
-RunMission(fileName, 18, 1);
-% RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser
+% fileName = './data/Vis2021_femur3D.vtk';
+% RunMission(fileName, 18, 1);
+% RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser 1st-row
 %% =======================================Bunny
 % fileName = './data/Vis2021_bunny3D.vtk';  
 % RunMission(fileName, 26, 1); 
@@ -24,7 +24,8 @@ RunMission(fileName, 18, 1);
 %% =======================================Bunny_HexMesh
 % fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
 % RunMission(fileName, 26, 1);
-% RunMission(fileName, 26, 3, 'Volume', 3, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
+% RunMission(fileName, 26, 3, 'Volume', 3, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2'); 
+% RunMission(fileName, 26, 3, 'Volume', 2, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser 2nd-row
 %% =======================================Armadillo_HexMesh
 % fileName = './data/Vis2021_armadillo3D_HexMesh.vtk';
 % RunMission(fileName, 30, 1);
