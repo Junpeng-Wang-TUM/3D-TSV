@@ -14,7 +14,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 	%% arg4: "seedStrategy", char array 
 	%% can be 'Volume', 'Surface', 'LoadingArea', 'FixedArea'
 	%% arg5: "seedDensCtrl", Scalar var in double float/integer & >=1
-	%% Seed Point Density Control for "Volume" Seeding Strategy of Cartesian Mesh, 
+	%% Control the Density of Seed Points, go to "GenerateSeedPoints.m" to see how it works
 	%% for meshType_ == 'CARTESIAN_GRID' & seedStrategy = 'Volume', it's the step size of sampling on vertices along X-, Y-, Z-directions 
 	%% 	else, it's the step size of sampling on the selected seed points. The smaller, the more seed points to be generated	
 	%% arg6: "selectedPrincipalStressField", char array
