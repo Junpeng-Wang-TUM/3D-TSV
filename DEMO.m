@@ -16,7 +16,7 @@ addpath('./src');
 %% =======================================femur
 fileName = './data/Vis2021_femur3D.vtk';
 RunMission(fileName, 18, 1);
-% RunMission(fileName, 20, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser
+% RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser
 %% =======================================Bunny
 % fileName = './data/Vis2021_bunny3D.vtk';  
 % RunMission(fileName, 26, 1); 
