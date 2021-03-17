@@ -19,8 +19,8 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	% mergeTrigger_ = iEpsilon*tracingStepWidth_;
 	mergeTrigger_ = iEpsilon;
     seedPoints_ = seedPointsHistory_;
-	numSamplings = size(seedPoints_,1);	
-    seedPointsValence_ = ones(numSamplings, 3);
+	numSeedPoints = size(seedPoints_,1);	
+    seedPointsValence_ = ones(numSeedPoints, 3);
 	%% Exclude the irrelated Principal Stress Fields 
 	numPSF = length(selectedPrincipalStressField_);
 	for ii=1:numPSF
@@ -36,7 +36,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	if mergingOpt_
 		its = 0;
 		looper = sum(sum(seedPointsValence_));	
-		while looper<3*numSamplings
+		while looper<3*numSeedPoints
 			its = its + 1;
 			valenceMetric = sum(seedPointsValence_,2);
 			%% 1st Priority: semi-empty seeds > empty seeds, which helps get PSLs intersection
@@ -76,7 +76,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				if 0==majorPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
-						' Total.: ' sprintf('%6i',3*numSamplings)]);
+						' Total.: ' sprintf('%6i',3*numSeedPoints)]);
 					continue; 
 				end
 				majorPSLpool_(end+1,1) = majorPSL;
@@ -104,7 +104,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				if 0==mediumPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
-						' Total.: ' sprintf('%6i',3*numSamplings)]);
+						' Total.: ' sprintf('%6i',3*numSeedPoints)]);
 					continue; 
 				end
 				mediumPSLpool_(end+1,1) = mediumPSL;
@@ -132,7 +132,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				if 0==minorPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
-						' Total.: ' sprintf('%6i',3*numSamplings)]);
+						' Total.: ' sprintf('%6i',3*numSeedPoints)]);
 					continue; 
 				end		
 				minorPSLpool_(end+1,1) = minorPSL;
@@ -156,10 +156,10 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			% if 1==its, CompactPSLs(); return; end
 			looper = sum(sum(seedPointsValence_));
 			disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
-				' Total.: ' sprintf('%6i',3*numSamplings)]);			
+				' Total.: ' sprintf('%6i',3*numSeedPoints)]);			
 		end
 	else
-		for ii=1:numSamplings
+		for ii=1:numSeedPoints
 			seed = seedPoints_(ii,:);
 			majorPSL = GridGrowthTrigger(seed, 'MAJOR');
 			mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');
@@ -168,7 +168,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			mediumPSLpool_(end+1,1) = mediumPSL;
 			minorPSLpool_(end+1,1) = minorPSL;
 			disp([' Iteration.: ' sprintf('%4i',ii) ' Progress.: ' sprintf('%6i',ii) ...
-				' Total.: ' sprintf('%6i',numSamplings)]);			
+				' Total.: ' sprintf('%6i',numSeedPoints)]);			
 		end
 	end
 	CompactPSLs();
