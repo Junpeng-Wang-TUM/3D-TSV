@@ -162,13 +162,24 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 		end
 	else
 		for ii=1:numSeedPoints
-			seed = seedPoints_(ii,:);
-			majorPSL = GridGrowthTrigger(seed, 'MAJOR');
-			mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');
-			minorPSL = GridGrowthTrigger(seed, 'MINOR');
-			majorPSLpool_(end+1,1) = majorPSL;
-			mediumPSLpool_(end+1,1) = mediumPSL;
-			minorPSLpool_(end+1,1) = minorPSL;
+			seed = seedPoints_(ii,:);		
+			for jj=1:numPSF
+				iPSF = selectedPrincipalStressField_(jj);
+				switch iPSF
+					case 'MAJOR'
+						majorPSL = GridGrowthTrigger(seed, 'MAJOR'); 
+						majorPSLpool_(end+1,1) = majorPSL;
+						PSLsAppearanceOrder_(end+1,:) = [1 length(majorPSLpool_)];
+					case 'MEDIUM'
+						mediumPSL = GridGrowthTrigger(seed, 'MEDIUM'); 
+						mediumPSLpool_(end+1,1) = mediumPSL;
+						PSLsAppearanceOrder_(end+1,:) = [2 length(mediumPSLpool_)];
+					case 'MINOR'
+						minorPSL = GridGrowthTrigger(seed, 'MINOR'); 
+						minorPSLpool_(end+1,1) = minorPSL;
+						PSLsAppearanceOrder_(end+1,:) = [3 length(minorPSLpool_)];
+				end
+			end					
 			disp([' Iteration.: ' sprintf('%4i',ii) ' Progress.: ' sprintf('%6i',ii) ...
 				' Total.: ' sprintf('%6i',numSeedPoints)]);			
 		end
