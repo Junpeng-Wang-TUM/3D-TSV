@@ -12,7 +12,7 @@ addpath('./src');
 %% =======================================cantilever
 fileName = './data/Vis2021_cantilever3D.vtk'; 
 % RunMission(fileName, 10, 1);
-RunMission(fileName, 10, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
+RunMission(fileName, 12.5, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
 %% =======================================femur
 % fileName = './data/Vis2021_femur3D.vtk';
 % RunMission(fileName, 18, 1);
