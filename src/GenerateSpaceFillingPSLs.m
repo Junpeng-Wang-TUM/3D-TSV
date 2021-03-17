@@ -119,9 +119,9 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 						seedPoints_(spps2BeMerged,:) = potentialPosListMedium(potentialSolidSppsMedium,:);								
 						seedPointsValence_(spps2BeMerged,2) = 1;
 						modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJOR');
-						samplingPointsValence_(modifiedMajorValences,1) = 1;
+						seedPointsValence_(modifiedMajorValences,1) = 1;
 						modifiedMinorValences = HighCurvatureModification(spps2BeMerged, 'MINOR');
-						samplingPointsValence_(modifiedMinorValences,3) = 1;
+						seedPointsValence_(modifiedMinorValences,3) = 1;
 					end
 				end				
 			end		
@@ -149,7 +149,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 						modifiedMajorValences = HighCurvatureModification(spps2BeMerged, 'MAJOR');					
 						seedPointsValence_(modifiedMajorValences,1) = 1;
 						modifiedMediumValences = HighCurvatureModification(spps2BeMerged, 'MEDIUM');
-						samplingPointsValence_(modifiedMediumValences,2) = 1;					
+						seedPointsValence_(modifiedMediumValences,2) = 1;					
 					end
 				end					
 			end
