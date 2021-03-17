@@ -5,18 +5,18 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	global mergingOpt_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
 	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
+	global PSLsAppearanceOrder_;
 	global mergeTrigger_; global relaxedFactor_;
 	global startCoord_;
 	
 	%%Taking the geometrical center as the start seed point 
 	lowerBound = min(seedPointsHistory_); upperBound = max(seedPointsHistory_);
 	startCoord_ = zeros(1,3);
-	startCoord_(1) = (lowerBound(1)+upperBound(1))/2;
-	startCoord_(2) = (lowerBound(2)+upperBound(2))/2;
-	startCoord_(3) = (lowerBound(3)+upperBound(3))/2;
+	startCoord_(1) = lowerBound(1)+(upperBound(1)-lowerBound(1))/2;
+	startCoord_(2) = lowerBound(2)+(upperBound(2)-lowerBound(2))/2;
+	startCoord_(3) = lowerBound(3)+(upperBound(3)-lowerBound(3))/2;
 	
 	%% Pre-process Seed Points
-	% mergeTrigger_ = iEpsilon*tracingStepWidth_;
 	mergeTrigger_ = iEpsilon;
     seedPoints_ = seedPointsHistory_;
 	numSeedPoints = size(seedPoints_,1);	
@@ -153,7 +153,6 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 					end
 				end					
 			end
-			% if 1==its, CompactPSLs(); return; end
 			looper = sum(sum(seedPointsValence_));
 			disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
 				' Total.: ' sprintf('%6i',3*numSeedPoints)]);			

@@ -10,12 +10,12 @@ addpath('./src');
 
 %% Some Examples for PSLs Generation
 %% =======================================cantilever
-fileName = './data/Vis2021_cantilever3D.vtk'; 
+% fileName = './data/Vis2021_cantilever3D.vtk'; 
 % RunMission(fileName, 10, 1);
-RunMission(fileName, 12.5, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
+% RunMission(fileName, 12.5, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
 %% =======================================femur
-% fileName = './data/Vis2021_femur3D.vtk';
-% RunMission(fileName, 18, 1);
+fileName = './data/Vis2021_femur3D.vtk';
+RunMission(fileName, 18, 1);
 % RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser 1st-row
 %% =======================================Bunny
 % fileName = './data/Vis2021_bunny3D.vtk';  
@@ -58,5 +58,6 @@ RunMission(fileName, 12.5, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler'
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
 DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 20);
 
-%%Show Seed Points if Necessary
+%% Show if Necessary
 % DrawSeedPoints();
+% DrawPSLsIntersections(1);

@@ -56,3 +56,4 @@ global minorCoordList_; minorCoordList_ = [];
 global majorHierarchy_; majorHierarchy_ = [];
 global mediumHierarchy_; mediumHierarchy_ = [];
 global minorHierarchy_; minorHierarchy_ = [];
+global PSLsAppearanceOrder_; PSLsAppearanceOrder_ = [];
