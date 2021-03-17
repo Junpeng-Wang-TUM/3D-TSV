@@ -18,13 +18,17 @@ fileName = './data/Vis2021_femur3D.vtk';
 RunMission(fileName, 18, 1);
 % RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2');
 %% =======================================Bunny
-% fileName = './data/Vis2021_bunny3D.vtk'; 
+% fileName = './data/Vis2021_bunny3D.vtk';  
 % RunMission(fileName, 26, 1); 
 % RunMission(fileName, 26, 3, 'Volume', 4, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
 %% =======================================Bunny_HexMesh
 % fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
 % RunMission(fileName, 26, 1);
 % RunMission(fileName, 26, 3, 'Volume', 3, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
+%% =======================================Armadillo_HexMesh
+% fileName = './data/Vis2021_armadillo3D_HexMesh.vtk';
+% RunMission(fileName, 30, 1);
+% RunMission(fileName, 30, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
 %% =======================================bridge
 % fileName = './data/Vis2021_bridge3D.vtk';
 % RunMission(fileName, 10, 3); 
@@ -51,7 +55,7 @@ RunMission(fileName, 18, 1);
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 10);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 20);
 
 %%Show Seed Points if Necessary
 % DrawSeedPoints();
