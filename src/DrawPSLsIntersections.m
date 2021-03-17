@@ -4,7 +4,7 @@ function numIntersections = DrawPSLsIntersections(lw)
 	if snappingOpt_, disp('Not Work with Snapping Option!'); return; end
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global minimumEpsilon_;
-	radius = lw*minimumEpsilon_/2.5;
+	seedRadius = lw*minimumEpsilon_/2.5;
 	intersectionList = [];
 	for ii=1:length(majorPSLpool_)
 		intersectionList(end+1,1:3) = majorPSLpool_(ii).phyCoordList(majorPSLpool_(ii).midPointPosition,:);
@@ -18,9 +18,9 @@ function numIntersections = DrawPSLsIntersections(lw)
 	intersectionList = unique(intersectionList, 'rows');
 	numIntersections = size(intersectionList,1);
 	[sphereX,sphereY,sphereZ] = sphere;
-	sphereX = radius*sphereX;
-	sphereY = radius*sphereY;
-	sphereZ = radius*sphereZ;
+	sphereX = seedRadius*sphereX;
+	sphereY = seedRadius*sphereY;
+	sphereZ = seedRadius*sphereZ;
 	
 	nn = size(sphereX);
 	patchX = []; patchY = []; patchZ = [];

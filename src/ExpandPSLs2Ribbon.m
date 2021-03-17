@@ -101,7 +101,6 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 		coordList(end+1:end+2*iPSLength,:) = iCoordList;
 	end
 	if 5==nargin
-		global axHandle_; axHandle_ = gca;
 		%%draw ribbon
 		xCoord = coordList(:,1); 
 		yCoord = coordList(:,2); 
@@ -111,14 +110,14 @@ function varargout = ExpandPSLs2Ribbon(varargin)
 		yPatchsFace = yCoord(quadMapFace);
 		zPatchsFace = zCoord(quadMapFace);
 		cPatchsFace = faceColorList(quadMapFace);
-		hdFace = patch(axHandle_, xPatchsFace, yPatchsFace, zPatchsFace, cPatchsFace); 
-		shading(axHandle_, 'interp'); hold(axHandle_, 'on');
+		hdFace = patch(xPatchsFace, yPatchsFace, zPatchsFace, cPatchsFace); 
+		shading('interp'); hold('on');
 		
 		xPatchsOutline = xCoord(quadMapOutline);
 		yPatchsOutline = yCoord(quadMapOutline);
 		zPatchsOutline = zCoord(quadMapOutline);
 		cPatchsOutline = zeros(size(xPatchsOutline));
-		hdOutline = patch(axHandle_, xPatchsOutline, yPatchsOutline, zPatchsOutline, cPatchsOutline); hold(axHandle_, 'on');
+		hdOutline = patch(xPatchsOutline, yPatchsOutline, zPatchsOutline, cPatchsOutline); hold('on');
 		set(hdOutline, 'facecol', 'None', 'linew', 3);
 		varargout{1} = hdFace; varargout{2} = hdOutline;
 	else

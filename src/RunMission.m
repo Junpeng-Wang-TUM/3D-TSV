@@ -87,6 +87,15 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 			case 'RK4', tracingFuncHandle_ = @TracingPSL_RK4_UnstructuredMesh;
 		end		
 	end
+	numPSF = length(selectedPrincipalStressField_);
+	for ii=1:numPSF
+		iPSF = selectedPrincipalStressField_(ii);
+		switch iPSF
+			case 'MAJOR', PSLsAppearanceOrder_(end+1,:) = [1 0];
+			case 'MEDIUM', PSLsAppearanceOrder_(end+1,:) = [2 0];
+			case 'MINOR', PSLsAppearanceOrder_(end+1,:) = [3 0];
+		end
+	end	
 
 	%%2. Seeding
 	GenerateSeedPoints(seedStrategy, seedDensCtrl);
@@ -110,7 +119,7 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
     BuildPSLs4Hierarchy();
 	
 	%%5. write results
-	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');;
+	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
 	ExportResult(pslDataNameOutput);
 	opt = 1;
 	tEnd = toc(tStart);

@@ -1,5 +1,4 @@
 function hd = ExpandPSLs2Tubes(PSLs, colorSrc, r)
-	global axHandle_; axHandle_ = gca;
 	hd = []; if isempty(PSLs), return; end
 	n = 8; ct=0.5*r;
 	numLines = length(PSLs);
@@ -38,5 +37,5 @@ function hd = ExpandPSLs2Tubes(PSLs, colorSrc, r)
 	gridX = squeeze(gridXYZ(1,:,:));
 	gridY = squeeze(gridXYZ(2,:,:));
 	gridZ = squeeze(gridXYZ(3,:,:));
-	hd = surf(axHandle_, gridX,gridY,gridZ,gridC); shading(axHandle_, 'interp'); hold(axHandle_, 'on');
+	hd = surf(gridX,gridY,gridZ,gridC); shading('interp'); hold('on');
 end

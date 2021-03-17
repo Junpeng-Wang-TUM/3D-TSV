@@ -26,8 +26,8 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	for ii=1:numPSF
 		iPSF = selectedPrincipalStressField_(ii);
 		switch iPSF
-			case 'MAJOR', seedPointsValence_(:,1) = 0;
-			case 'MEDIUM', seedPointsValence_(:,2) = 0;
+			case 'MAJOR', seedPointsValence_(:,1) = 0; 
+			case 'MEDIUM', seedPointsValence_(:,2) = 0; 
 			case 'MINOR', seedPointsValence_(:,3) = 0;
 		end
 	end
@@ -78,9 +78,10 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
 						' Total.: ' sprintf('%6i',3*numSeedPoints)]);
 					continue; 
-				end
-				majorPSLpool_(end+1,1) = majorPSL;
+				end			
+				majorPSLpool_(end+1,1) = majorPSL;				
 				majorCoordList_(end+1:end+majorPSL.length,:) = majorPSL.phyCoordList;
+				PSLsAppearanceOrder_(end+1,:) = [1 length(majorPSLpool_)];
 				sppsEmptyMajorValence = find(0==seedPointsValence_(:,1));
 				if ~isempty(sppsEmptyMajorValence)
 					[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(seedPoints_(...
@@ -109,6 +110,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				end
 				mediumPSLpool_(end+1,1) = mediumPSL;
 				mediumCoordList_(end+1:end+mediumPSL.length,:) = mediumPSL.phyCoordList;
+				PSLsAppearanceOrder_(end+1,:) = [2 length(mediumPSLpool_)];
 				sppsEmptyMediumValence = find(0==seedPointsValence_(:,2));
 				if ~isempty(sppsEmptyMediumValence)
 					[potentialDisListMedium, potentialPosListMedium] = GetDisListOfPointList2Curve(seedPoints_(...
@@ -136,7 +138,8 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 					continue; 
 				end		
 				minorPSLpool_(end+1,1) = minorPSL;
-				minorCoordList_(end+1:end+minorPSL.length,:) = minorPSL.phyCoordList;										
+				minorCoordList_(end+1:end+minorPSL.length,:) = minorPSL.phyCoordList;
+				PSLsAppearanceOrder_(end+1,:) = [3 length(minorPSLpool_)];				
 				sppsEmptyMinorValence = find(0==seedPointsValence_(:,3));
 				if ~isempty(sppsEmptyMinorValence)   
 					[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(seedPoints_(...
@@ -302,31 +305,50 @@ end
 function CompactPSLs()
 	global minLengthVisiblePSLs_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
+	global PSLsAppearanceOrder_;
 	filterThreshold = minLengthVisiblePSLs_;
 	
+	numMajorPSLs = length(majorPSLpool_);
 	tarIndice = [];
-	for ii=1:length(majorPSLpool_)
+	for ii=1:numMajorPSLs
 		if majorPSLpool_(ii).length > filterThreshold
 			tarIndice(end+1,1) = ii;
 		end
 	end
 	majorPSLpool_ = majorPSLpool_(tarIndice);
-	
+	tmp = find(1==PSLsAppearanceOrder_(:,1));
+	if ~isempty(tmp)
+		PSLsAppearanceOrder_(tmp(tarIndice),2) = (1:length(tarIndice))';
+		PSLsAppearanceOrder_(tmp(setdiff((1:numMajorPSLs)', tarIndice)),:) = []; 	
+	end
+
+	numMediumPSLs = length(mediumPSLpool_);
 	tarIndice = [];
-	for ii=1:length(mediumPSLpool_)
+	for ii=1:numMediumPSLs
 		if mediumPSLpool_(ii).length > filterThreshold
 			tarIndice(end+1,1) = ii;
 		end
 	end
 	mediumPSLpool_ = mediumPSLpool_(tarIndice);	
+	tmp = find(2==PSLsAppearanceOrder_(:,1));
+	if ~isempty(tmp)
+		PSLsAppearanceOrder_(tmp(tarIndice),2) = (1:length(tarIndice))';
+		PSLsAppearanceOrder_(tmp(setdiff((1:numMediumPSLs)', tarIndice)),:) = []; 	
+	end
 
+	numMinorPSLs = length(minorPSLpool_);
 	tarIndice = [];
-	for ii=1:length(minorPSLpool_)
+	for ii=1:numMinorPSLs
 		if minorPSLpool_(ii).length > filterThreshold
 			tarIndice(end+1,1) = ii;
 		end
 	end
-	minorPSLpool_ = minorPSLpool_(tarIndice);	
+	minorPSLpool_ = minorPSLpool_(tarIndice);
+	tmp = find(3==PSLsAppearanceOrder_(:,1));
+	if ~isempty(tmp)
+		PSLsAppearanceOrder_(tmp(tarIndice),2) = (1:length(tarIndice))';
+		PSLsAppearanceOrder_(tmp(setdiff((1:numMinorPSLs)', tarIndice)),:) = [];
+	end
 end
 
 function tarPSL = CroppingPSLifNeeded(srcPSL, psDir)
