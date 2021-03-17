@@ -11,11 +11,9 @@ function DrawSamplingHistory(lw)
 	sphereY = seedRadius*sphereY;
 	sphereZ = seedRadius*sphereZ;
 	fileName = strcat(erase(dataName_,'.vtk'), '_SamplingHistory.gif');
-	figure; handleSilhouette = DrawSilhouette(); 
+	figure; handleSilhouette = DrawSilhouette(); view(0,0);
 	disp('Rotate to a Preferable View Direction if Necessary. Press Enter to Continue!'); pause
-	camlight('headlight','infinite');
-	camlight('right','infinite');
-	camlight('left','infinite');
+	[az0, el0] = view;
 	material metal;
 	colormap([winter; pink; flip(autumn)]);
 	for jj=1:size(PSLsAppearanceOrder_)
@@ -68,6 +66,9 @@ function DrawSamplingHistory(lw)
 		handleMediumPSL = ExpandPSLs2Tubes(tarMediumPSLs, color4MediumPSLs, lineWidthTube);
 		handleMinorPSL = ExpandPSLs2Tubes(tarMinorPSLs, color4MinorPSLs, lineWidthTube);
 		handleSeed = surf(seedPatchX,seedPatchY,seedPatchZ); hold on
+		handleLights = camlight('headlight','infinite');
+		handleLights(2) = camlight('right','infinite');
+		% handleLights(3) = camlight('left','infinite');		
 		set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
 		set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 		set(handleMediumPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
@@ -83,6 +84,9 @@ function DrawSamplingHistory(lw)
 			imwrite(imind, cm, fileName, 'gif', 'writeMode', 'append', 'DelayTime', 0.3);
         end
 		set([handleMajorPSL; handleMediumPSL; handleMinorPSL; handleSeed],'visible','off');
+		set(handleLights,'visible','off');
+		az = az0+5*jj;
+		view(az, el0);		
 	end
 	close;
 end
