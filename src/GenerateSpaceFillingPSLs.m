@@ -6,11 +6,8 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
 	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
 	global PSLsAppearanceOrder_;
-	global mergeTrigger_; global relaxedFactor_;
+	global mergeTrigger_; global relaxedFactor_; global multiMergingThresholdsCtrl_;
 	global startCoord_;
-	global mergingThresholdCtrlMajor_; 
-	global mergingThresholdCtrlMedium_;
-	global mergingThresholdCtrlMinor_;
 	
 	%%Taking the geometrical center as the start seed point 
 	lowerBound = min(seedPointsHistory_); upperBound = max(seedPointsHistory_);
@@ -89,7 +86,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				if ~isempty(sppsEmptyMajorValence)
 					[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(seedPoints_(...
 							sppsEmptyMajorValence,:), majorPSL.phyCoordList);					
-					potentialSolidSppsMajor = find(potentialDisListMajor<mergingThresholdCtrlMajor_*relaxedFactor_);
+					potentialSolidSppsMajor = find(potentialDisListMajor<multiMergingThresholdsCtrl_(1)*relaxedFactor_);
 					if ~isempty(potentialSolidSppsMajor)
 						spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);
 						seedPoints_(spps2BeMerged,:) = potentialPosListMajor(potentialSolidSppsMajor,:);								
@@ -118,7 +115,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				if ~isempty(sppsEmptyMediumValence)
 					[potentialDisListMedium, potentialPosListMedium] = GetDisListOfPointList2Curve(seedPoints_(...
 							sppsEmptyMediumValence,:), mediumPSL.phyCoordList);					
-					potentialSolidSppsMedium = find(potentialDisListMedium<mergingThresholdCtrlMedium_*relaxedFactor_);
+					potentialSolidSppsMedium = find(potentialDisListMedium<multiMergingThresholdsCtrl_(2)*relaxedFactor_);
 					if ~isempty(potentialSolidSppsMedium)
 						spps2BeMerged = sppsEmptyMediumValence(potentialSolidSppsMedium);
 						seedPoints_(spps2BeMerged,:) = potentialPosListMedium(potentialSolidSppsMedium,:);								
@@ -147,7 +144,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				if ~isempty(sppsEmptyMinorValence)   
 					[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(seedPoints_(...
 							sppsEmptyMinorValence,:), minorPSL.phyCoordList);					
-					potentialSolidSppsMinor = find(potentialDisListMinor<mergingThresholdCtrlMinor_*relaxedFactor_);
+					potentialSolidSppsMinor = find(potentialDisListMinor<multiMergingThresholdsCtrl_(3)*relaxedFactor_);
 					if ~isempty(potentialSolidSppsMinor)
 						spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
 						seedPoints_(spps2BeMerged,:) = potentialPosListMinor(potentialSolidSppsMinor,:);
@@ -194,9 +191,7 @@ function PreprocessSeedPoints()
 	global seedPointsValence_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
 	global relaxedFactor_;
-	global mergingThresholdCtrlMajor_; 
-	global mergingThresholdCtrlMedium_;
-	global mergingThresholdCtrlMinor_;
+	global multiMergingThresholdsCtrl_;
 	
 	numMajorPSLs = length(majorPSLpool_);
 	for ii=1:numMajorPSLs
@@ -206,7 +201,7 @@ function PreprocessSeedPoints()
             if ~isempty(sppsEmptyMajorValence)
 				[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(...	
 					seedPoints_(sppsEmptyMajorValence,:), majorPSL.phyCoordList);
-				potentialSolidSppsMajor = find(potentialDisListMajor<=mergingThresholdCtrlMajor_*relaxedFactor_);
+				potentialSolidSppsMajor = find(potentialDisListMajor<=multiMergingThresholdsCtrl_(1)*relaxedFactor_);
 				if ~isempty(potentialSolidSppsMajor)
 					spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);							
 					seedPoints_(spps2BeMerged,:) = potentialPosListMajor(potentialSolidSppsMajor,:);
@@ -228,7 +223,7 @@ function PreprocessSeedPoints()
             if ~isempty(sppsEmptyMediumValence)
 				[potentialDisListMedium, potentialPosListMedium] = GetDisListOfPointList2Curve(...	
 					seedPoints_(sppsEmptyMediumValence,:), mediumPSL.phyCoordList);
-				potentialSolidSppsMedium = find(potentialDisListMedium<=mergingThresholdCtrlMedium_*relaxedFactor_);
+				potentialSolidSppsMedium = find(potentialDisListMedium<=multiMergingThresholdsCtrl_(2)*relaxedFactor_);
 				if ~isempty(potentialSolidSppsMedium)
 					spps2BeMerged = sppsEmptyMediumValence(potentialSolidSppsMedium);							
 					seedPoints_(spps2BeMerged,:) = potentialPosListMedium(potentialSolidSppsMedium,:);
@@ -250,7 +245,7 @@ function PreprocessSeedPoints()
             if ~isempty(sppsEmptyMinorValence)
 				[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(...	
 					seedPoints_(sppsEmptyMinorValence,:), minorPSL.phyCoordList);
-				potentialSolidSppsMinor = find(potentialDisListMinor<=mergingThresholdCtrlMinor_*relaxedFactor_);
+				potentialSolidSppsMinor = find(potentialDisListMinor<=multiMergingThresholdsCtrl_(3)*relaxedFactor_);
 				if ~isempty(potentialSolidSppsMinor)
 					spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
 					seedPoints_(spps2BeMerged,:) = potentialPosListMinor(potentialSolidSppsMinor,:);
@@ -291,10 +286,8 @@ function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 	global seedPointsValence_;
 	global mergeTrigger_;
 	global relaxedFactor_;
-	global mergingThresholdCtrlMajor_; 
-	global mergingThresholdCtrlMedium_;
-	global mergingThresholdCtrlMinor_;
-	
+	global multiMergingThresholdsCtrl_; 
+
 	coordList = [];
 	switch psDir
 		case 'MAJOR'
@@ -319,11 +312,11 @@ function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 	minVal = minVal/mergeTrigger_;
 	switch psDir
 		case 'MAJOR'
-			modifiedValences = find(minVal<mergingThresholdCtrlMajor_*relaxedFactor_);	
+			modifiedValences = find(minVal<multiMergingThresholdsCtrl_(1)*relaxedFactor_);	
 		case 'MEDIUM'
-			modifiedValences = find(minVal<mergingThresholdCtrlMedium_*relaxedFactor_);	
+			modifiedValences = find(minVal<multiMergingThresholdsCtrl_(2)*relaxedFactor_);	
 		case 'MINOR'
-			modifiedValences = find(minVal<mergingThresholdCtrlMinor_*relaxedFactor_);	
+			modifiedValences = find(minVal<multiMergingThresholdsCtrl_(3)*relaxedFactor_);	
 	end	
 	modifiedValences = spps2BeMerged(modifiedValences);
 end

@@ -50,9 +50,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	
 	mergingOpt_ = userInterface.mergingOpt;
 	if ~mergingOpt_, numLevels = 1; end
-	mergingThresholdCtrlMajor_ = userInterface.mergingResCtrlMajor;
-	mergingThresholdCtrlMedium_ = userInterface.mergingResCtrlMedium;
-	mergingThresholdCtrlMinor_ = userInterface.mergingResCtrlMinor;
+	multiMergingThresholdsCtrl_ = userInterface.multiMergingThresholds;
 	
 	snappingOpt_ = userInterface.snappingOpt;
 	
