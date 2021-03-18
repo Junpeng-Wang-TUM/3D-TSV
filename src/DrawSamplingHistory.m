@@ -5,7 +5,7 @@ function DrawSamplingHistory(lw)
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global PSLsAppearanceOrder_;
 	lineWidthTube = lw*minimumEpsilon_/5;
-	seedRadius = 2.5*lineWidthTube;
+	seedRadius = 4*lineWidthTube;
 	[sphereX,sphereY,sphereZ] = sphere;	
 	sphereX = seedRadius*sphereX;
 	sphereY = seedRadius*sphereY;

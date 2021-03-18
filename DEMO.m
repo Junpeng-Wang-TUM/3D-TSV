@@ -1,7 +1,6 @@
 clc;
 addpath('./src');
 
-
 %% Space-filling PSLs Generation
 %% ======Syntax (Example)======
 %% userInterface.fileName = './data/Vis2021_femur3D.vtk';
@@ -36,15 +35,23 @@ userInterface.fileName = './data/Vis2021_femur3D.vtk';
 % userInterface.numLevels = 1;
 % userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 3: %%Teaser 2nd-row
-% userInterface.lineDensCtrl = 18;
-% userInterface.numLevels = 3;
-% userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+userInterface.lineDensCtrl = 18;
+userInterface.numLevels = 3;
+userInterface.seedDensCtrl = 4;
+userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
 %% ---------------------------------------Experiment 4
 % userInterface.seedStrategy = 'LoadingArea';
 % userInterface.seedDensCtrl = 4;
 % userInterface.selectedPrincipalStressField = "MINOR";
 % userInterface.mergingOpt = 0;
+%% ---------------------------------------Experiment 5: %%Teaser 2nd-row PlanB
+% userInterface.mergingResCtrlMajor = 2;
+% userInterface.mergingResCtrlMedium = 3;
+% userInterface.mergingResCtrlMinor = 1;
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 1;
+% userInterface.seedDensCtrl = 4;
+% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
 
 %% =======================================Bunny=======================================
 % userInterface.fileName = './data/Vis2021_bunny3D.vtk';
@@ -68,7 +75,15 @@ userInterface.fileName = './data/Vis2021_femur3D.vtk';
 %% ---------------------------------------Experiment 3: %%Teaser 2nd-row
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
-% userInterface.seedDensCtrl = 3;
+% userInterface.seedDensCtrl = 2;
+% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+%% ---------------------------------------Experiment 4: %%Teaser 2nd-row Plan  B
+% userInterface.mergingResCtrlMajor = 1;
+% userInterface.mergingResCtrlMedium = 3;
+% userInterface.mergingResCtrlMinor = 2;
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 1;
+% userInterface.seedDensCtrl = 2;
 % userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
 
 %% =======================================Armadillo_HexMesh=======================================

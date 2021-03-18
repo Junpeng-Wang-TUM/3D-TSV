@@ -25,7 +25,8 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	
 	numLevels = userInterface.numLevels;
 	if strcmp(numLevels, 'default')
-		numLevels = max(round(log2(lineDensCtrl)),2);
+		numLevels = max(round(log2(lineDensCtrl)),2); %% or simply
+		%% numLevels = 1;	
 	end
 	
 	seedStrategy = userInterface.seedStrategy;
@@ -49,6 +50,9 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	
 	mergingOpt_ = userInterface.mergingOpt;
 	if ~mergingOpt_, numLevels = 1; end
+	mergingThresholdCtrlMajor_ = userInterface.mergingResCtrlMajor;
+	mergingThresholdCtrlMedium_ = userInterface.mergingResCtrlMedium;
+	mergingThresholdCtrlMinor_ = userInterface.mergingResCtrlMinor;
 	
 	snappingOpt_ = userInterface.snappingOpt;
 	

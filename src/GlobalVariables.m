@@ -35,6 +35,9 @@ global seedPointsHistory_;
 global seedSpan4VolumeOptCartesianMesh_; 
 %% 2.5 Relaxing Merge Operation via Epsilon*relaxedFactor_
 global relaxedFactor_; relaxedFactor_ = 1;
+global mergingThresholdCtrlMajor_; 
+global mergingThresholdCtrlMedium_; 
+global mergingThresholdCtrlMinor_;
 %% 2.6 Snapping PSLs (1) or not (0) when they are too close
 global snappingOpt_; 
 %% 2.7 Excluding PSLs with less than 'minLengthVisiblePSLs_' Integrating Steps
