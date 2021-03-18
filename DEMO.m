@@ -34,7 +34,7 @@ userInterface.fileName = './data/Vis2021_femur3D.vtk';
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 1;
 % userInterface.traceAlgorithm = 'Euler';
-%% ---------------------------------------Experiment 3: %%Teaser 2nd-row
+%% ---------------------------------------Experiment 3: %%Teaser 1st-row
 userInterface.lineDensCtrl = 18;
 userInterface.numLevels = 3;
 userInterface.seedDensCtrl = 4;
