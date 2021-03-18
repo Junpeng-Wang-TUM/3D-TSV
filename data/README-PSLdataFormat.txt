@@ -5,6 +5,13 @@ Write_PSL_info(2nd_PSL)
 :
 :
 Write_PSL_info(Nth__PSL)
+'#Medium' N (number of PSLs)
+Write_PSL_info(1st_PSL)
+Write_PSL_info(2nd_PSL)
+:
+:
+:
+Write_PSL_info(Nth__PSL)
 '#Minor' N (number of PSLs)
 Write_PSL_info(1st_PSL)
 Write_PSL_info(2nd_PSL)
@@ -33,7 +40,7 @@ f_numFaces_1 f_numFaces_2 f_numFaces_3 f_numFaces_4
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Comment 1
 function Write_PSL_info(ith_PSL)
-	 L	IM1 (geo-based) IM2 (PS-based) IM3 (vM-based) IM4 (Length-based)
+	 L	IM1 (geo-based) IM2 (PS-based) IM3 (vM-based) IM4 (Length-based) AppearanceOrder Seed(x, y, z)
 	'spatial coordinates:' X_1 Y_1 Z_1	X_2 Y_2 Z_2 ..... X_L Y_L Z_L
 	'band vertex coordinates (unSmoothed) :' x_1 y_1 z_1	x_2 y_2 z_2 ..... x_2L y_2L z_2L
 	'band vertex coordinates (smoothed) :' x_1 y_1 z_1	x_2 y_2 z_2 ..... x_2L y_2L z_2L
