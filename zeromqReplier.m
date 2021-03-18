@@ -59,18 +59,17 @@ function zeromqReplier
         disp(request);
 
         % ... do something with the received request ...
-		fileName = request.fileName;
-		lineDensCtrl = request.lineDensCtrl;
-		numLevels = request.numLevels;
-		seedStrategy = request.seedStrategy;
-		seedDensCtrl = request.seedDensCtrl;
-		selectedPrincipalStressField = request.selectedPrincipalStressField;
-		mergingOpt = request.mergingOpt;
-		snappingOpt = request.snappingOpt;
-		maxAngleDevi = request.maxAngleDevi;
-		traceAlgorithm = request.traceAlgorithm;
-		[opt, PSLdatasetFile] = RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, ...
-			selectedPrincipalStressField, mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
+		% fileName = request.fileName;
+		% lineDensCtrl = request.lineDensCtrl;
+		% numLevels = request.numLevels;
+		% seedStrategy = request.seedStrategy;
+		% seedDensCtrl = request.seedDensCtrl;
+		% selectedPrincipalStressField = request.selectedPrincipalStressField;
+		% mergingOpt = request.mergingOpt;
+		% snappingOpt = request.snappingOpt;
+		% maxAngleDevi = request.maxAngleDevi;
+		% traceAlgorithm = request.traceAlgorithm;
+		[opt, PSLdatasetFile] = RunMission(request);
 		if 0==opt, error('Failed to Generate PSLs!'); end
 		
         % Send a reply.

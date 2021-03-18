@@ -1,60 +1,153 @@
 clc;
 addpath('./src');
 
+
 %% Space-filling PSLs Generation
-%% ======Syntax======
-%% RunMission(fileName); %% Easy-to-Run
-%% RunMission(fileName, lineDensCtrl, numLevels);
-%% RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, selectedPrincipalStressField, ...
-%%	mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
+%% ======Syntax (Example)======
+%% userInterface.fileName = './data/Vis2021_femur3D.vtk';
+%% userInterface.lineDensCtrl = 18;
+%% userInterface.numLevels = 3;
+%% userInterface.seedStrategy = 'Volume';
+%% userInterface.seedDensCtrl = 4;
+%% userInterface.selectedPrincipalStressField = ["MAJOR", "MINOR"];
+%% userInterface.mergingOpt = 1;
+%% userInterface.snappingOpt = 0;
+%% userInterface.maxAngleDevi = 6;
+%% userInterface.traceAlgorithm = 'RK2';
+%% RunMission(userInterface);
 
-%% Some Examples for PSLs Generation
-%% =======================================cantilever
-% fileName = './data/Vis2021_cantilever3D.vtk'; 
-% RunMission(fileName, 10, 1);
-% RunMission(fileName, 12.5, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 20, 'Euler');
-%% =======================================femur
-fileName = './data/Vis2021_femur3D.vtk';
-% RunMission(fileName);
-RunMission(fileName, 18, 1);
-% RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser 1st-row
-% RunMission(fileName, 18, 1, 'LoadingArea', 4, ["MINOR"], 0, 0, 6, 'RK2');
-%% =======================================Bunny
-% fileName = './data/Vis2021_bunny3D.vtk';  
-% RunMission(fileName, 26, 1); 
-% RunMission(fileName, 26, 3, 'Volume', 4, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
-%% =======================================Bunny_HexMesh
-% fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
-% RunMission(fileName, 26, 1);
-% RunMission(fileName, 26, 3, 'Volume', 3, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2'); 
-% RunMission(fileName, 26, 3, 'Volume', 2, ["MAJOR", "MEDIUM", "MINOR"], 1, 0, 6, 'RK2'); %%Teaser 2nd-row
-%% =======================================Armadillo_HexMesh
-% fileName = './data/Vis2021_armadillo3D_HexMesh.vtk';
-% RunMission(fileName, 30, 1);
-% RunMission(fileName, 30, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
-%% =======================================bridge
-% fileName = './data/Vis2021_bridge3D.vtk';
-% RunMission(fileName, 10, 3); 
-% RunMission(fileName, 10, 3, 'Volume', 3, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
-%% =======================================bracket
-% fileName = './data/Vis2021_bracket3D.vtk';  
-% RunMission(fileName, 18, 3); 
-% RunMission(fileName, 18, 3, 'Volume', 4, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
-%% =======================================roof
-% fileName = './data/Vis2021_roof3D.vtk';
-% RunMission(fileName, 32, 3);
-% RunMission(fileName, 32, 3, 'Volume', 2, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2'); 
-%% =======================================kitten
-% fileName = './data/Vis2021_kitten3D.vtk'; 
-% RunMission(fileName, 15, 3);
-% RunMission(fileName, 15, 20, 'Volume', 30, ["MAJOR", "MINOR", "MEDIUM"], 0, 0, 20, 'RK2'); %%fig.2 left
-% RunMission(fileName, 15, 1, 'LoadingArea', 2, ["MAJOR", "MINOR", "MEDIUM"], 0, 0, 6, 'RK2'); %%fig.2 right
-% RunMission(fileName, 15, 3, 'Volume', 5, ["MAJOR", "MINOR"], 1, 1, 6, 'RK2'); %%fig.X 
-%% =======================================parts
-% fileName = './data/Vis2021_parts3D.vtk';
-% RunMission(fileName, 30, 3);
-% RunMission(fileName, 30, 3, 'Volume', 5, ["MAJOR", "MINOR"], 1, 0, 6, 'RK2');
+%% Some Examples used in the paper
+userInterface = InterfaceStruct();
 
+%% =======================================cantilever=======================================
+%% ---------------------------------------Experiment 1
+% userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
+% userInterface.lineDensCtrl = 12.5;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 3;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'Euler';
+
+%% =======================================femur=======================================
+userInterface.fileName = './data/Vis2021_femur3D.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 1;
+% userInterface.traceAlgorithm = 'Euler';
+%% ---------------------------------------Experiment 3: %%Teaser 2nd-row
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 4;
+% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+%% ---------------------------------------Experiment 4
+% userInterface.seedStrategy = 'LoadingArea';
+% userInterface.seedDensCtrl = 4;
+% userInterface.selectedPrincipalStressField = "MINOR";
+% userInterface.mergingOpt = 0;
+
+%% =======================================Bunny=======================================
+% userInterface.fileName = './data/Vis2021_bunny3D.vtk';
+%% ---------------------------------------Experiment 1
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 4;
+
+%% =======================================Bunny_HexMesh=======================================
+% userInterface.fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
+%% ---------------------------------------Experiment 1
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 3;
+%% ---------------------------------------Experiment 3: %%Teaser 2nd-row
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 3;
+% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+
+%% =======================================Armadillo_HexMesh=======================================
+% userInterface.fileName = './data/Vis2021_armadillo3D_HexMesh.vtk';
+%% ---------------------------------------Experiment 1
+% userInterface.lineDensCtrl = 30;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 30;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 2;
+
+%% =======================================bridge=======================================
+% userInterface.fileName = './data/Vis2021_bridge3D.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 10;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 3
+% userInterface.lineDensCtrl = 10;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 3;
+
+%% =======================================bracket=======================================
+% userInterface.fileName = './data/Vis2021_bracket3D.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 3
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 4;
+
+%% =======================================roof=======================================
+% userInterface.fileName = './data/Vis2021_roof3D.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 32;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 3
+% userInterface.lineDensCtrl = 32;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 2;
+
+%% =======================================kitten=======================================
+% userInterface.fileName = './data/Vis2021_kitten3D.vtk';
+%% ---------------------------------------Experiment 1
+% userInterface.lineDensCtrl = 15;
+% userInterface.numLevels = 3;
+%% ---------------------------------------Experiment 2: %%fig.2 left
+% userInterface.seedDensCtrl = 30;
+% userInterface.selectedPrincipalStressField = ["MAJOR", "MINOR", "MEDIUM"];
+% userInterface.mergingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+%% ---------------------------------------Experiment 3: %%fig.2 right
+% userInterface.seedStrategy = 'LoadingArea';
+% userInterface.seedDensCtrl = 2;
+% userInterface.selectedPrincipalStressField = ["MAJOR", "MINOR", "MEDIUM"];
+% userInterface.mergingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+%% ---------------------------------------Experiment 4: %%fig.xx
+% userInterface.lineDensCtrl = 15;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 5;
+% userInterface.snappingOpt = 1;
+
+%% =======================================parts=======================================
+% userInterface.fileName = './data/Vis2021_parts3D.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 30;
+% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 3
+% userInterface.lineDensCtrl = 30;
+% userInterface.numLevels = 3;
+% userInterface.seedDensCtrl = 5;
+
+RunMission(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);

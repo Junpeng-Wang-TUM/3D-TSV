@@ -24,11 +24,11 @@ global faceCentres_; global faceNormals_; global elementsSharingThisElementFaces
 
 %% 2. Algorithm Control
 %% 2.0 Selected Principal Stress Fields to be Visualized
-global selectedPrincipalStressField_; selectedPrincipalStressField_ = ["MAJOR", "MINOR"];
+global selectedPrincipalStressField_; 
 %% 2.1 Integrating Step Size = element Size * tracingStepWidth_
 global tracingStepWidth_; 
 %% 2.2 %% Tracing PSL stops when the angle deviation between the neighboring tangents is larger than 180/permittedMaxAdjacentTangentAngleDeviation_
-global permittedMaxAdjacentTangentAngleDeviation_; permittedMaxAdjacentTangentAngleDeviation_ = 6; 
+global permittedMaxAdjacentTangentAngleDeviation_;
 %% 2.3 Store the Original Seed Points
 global seedPointsHistory_;
 %% 2.4 Control Seed Point Density under 'Volume' Seeding Strategy
@@ -36,13 +36,13 @@ global seedSpan4VolumeOptCartesianMesh_;
 %% 2.5 Relaxing Merge Operation via Epsilon*relaxedFactor_
 global relaxedFactor_; relaxedFactor_ = 1;
 %% 2.6 Snapping PSLs (1) or not (0) when they are too close
-global snappingOpt_; snappingOpt_ = 0;
+global snappingOpt_; 
 %% 2.7 Excluding PSLs with less than 'minLengthVisiblePSLs_' Integrating Steps
 global minLengthVisiblePSLs_; minLengthVisiblePSLs_ = 5;
 %% 2.8 Merging or not. FALSE == Generating PSLs Brutally from Selected Seed Points 
-global mergingOpt_; mergingOpt_ = 1;
+global mergingOpt_; 
 %% 2.9 PSL Tracing Algorithm
-global traceAlg_; traceAlg_ = 'RK2'; %% 'Euler', 'RK2', 'RK4'
+global traceAlg_; 
 %% 2.10 Minimum Merging Threshold 
 global minimumEpsilon_;
 

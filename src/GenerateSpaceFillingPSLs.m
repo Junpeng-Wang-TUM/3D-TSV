@@ -180,8 +180,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 						PSLsAppearanceOrder_(end+1,:) = [3 length(minorPSLpool_)];
 				end
 			end					
-			disp([' Iteration.: ' sprintf('%4i',ii) ' Progress.: ' sprintf('%6i',ii) ...
-				' Total.: ' sprintf('%6i',numSeedPoints)]);			
+			disp([' Progress.: ' sprintf('%6i',ii) ' Total.: ' sprintf('%6i',numSeedPoints)]);			
 		end
 	end
 	CompactPSLs();

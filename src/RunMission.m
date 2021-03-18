@@ -1,35 +1,6 @@
-function [opt, pslDataNameOutput] = RunMission(fileName, varargin)	
-	%% Syntax:
-	%% RunMission(fileName);
-	%% RunMission(fileName, lineDensCtrl, numLevels);
-	%% RunMission(fileName, lineDensCtrl, numLevels, seedStrategy, seedDensCtrl, selectedPrincipalStressField, ...
-	%%	mergingOpt, snappingOpt, maxAngleDevi, traceAlgorithm);
-	%% =====================================================================
-	%% arg1: "fileName", char array
-	%% path + fullname of dataset, e.g., 'D:/data/name.vtk'
-	%% arg2: "lineDensCtrl", Scalar var in double float
-	%% minimum feature size of the stress field divided by "lineDensCtrl" is used as the merging threshold Epsilon,
-	%%	the smaller, the more PSLs to be generated	
-	%% arg3: "numLevels", Scalar var in double float, Generally lineDensCtrl/2^(numLevels-1) > 1	
-	%% arg4: "seedStrategy", char array 
-	%% can be 'Volume', 'Surface', 'LoadingArea', 'FixedArea'
-	%% arg5: "seedDensCtrl", Scalar var in double float/integer & >=1
-	%% Control the Density of Seed Points, go to "GenerateSeedPoints.m" to see how it works
-	%% for meshType_ == 'CARTESIAN_GRID' & seedStrategy = 'Volume', it's the step size of sampling on vertices along X-, Y-, Z-directions 
-	%% 	else, it's the step size of sampling on the selected seed points. The smaller, the more seed points to be generated	
-	%% arg6: "selectedPrincipalStressField", char array
-	%% default ["MAJOR", "MINOR"], can be ["MAJOR", "MEDIUM", "MINOR"], "MAJOR", "MINOR", etc
-	%% arg7: "mergingOpt", Scalar var in any format
-	%% Our methods (=='TRUE') or brutally tracing from each seed point (=='FALSE')
-	%% arg8: "snappingOpt", Scalar var in any format
-	%% Snapping PSLs (=='TRUE') or not (=='FALSE') when they are too close
-	%% arg9: "maxAngleDevi", Scalar var in double float
-	%% Permitted Maximum Adjacent Tangent Angle Deviation, default 6
-	%% arg10: "traceAlgorithm"
-	%% can be 'Euler', 'RK2', 'RK4'
-	
+function [opt, pslDataNameOutput] = RunMission(userInterface)	
 	%%1. Initialize Experiment Environment
-	%%1.1 variable declaration
+	%%1.1 variable declaration	
 	tStart = tic;
 	global tracingFuncHandle_;
 	global majorPSLindexList_;
@@ -37,43 +8,53 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 	global minorPSLindexList_;	
 	opt = 0; pslDataNameOutput = [];
 	if ~(1==nargin || 3==nargin || 10==nargin), error('Wrong Input!'); end
-	GlobalVariables;
-	%%1.2 Import dataset if needed
+	GlobalVariables;	
+	%%1.2 Decode input arguments
+	fileName = userInterface.fileName;
 	if ~strcmp(dataName_, fileName)		
 		ImportStressFields(fileName);
 		dataName_ = fileName;
 	end
-	%%1.3 Decode input arguments
-	minFeatureSize = min(vtxUpperBound_-vtxLowerBound_);
-	maxFeatureSize = max(vtxUpperBound_-vtxLowerBound_);
-	switch nargin
-		case 1
-			%%Easy-to-Run, all control parameters are default
-			if maxFeatureSize/minFeatureSize>2, lineDensCtrl = 10; 
-			else, lineDensCtrl = 15; end
-			minimumEpsilon_ = minFeatureSize/lineDensCtrl;
-			numLevels = 3;
-			seedStrategy = 'Volume';
-			if strcmp(meshType_, 'CARTESIAN_GRID'), seedDensCtrl = max(ceil(minimumEpsilon_/eleSize_/1.7), 2);
-			else, seedDensCtrl = 2; end					
-		case 3
-			lineDensCtrl = varargin{1}; minimumEpsilon_ = minFeatureSize/lineDensCtrl;
-			numLevels = varargin{2};	
-			seedStrategy = 'Volume';
-			if strcmp(meshType_, 'CARTESIAN_GRID'), seedDensCtrl = max(ceil(minimumEpsilon_/eleSize_/1.7), 2);
-			else, seedDensCtrl = 2; end			
-		case 10
-			lineDensCtrl = varargin{1}; minimumEpsilon_ = minFeatureSize/lineDensCtrl;	
-			numLevels = varargin{2};		
-			seedStrategy = varargin{3};
-			seedDensCtrl = varargin{4};
-			selectedPrincipalStressField_ = varargin{5};
-			mergingOpt_ = varargin{6};
-			snappingOpt_ = varargin{7};
-			permittedMaxAdjacentTangentAngleDeviation_ = varargin{8};
-			traceAlg_ = varargin{9};			
+	
+	dimentions = sort(vtxUpperBound_-vtxLowerBound_); %%Ascending
+	lineDensCtrl = userInterface.lineDensCtrl;
+	if strcmp(lineDensCtrl, 'default')
+		lineDensCtrl = (8000/(dimentions(2)/dimentions(1))/(dimentions(3)/dimentions(2)))^(1/3);
 	end
+	minimumEpsilon_ = dimentions(1)/lineDensCtrl;
+	
+	numLevels = userInterface.numLevels;
+	if strcmp(numLevels, 'default')
+		numLevels = max(round(log2(lineDensCtrl)),2);
+	end
+	
+	seedStrategy = userInterface.seedStrategy;
+	
+	seedDensCtrl = userInterface.seedDensCtrl;
+	if strcmp(seedDensCtrl, 'default')
+		if strcmp(meshType_, 'CARTESIAN_GRID'), seedDensCtrl = max(ceil(minimumEpsilon_/eleSize_/1.7), 2);
+		else, seedDensCtrl = 2; end		
+	end
+	
+	selectedPrincipalStressField_ = userInterface.selectedPrincipalStressField;
+	numPSF = length(selectedPrincipalStressField_);
+	for ii=1:numPSF
+		iPSF = selectedPrincipalStressField_(ii);
+		switch iPSF
+			case 'MAJOR', PSLsAppearanceOrder_(end+1,:) = [1 0];
+			case 'MEDIUM', PSLsAppearanceOrder_(end+1,:) = [2 0];
+			case 'MINOR', PSLsAppearanceOrder_(end+1,:) = [3 0];
+		end
+	end
+	
+	mergingOpt_ = userInterface.mergingOpt;
 	if ~mergingOpt_, numLevels = 1; end
+	
+	snappingOpt_ = userInterface.snappingOpt;
+	
+	permittedMaxAdjacentTangentAngleDeviation_ = userInterface.maxAngleDevi;
+	
+	traceAlg_ = userInterface.traceAlgorithm;
 	if strcmp(meshType_, 'CARTESIAN_GRID')
 		switch traceAlg_
 			case 'Euler', tracingFuncHandle_ = @TracingPSL_Euler_CartesianMesh;
@@ -86,15 +67,6 @@ function [opt, pslDataNameOutput] = RunMission(fileName, varargin)
 			case 'RK2', tracingFuncHandle_ = @TracingPSL_RK2_UnstructuredMesh;
 			case 'RK4', tracingFuncHandle_ = @TracingPSL_RK4_UnstructuredMesh;
 		end		
-	end
-	numPSF = length(selectedPrincipalStressField_);
-	for ii=1:numPSF
-		iPSF = selectedPrincipalStressField_(ii);
-		switch iPSF
-			case 'MAJOR', PSLsAppearanceOrder_(end+1,:) = [1 0];
-			case 'MEDIUM', PSLsAppearanceOrder_(end+1,:) = [2 0];
-			case 'MINOR', PSLsAppearanceOrder_(end+1,:) = [3 0];
-		end
 	end	
 
 	%%2. Seeding
