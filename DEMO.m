@@ -82,16 +82,6 @@ userInterface.numLevels = 1;
 % userInterface.seedDensCtrl = 2;
 % userInterface.selectedPrincipalStressField = [1, 2, 3];
 
-%% =======================================Armadillo_HexMesh=======================================
-% userInterface.fileName = './data/Vis2021_armadillo3D_HexMesh.vtk';
-%% ---------------------------------------Experiment 1
-% userInterface.lineDensCtrl = 30;
-% userInterface.numLevels = 1;
-%% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 30;
-% userInterface.numLevels = 3;
-% userInterface.seedDensCtrl = 2;
-
 %% =======================================bridge=======================================
 % userInterface.fileName = './data/Vis2021_bridge3D.vtk';
 %% ---------------------------------------Experiment 1
