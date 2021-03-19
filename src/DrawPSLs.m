@@ -1,11 +1,23 @@
-function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt)
-	global majorPSLpool_; global minorPSLpool_;
-	global majorHierarchy_; global minorHierarchy_;
-	global tracingStepWidth_;
-	
-	lineWidthTube = lw*tracingStepWidth_;
-	lineWidthRibbon = 2*lineWidthTube;
-	
+function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
+	%% Syntax:
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
+	%% =====================================================================
+	%% imOpt: ["Geo", "Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
+	%% imVal: [1,0.5, 0.3]; %% PSLs with IM>=imVal shown
+	%% pslGeo: ["TUBE", "TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
+	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
+	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
+	%% smoothingOpt: %% smoothing ribbon or not (0)
+	%% minLength: minLengthVisiblePSLs_ or varargin{1} if exists, only PSLs with length larger than minLength can be shown
+	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
+	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
+	global minimumEpsilon_;
+	global minLengthVisiblePSLs_;
+	miniPSLength = minLengthVisiblePSLs_;
+	if 7==nargin, miniPSLength = varargin{1}; end
+	lineWidthTube = lw*minimumEpsilon_/5;
+	lineWidthRibbon = 3*lineWidthTube;
 	%% Get Target PSLs to Draw
 	%% Major
 	switch imOpt(1)
@@ -21,28 +33,60 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			error('Wrong Input!');
 	end
 	tarMajorPSLs = majorPSLpool_(tarMajorPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMajorPSLs)
+		if tarMajorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMajorPSLs = tarMajorPSLs(tarIndice);	
 	numTarMajorPSLs = length(tarMajorPSLs);
 	
-	%% Minor
+	%% Medium
 	switch imOpt(2)
 		case 'Geo'
-			tarMinorPSLindex = find(minorHierarchy_(:,1)>=imVal(2));
+			tarMediumPSLindex = find(mediumHierarchy_(:,1)>=imVal(2));
 		case 'PS'
-			tarMinorPSLindex = find(minorHierarchy_(:,2)>=imVal(2));
+			tarMediumPSLindex = find(mediumHierarchy_(:,2)>=imVal(2));
 		case 'vM'
-			tarMinorPSLindex = find(minorHierarchy_(:,3)>=imVal(2));
+			tarMediumPSLindex = find(mediumHierarchy_(:,3)>=imVal(2));
 		case 'Length'
-			tarMinorPSLindex = find(minorHierarchy_(:,4)>=imVal(2));
+			tarMediumPSLindex = find(mediumHierarchy_(:,4)>=imVal(2));
+		otherwise
+			error('Wrong Input!');
+	end
+	tarMediumPSLs = mediumPSLpool_(tarMediumPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMediumPSLs)
+		if tarMediumPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMediumPSLs = tarMediumPSLs(tarIndice);		
+	numTarMediumPSLs = length(tarMediumPSLs);	
+	
+	%% Minor
+	switch imOpt(3)
+		case 'Geo'
+			tarMinorPSLindex = find(minorHierarchy_(:,1)>=imVal(3));
+		case 'PS'
+			tarMinorPSLindex = find(minorHierarchy_(:,2)>=imVal(3));
+		case 'vM'
+			tarMinorPSLindex = find(minorHierarchy_(:,3)>=imVal(3));
+		case 'Length'
+			tarMinorPSLindex = find(minorHierarchy_(:,4)>=imVal(3));
 		otherwise
 			error('Wrong Input!');
 	end
 	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMinorPSLs)
+		if tarMinorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMinorPSLs = tarMinorPSLs(tarIndice);	
 	numTarMinorPSLs = length(tarMinorPSLs);
 	
-	if 0==numTarMajorPSLs && 0==numTarMinorPSLs, return; end
+	if 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs, return; end
 	
 	%% Initialize Stress Component for Coloring
 	color4MajorPSLs = struct('arr', []); color4MajorPSLs = repmat(color4MajorPSLs, numTarMajorPSLs, 1);
+	color4MediumPSLs = struct('arr', []); color4MediumPSLs = repmat(color4MediumPSLs, numTarMediumPSLs, 1);
 	color4MinorPSLs = struct('arr', []); color4MinorPSLs = repmat(color4MinorPSLs, numTarMinorPSLs, 1);
 	%%'None', 'Sigma', 'Sigma_3', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 	switch stressComponentOpt
@@ -50,6 +94,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = zeros(1, tarMajorPSLs(ii).length);
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = zeros(1, tarMediumPSLs(ii).length);
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = zeros(1, tarMinorPSLs(ii).length);
 			end			
@@ -57,13 +104,20 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).principalStressList(:,9)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).principalStressList(:,5)';
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).principalStressList(:,1)';
 			end				
-			m=100; r4Minor = [1 m]; r4Major = m+r4Minor;
+			m=100; r4Minor = [1 m]; r4Medium = m+r4Minor; r4Major = m+r4Medium;
 			cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
+			end
+			cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
 			end
 			cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
 			for ii=1:numTarMinorPSLs
@@ -73,6 +127,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,1)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,1)';
+			end
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,1)';
 			end		
@@ -80,6 +137,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,2)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,2)';
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,2)';
 			end		
@@ -87,6 +147,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,3)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,3)';
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,3)';
 			end		
@@ -94,6 +157,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,4)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,4)';
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,4)';
 			end		
@@ -101,6 +167,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,5)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,5)';
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,5)';
 			end		
@@ -108,6 +177,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,6)';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,6)';
+			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,6)';
 			end		
@@ -115,6 +187,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			for ii=1:numTarMajorPSLs
 				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).vonMisesStressList';
 			end
+			for ii=1:numTarMediumPSLs
+				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).vonMisesStressList';
+			end				
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).vonMisesStressList';
 			end
@@ -129,28 +204,40 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			handleMajorPSL = ExpandPSLs2Tubes(tarMajorPSLs, color4MajorPSLs, lineWidthTube);
 		case 'RIBBON'
 			[handleMajorPSL, handleRibbonOutlineMajorPSL] = ...
-				ExpandPSLs2Ribbon(tarMajorPSLs, color4MajorPSLs, lineWidthRibbon, ribbonSmoothingOpt);
+				ExpandPSLs2Ribbon(tarMajorPSLs, [6 7 8], color4MajorPSLs, lineWidthRibbon, ribbonSmoothingOpt);
 	end
 	switch pslGeo(2)
+		case 'TUBE'
+			handleMediumPSL = ExpandPSLs2Tubes(tarMediumPSLs, color4MediumPSLs, lineWidthTube);
+		case 'RIBBON'
+			[handleMediumPSL, handleRibbonOutlineMediumPSL] = ...
+				ExpandPSLs2Ribbon(tarMediumPSLs, [2 3 4],  color4MediumPSLs, lineWidthRibbon, ribbonSmoothingOpt);
+	end	
+	switch pslGeo(3)
 		case 'TUBE'
 			handleMinorPSL = ExpandPSLs2Tubes(tarMinorPSLs, color4MinorPSLs, lineWidthTube);
 		case 'RIBBON'
 			[handleMinorPSL, handleRibbonOutlineMinorPSL] = ...
-				ExpandPSLs2Ribbon(tarMinorPSLs, color4MinorPSLs, lineWidthRibbon, ribbonSmoothingOpt);		
+				ExpandPSLs2Ribbon(tarMinorPSLs, [6 7 8],  color4MinorPSLs, lineWidthRibbon, ribbonSmoothingOpt);		
 	end
 	
 	set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
 	if exist('handleRibbonOutlineMajorPSL')
 		set(handleRibbonOutlineMajorPSL, 'EdgeAlpha', 1, 'edgecol','k');
 	end
+	if exist('handleRibbonOutlineMediumPSL')
+		set(handleRibbonOutlineMediumPSL, 'EdgeAlpha', 1, 'edgecol','k');
+	end
 	if exist('handleRibbonOutlineMinorPSL')
 		set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
 	end
 	if strcmp(stressComponentOpt, "None")
 		set(handleMajorPSL, 'FaceColor', [1 0 0]);
+		set(handleMediumPSL, 'FaceColor', [0 1 0]);
 		set(handleMinorPSL, 'FaceColor', [0 0 1]);	
 	end
 	set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
+	set(handleMediumPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 	set(handleMinorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 	
 	%%Colorbar
@@ -159,21 +246,31 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		elseif strcmp(stressComponentOpt, "Sigma")
 			cb = colorbar('Location', 'east');
 			v1 = min(cValOnMinor); v2 = max(cValOnMinor);
+			v3 = min(cValOnMedium); v4 = max(cValOnMedium);
 			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
-			if 0==numTarMajorPSLs
-				colormap('winter');
-				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v1, v2, 5)}, 'AxisLocation','out');
-				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v1, v2, 5)),'Un',0); set(cb,'xticklabel',L);				
-			elseif 0==numTarMinorPSLs
+			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
+				%colormap([RedRGB()]);
 				colormap('autumn');
-				set(cb,'Ticks',[0 50 100 150 200],'TickLabels', {linspace(v5, v6, 5)}, 'AxisLocation','out');
-				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v5, v6, 5)),'Un',0); set(cb,'xticklabel',L);					
+			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
+				%colormap([GreenRGB();]);
+				colormap('copper');
+			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
+				%colormap([BlueRGB();]);
+				colormap('winter');
+			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
+				% colormap([GreenRGB(); RedRGB()]);
+				colormap([pink; flip(autumn)]);
+			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
+				% colormap([BlueRGB(); RedRGB()]);
+				colormap([winter; pink; flip(autumn)]);
+			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
+				% colormap([BlueRGB(); GreenRGB();]);
+				colormap([winter; pink]);
 			else
-				%colormap([BlueRGB(); RedRGB()]);
-				colormap([winter; flip(autumn)]);
-				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
-				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);
+				%colormap([BlueRGB(); GreenRGB(); RedRGB()]);
+				colormap([winter; pink; flip(autumn)]);
 			end
+			colorbar off
 		else
 			colormap('jet'); cb = colorbar('Location', 'east');
 			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
@@ -185,15 +282,13 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	%%Lighting, Reflection
 	if 1
 		% view(6.43e+01, 1.61e+01); %%cantilever - 1
-		% view(8.15e+01, 1.09e+01); %%cantilever - 2
-		% view(-7.65e+01, 1.08e+01); %%cantilever - 3
-		% view(-1.11e+00, 1.97e+01); %%femur 
-		% view(7.07e+01, 1.24e+00); %%femur 
+		% view(2.89e+01, 5.90e+00); %%femur
 		% view(0, 0); %% bracket
-		% view(-1.96e+02, 1.31e+01); %%bunny
+		% view(-1.68e+02, 8.96e+00); %%bunny
 		% view(-5.32e+00,3.77e+00); %%kitten
-		% view(-2.05e+02,1.69e+01) %%parts
+		% view(-2.05e+02,1.69e+01); %%parts
 		% view(-2.44e+01, 1.24e+01); %%bridge
+		% view(3.56e+01, -1.08e+00); %%armadillo
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
@@ -272,6 +367,60 @@ function val = RedRGB()
 			0.477928407843137	0.0298375529411765	0.0570388078431373
 			0.443487738235294	0.0168363205882352	0.0539341294117647
 			0.403921568627451	0					0.0509803921568627];
+end
+
+function val = GreenRGB()
+	val = [ 0.631372549019608	0.850980392156863	0.607843137254902
+			0.629617669607843	0.839994433333334	0.589383415686275
+			0.621943466666667	0.830214023529412	0.572002635294118
+			0.609418910784314	0.821368868627451	0.555621482352941
+			0.593008188235294	0.813217380392157	0.540162760784314
+			0.573575367647059	0.805545343137255	0.525551470588235
+			0.551889066666667	0.798164580392157	0.511714886274510
+			0.528627118627451	0.790911621568628	0.498582635294118
+			0.504381239215686	0.783646368627451	0.486086776470588
+			0.479661693137255	0.776250762745098	0.474161878431373
+			0.454901960784314	0.768627450980392	0.462745098039216
+			0.430463404901961	0.760698452941177	0.451776258823529
+			0.406639937254902	0.752403827450980	0.441197929411765
+			0.383662685294118	0.743700339215686	0.430955501960784
+			0.361704658823529	0.734560125490196	0.420997270588235
+			0.340885416666667	0.724969362745098	0.411274509803922
+			0.321275733333333	0.714926933333333	0.401741552941176
+			0.302902265686274	0.704443092156863	0.392355870588235
+			0.285752219607843	0.693538133333333	0.383078149019608
+			0.269778016666667	0.682241056862745	0.373872368627451
+			0.254901960784314	0.670588235294118	0.364705882352941
+			0.241020904901961	0.658622080392157	0.355549494117647
+			0.228010917647059	0.646389709803922	0.346377537254902
+			0.215731950000000	0.633941613725490	0.337167952941176
+			0.204032501960784	0.621330321568627	0.327902368627451
+			0.192754289215686	0.608609068627451	0.318566176470588
+			0.181736909803922	0.595830462745098	0.309148611764706
+			0.170822510784314	0.583045150980392	0.299642831372549
+			0.159860454901961	0.570300486274510	0.290045992156863
+			0.148711987254902	0.557639194117647	0.280359329411765
+			0.137254901960784	0.545098039215686	0.270588235294118
+			0.125388208823529	0.532706492156863	0.260742337254902
+			0.113036800000000	0.520485396078431	0.250835576470588
+			0.100156116666667	0.508445633333333	0.240886286274510
+			0.0867368156862745	0.496586792156863	0.230917270588235
+			0.0728094362745098	0.484895833333333	0.220955882352941
+			0.0584490666666668	0.473345756862745	0.211034101960784
+			0.0437800107843137	0.461894268627451	0.201188615686275
+			0.0289804549019608	0.450482447058824	0.191460894117647
+			0.0142871343137254	0.439033409803921	0.181897270588235
+			0					0.427450980392157	0.172549019607843
+			0					0.415618354901961	0.163472435294118
+			0					0.403396768627451	0.154728909803922
+			0					0.390624162745098	0.146385011764706
+			0					0.377113850980392	0.138512564705882
+			0					0.362653186274510	0.131188725490196
+			0					0.347002227450981	0.124496062745098
+			0					0.329892405882353	0.118522635294118
+			0					0.311025192156863	0.113362070588235
+			0					0.290070762745098	0.109113643137255
+			0					0.266666666666667	0.105882352941176 ];
 end
 
 function val = BlueRGB()

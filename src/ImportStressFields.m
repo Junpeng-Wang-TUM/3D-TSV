@@ -134,7 +134,7 @@ function ImportStressFields(fileName)
 		cartesianStressField_ = tmp';
 		fclose(fid);
 		
-		%% element centroids and size
+		%% element centroids and size	
 		eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
 		eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
 		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
@@ -144,7 +144,7 @@ function ImportStressFields(fileName)
 			min(nodeCoords_(:,3))];
 		vtxUpperBound_ = [max(nodeCoords_(:,1)) max(nodeCoords_(:,2)) ...
 			max(nodeCoords_(:,3))];
-		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;	
+		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;
 		%%extract and Re-organize silhouette into quad-mesh for exporting
 		faceIndex = zeros(4,6*numEles_);
 		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
@@ -160,29 +160,50 @@ function ImportStressFields(fileName)
 		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
 		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
 		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
-		%% in case there are some "fake" surface node
-		maxSurMeshNodeIndex = max(max(surfaceQuadMeshElements_));
-		tmp = zeros(maxSurMeshNodeIndex,1);
-		surfMeshNodeReal = unique(surfaceQuadMeshElements_);
-		tmp(surfMeshNodeReal) = (1:length(surfMeshNodeReal))';
-		nodState_ = zeros(size(nodState_)); nodState_(boundaryNode(surfMeshNodeReal)) = 1;
-		surfaceQuadMeshElements_ = tmp(surfaceQuadMeshElements_);
-		surfaceQuadMeshNodeCoords_ = surfaceQuadMeshNodeCoords_(surfMeshNodeReal,:);
-		
 		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
 		xPatchs = surfaceQuadMeshNodeCoords_(:,1); silhouetteStruct_.xPatchs = xPatchs(surfaceQuadMeshElements_');
 		yPatchs = surfaceQuadMeshNodeCoords_(:,2); silhouetteStruct_.yPatchs = yPatchs(surfaceQuadMeshElements_');
 		zPatchs = surfaceQuadMeshNodeCoords_(:,3); silhouetteStruct_.zPatchs = zPatchs(surfaceQuadMeshElements_');
 		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.zPatchs));		
-			
-		global nodStruct_; global boundaryElements_; 
-		nodStruct_ = struct('adjacentEles', []); nodStruct_ = repmat(nodStruct_, numNodes_, 1);
+		
+		%% build element three
+		global nodStruct_; global eleStruct_; global boundaryElements_; 
+		iNodStruct = struct('adjacentEles', []); 
+		nodStruct_ = repmat(iNodStruct, numNodes_, 1);
 		for ii=1:numEles_
 			for jj=1:8
 				nodStruct_(eNodMat_(ii,jj)).adjacentEles(1,end+1) = ii;
 			end
 		end		
-		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);		
+		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);
+		eleFaces = mapEle2patch';	 
+		iEleStruct = struct('faceCentres', [], 'faceNormals', []); %%pure-Hex
+		eleStruct_ = repmat(iEleStruct, numEles_, 1);
+		for ii=1:numEles_
+			iNodes = eNodMat_(ii,:);
+			iEleVertices = nodeCoords_(iNodes, :);
+			iEleFacesX = iEleVertices(:,1); iEleFacesX = iEleFacesX(eleFaces);
+			iEleFacesY = iEleVertices(:,2); iEleFacesY = iEleFacesY(eleFaces);
+			iEleFacesZ = iEleVertices(:,3); iEleFacesZ = iEleFacesZ(eleFaces);				
+			ABs = [iEleFacesX(:,1)-iEleFacesX(:,2) iEleFacesY(:,1)-iEleFacesY(:,2) iEleFacesZ(:,1)-iEleFacesZ(:,2)];
+			ADs = [iEleFacesX(:,1)-iEleFacesX(:,4) iEleFacesY(:,1)-iEleFacesY(:,4) iEleFacesZ(:,1)-iEleFacesZ(:,4)];
+			iABxAC = cross(ABs,ADs); iABxAC = iABxAC ./ vecnorm(iABxAC,2,2);
+			CBs = -[iEleFacesX(:,3)-iEleFacesX(:,2) iEleFacesY(:,3)-iEleFacesY(:,2) iEleFacesZ(:,3)-iEleFacesZ(:,2)];
+			CDs = [iEleFacesX(:,3)-iEleFacesX(:,4) iEleFacesY(:,3)-iEleFacesY(:,4) iEleFacesZ(:,3)-iEleFacesZ(:,4)];
+			iCBxCD = cross(CBs,CDs); iCBxCD = iCBxCD ./ vecnorm(iCBxCD,2,2);
+			aveNormal = (iABxAC+iCBxCD)/2; aveNormal = aveNormal ./ vecnorm(aveNormal,2,2);
+			tmp = iEleStruct;		
+			tmp.faceCentres = [sum(iEleFacesX,2) sum(iEleFacesY,2) sum(iEleFacesZ,2)]/4;
+			
+			%% tmp.faceNormals = aveNormal;
+			%% in case the node orderings on each element face are not constant
+			refVecs = eleCentroidList_(ii,:) - tmp.faceCentres; refVec = refVecs ./ vecnorm(refVecs,2,2);
+			dirEval = acos(sum(refVec .* aveNormal, 2));
+			dirDes = ones(6,1); dirDes(dirEval<pi/2) = -1;
+			tmp.faceNormals = dirDes .* aveNormal;
+			
+			eleStruct_(ii) = tmp;
+		end
 	end
 
 end
