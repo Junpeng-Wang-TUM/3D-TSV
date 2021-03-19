@@ -28,12 +28,12 @@ userInterface = InterfaceStruct();
 % userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================femur=======================================
-% userInterface.fileName = './data/Vis2021_femur3D.vtk';
+userInterface.fileName = './data/Vis2021_femur3D.vtk';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 18;
-% userInterface.numLevels = 1;
-% userInterface.traceAlgorithm = 'Euler';
+userInterface.lineDensCtrl = 18;
+userInterface.numLevels = 1;
+userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 3: %%Teaser 1st-row
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
@@ -62,10 +62,10 @@ userInterface = InterfaceStruct();
 % userInterface.seedDensCtrl = 4;
 
 %% =======================================Bunny_HexMesh=======================================
-userInterface.fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
+% userInterface.fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
 %% ---------------------------------------Experiment 1
-userInterface.lineDensCtrl = 26;
-userInterface.numLevels = 1;
+% userInterface.lineDensCtrl = 26;
+% userInterface.numLevels = 1;
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
