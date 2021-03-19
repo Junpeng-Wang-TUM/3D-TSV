@@ -42,9 +42,9 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	for ii=1:numPSF
 		iPSF = selectedPrincipalStressField_(ii);
 		switch iPSF
-			case 'MAJOR', PSLsAppearanceOrder_(end+1,:) = [1 0];
-			case 'MEDIUM', PSLsAppearanceOrder_(end+1,:) = [2 0];
-			case 'MINOR', PSLsAppearanceOrder_(end+1,:) = [3 0];
+			case 1, PSLsAppearanceOrder_(end+1,:) = [1 0];
+			case 2, PSLsAppearanceOrder_(end+1,:) = [2 0];
+			case 3, PSLsAppearanceOrder_(end+1,:) = [3 0];
 		end
 	end
 	

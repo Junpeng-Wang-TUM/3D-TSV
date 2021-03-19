@@ -26,9 +26,9 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	for ii=1:numPSF
 		iPSF = selectedPrincipalStressField_(ii);
 		switch iPSF
-			case 'MAJOR', seedPointsValence_(:,1) = 0; 
-			case 'MEDIUM', seedPointsValence_(:,2) = 0; 
-			case 'MINOR', seedPointsValence_(:,3) = 0;
+			case 1, seedPointsValence_(:,1) = 0; 
+			case 2, seedPointsValence_(:,2) = 0; 
+			case 3, seedPointsValence_(:,3) = 0;
 		end
 	end
 	PreprocessSeedPoints();
@@ -166,15 +166,15 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			for jj=1:numPSF
 				iPSF = selectedPrincipalStressField_(jj);
 				switch iPSF
-					case 'MAJOR'
+					case 1
 						majorPSL = GridGrowthTrigger(seed, 'MAJOR'); 
 						majorPSLpool_(end+1,1) = majorPSL;
 						PSLsAppearanceOrder_(end+1,:) = [1 length(majorPSLpool_)];
-					case 'MEDIUM'
+					case 2
 						mediumPSL = GridGrowthTrigger(seed, 'MEDIUM'); 
 						mediumPSLpool_(end+1,1) = mediumPSL;
 						PSLsAppearanceOrder_(end+1,:) = [2 length(mediumPSLpool_)];
-					case 'MINOR'
+					case 3
 						minorPSL = GridGrowthTrigger(seed, 'MINOR'); 
 						minorPSLpool_(end+1,1) = minorPSL;
 						PSLsAppearanceOrder_(end+1,:) = [3 length(minorPSLpool_)];

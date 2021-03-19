@@ -8,7 +8,7 @@ addpath('./src');
 %% userInterface.numLevels = 3;
 %% userInterface.seedStrategy = 'Volume';
 %% userInterface.seedDensCtrl = 4;
-%% userInterface.selectedPrincipalStressField = ["MAJOR", "MINOR"];
+%% userInterface.selectedPrincipalStressField = [1, 3];
 %% userInterface.mergingOpt = 1;
 %% userInterface.snappingOpt = 0;
 %% userInterface.maxAngleDevi = 6;
@@ -28,28 +28,28 @@ userInterface = InterfaceStruct();
 % userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================femur=======================================
-userInterface.fileName = './data/Vis2021_femur3D.vtk';
+% userInterface.fileName = './data/Vis2021_femur3D.vtk';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
-userInterface.lineDensCtrl = 18;
-userInterface.numLevels = 1;
-userInterface.traceAlgorithm = 'Euler';
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 1;
+% userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 3: %%Teaser 1st-row
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 %% ---------------------------------------Experiment 4
 % userInterface.seedStrategy = 'LoadingArea';
 % userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = "MINOR";
+% userInterface.selectedPrincipalStressField = 3;
 % userInterface.mergingOpt = 0;
 %% ---------------------------------------Experiment 5: %%Teaser 2nd-row PlanB
 % userInterface.multiMergingThresholds = [2 3 1];
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 1;
 % userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 
 %% =======================================Bunny=======================================
 % userInterface.fileName = './data/Vis2021_bunny3D.vtk';
@@ -62,10 +62,10 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.seedDensCtrl = 4;
 
 %% =======================================Bunny_HexMesh=======================================
-% userInterface.fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
+userInterface.fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
 %% ---------------------------------------Experiment 1
-% userInterface.lineDensCtrl = 26;
-% userInterface.numLevels = 1;
+userInterface.lineDensCtrl = 26;
+userInterface.numLevels = 1;
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
@@ -74,13 +74,13 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 2;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 %% ---------------------------------------Experiment 4: %%Teaser 2nd-row Plan  B
 % userInterface.multiMergingThresholds = [1 3 2];
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 1;
 % userInterface.seedDensCtrl = 2;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MEDIUM", "MINOR"];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 
 %% =======================================Armadillo_HexMesh=======================================
 % userInterface.fileName = './data/Vis2021_armadillo3D_HexMesh.vtk';
@@ -132,13 +132,13 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.numLevels = 3;
 %% ---------------------------------------Experiment 2: %%fig.2 left
 % userInterface.seedDensCtrl = 30;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MINOR", "MEDIUM"];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 % userInterface.mergingOpt = 0;
 % userInterface.maxAngleDevi = 20;
 %% ---------------------------------------Experiment 3: %%fig.2 right
 % userInterface.seedStrategy = 'LoadingArea';
 % userInterface.seedDensCtrl = 2;
-% userInterface.selectedPrincipalStressField = ["MAJOR", "MINOR", "MEDIUM"];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 % userInterface.mergingOpt = 0;
 % userInterface.maxAngleDevi = 20;
 %% ---------------------------------------Experiment 4: %%fig.xx
