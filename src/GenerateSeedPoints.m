@@ -10,10 +10,11 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 	global nodStruct_;
 	global eNodMat_;
 	global numNodes_;
-	if 0>=seedDensCtrl, seedDensCtrl = 2; end %% in case 0>=minimumEpsilon and volumeSeedingOpt is not defined
+	if 0>=seedDensCtrl, seedDensCtrl = 4; end %% in case 0>=minimumEpsilon and volumeSeedingOpt is not defined
 	switch seedStrategy
 		case 'Volume'
 			if strcmp(meshType_, 'CARTESIAN_GRID')
+				if seedDensCtrl > min([nelx_ nely_ nelz_])/3, seedDensCtrl = 4; end %% in case seedDensCtrl is wrongly selected
 				validNodesVolume = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
 				validNodesVolume(originalValidNodeIndex_) = (1:length(originalValidNodeIndex_))';
 				validNodesVolume = reshape(validNodesVolume, nely_+1, nelx_+1, nelz_+1);
