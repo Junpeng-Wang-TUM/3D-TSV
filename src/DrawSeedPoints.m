@@ -1,7 +1,6 @@
-function [handleSilhouette, handleSeeds] = DrawSeedPoints(varargin)
+function [handleSilhouette, handleSeeds] = DrawSeedPoints(lw, varargin)
 	global seedPointsHistory_;
 	global minimumEpsilon_;
-	lw = 0.5;
 	seedRadius = lw*minimumEpsilon_/4;
 	numSeedPoints = size(seedPointsHistory_,1);
 	[sphereX,sphereY,sphereZ] = sphere(10);
@@ -22,7 +21,7 @@ function [handleSilhouette, handleSeeds] = DrawSeedPoints(varargin)
 	patchZ = repmat(patchZ, numSeedPoints, 1); ctrZ = repmat(ctrZ, 1, nn); ctrZ = reshape(ctrZ', numel(ctrZ), 1);
 	patchZ = ctrZ + patchZ;	
 	
-	if 0==nargin
+	if 1==nargin
 		figure; axHandle_ = gca; lightsOpt = 1;
 		handleSilhouette = DrawSilhouette(axHandle_);
 	else

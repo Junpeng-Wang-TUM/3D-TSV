@@ -60,26 +60,31 @@ function numIntersections = DrawPSLsIntersections(imOpt, imVal, lw, varargin)
 	[sphereX,sphereY,sphereZ] = sphere;
 	sphereX = seedRadius*sphereX;
 	sphereY = seedRadius*sphereY;
-	sphereZ = seedRadius*sphereZ;
-	
+	sphereZ = seedRadius*sphereZ;	
 	nn = size(sphereX,1);
-	patchX = []; patchY = []; patchZ = [];
-	for ii=1:numIntersections
-		patchX(end+1:end+nn,:) = intersectionList(ii,1)+sphereX;
-		patchY(end+1:end+nn,:) = intersectionList(ii,2)+sphereY;
-		patchZ(end+1:end+nn,:) = intersectionList(ii,3)+sphereZ;	
-	end
+
+	patchX = sphereX; ctrX = intersectionList(:,1);
+	patchX = repmat(patchX, numIntersections, 1); ctrX = repmat(ctrX, 1, nn); ctrX = reshape(ctrX', numel(ctrX), 1);
+	patchX = ctrX + patchX;
+	
+	patchY = sphereY; ctrY = intersectionList(:,2);
+	patchY = repmat(patchY, numIntersections, 1); ctrY = repmat(ctrY, 1, nn); ctrY = reshape(ctrY', numel(ctrY), 1);
+	patchY = ctrY + patchY;	
+	
+	patchZ = sphereZ; ctrZ = intersectionList(:,3);
+	patchZ = repmat(patchZ, numIntersections, 1); ctrZ = repmat(ctrZ, 1, nn); ctrZ = reshape(ctrZ', numel(ctrZ), 1);
+	patchZ = ctrZ + patchZ;		
+	
 	if 3==nargin
 		figure; 
 		handleSilhouette = DrawSilhouette();
 		handleIntersections = surf(patchX,patchY,patchZ); hold on
 		set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
-		set(handleIntersections, 'FaceColor', [0 0 1], 'FaceAlpha', 1, 'EdgeColor', 'none');
+		set(handleIntersections, 'FaceColor', [65 174 118]/255, 'FaceAlpha', 1, 'EdgeColor', 'none');
 		if 1
 			lighting gouraud;
 			Lopt = 'LA'; %% 'LA', 'LB'
-			Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
-			
+			Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'		
 			switch Lopt
 				case 'LA'
 					camlight('headlight','infinite');
@@ -87,17 +92,12 @@ function numIntersections = DrawPSLsIntersections(imOpt, imVal, lw, varargin)
 					camlight('left','infinite');					
 				case 'LB'
 					camlight('headlight','infinite');				
-			end
-			
+			end		
 			switch Mopt
-				case 'M0'
-				
-				case 'MA'
-					material dull
-				case 'MB'
-					material shiny
-				case 'MC'
-					material metal
+				case 'M0',
+				case 'MA', material([handleSilhouette(:); handleIntersections(:)], 'dull'); 
+				case 'MB', material([handleSilhouette(:); handleIntersections(:)], 'shiny'); 
+				case 'MC', material([handleSilhouette(:); handleIntersections(:)], 'metal'); 
 			end
 		end		
 	else
