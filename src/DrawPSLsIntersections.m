@@ -62,7 +62,7 @@ function numIntersections = DrawPSLsIntersections(imOpt, imVal, lw, varargin)
 	sphereY = seedRadius*sphereY;
 	sphereZ = seedRadius*sphereZ;
 	
-	nn = size(sphereX);
+	nn = size(sphereX,1);
 	patchX = []; patchY = []; patchZ = [];
 	for ii=1:numIntersections
 		patchX(end+1:end+nn,:) = intersectionList(ii,1)+sphereX;

@@ -1,10 +1,11 @@
-function hd = DrawSilhouette()
+function hd = DrawSilhouette(varargin)
 	global silhouetteStruct_;
-	global axHandle_;
 	global meshType_;
-	axHandle_ = gca;
+	if 0==nargin, axHandle_ = gca;
+	else, axHandle_ = varargin{1}; end
+	
 	if strcmp(meshType_, 'CARTESIAN_GRID')
-		for ii=1:1:length(silhouetteStruct_)
+		for ii=1:length(silhouetteStruct_)
 			hd(ii) = patch(axHandle_, silhouetteStruct_(ii)); hold(axHandle_, 'on');
 		end				
 	else
