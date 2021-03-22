@@ -107,7 +107,12 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 				coordX = tubeShapedPSLs_Patches_.majorPatchX(:,tarPatches);
 				coordY = tubeShapedPSLs_Patches_.majorPatchY(:,tarPatches);
 				coordZ = tubeShapedPSLs_Patches_.majorPatchZ(:,tarPatches);
-				coordC = tubeShapedPSLs_Patches_.majorPatchC(:,tarPatches, colorOpt);			
+				coordC = tubeShapedPSLs_Patches_.majorPatchC(:,tarPatches, colorOpt);
+				if strcmp(stressComponentOpt, "Sigma")
+					r4Major = [201, 300];
+					v5 = min(min(coordC)); v6 = max(max(coordC));
+					coordC = (r4Major(2)-r4Major(1))*(coordC-v5)/(v6-v5)+r4Major(1);					
+				end
 				handleMajorPSL = surf(coordX, coordY, coordZ, coordC); 
 				shading(axHandle_, 'interp'); hold(axHandle_, 'on');
 			case 'RIBBON'
@@ -117,7 +122,7 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 					coordX = ribbonShapedPSLs_Patches_.majorPatchX(:,tarPatches);
 					coordY = ribbonShapedPSLs_Patches_.majorPatchY(:,tarPatches);
 					coordZ = ribbonShapedPSLs_Patches_.majorPatchZ(:,tarPatches);
-					coordC = ribbonShapedPSLs_Patches_.majorPatchC(:,tarPatches, colorOpt);	
+					coordC = ribbonShapedPSLs_Patches_.majorPatchC(:,tarPatches, colorOpt);					
 					coordOutlineX = ribbonShapedPSLs_Patches_.majorPatchOutlineX(:,tarPatcheOutlines);
 					coordOutlineY = ribbonShapedPSLs_Patches_.majorPatchOutlineY(:,tarPatcheOutlines);
 					coordOutlineZ = ribbonShapedPSLs_Patches_.majorPatchOutlineZ(:,tarPatcheOutlines);					
@@ -130,6 +135,11 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 					coordOutlineY = ribbonShapedPSLs_Patches_.majorPatchOutlineY_unSmo(:,tarPatcheOutlines);
 					coordOutlineZ = ribbonShapedPSLs_Patches_.majorPatchOutlineZ_unSmo(:,tarPatcheOutlines);						
 				end
+				if strcmp(stressComponentOpt, "Sigma")
+					r4Major = [201, 300];
+					v5 = min(min(coordC)); v6 = max(max(coordC));
+					coordC = (r4Major(2)-r4Major(1))*(coordC-v5)/(v6-v5)+r4Major(1);
+				end				
 				handleMajorPSL = patch(coordX, coordY, coordZ, coordC); hold(axHandle_, 'on');
 				handleRibbonOutlineMajorPSL = patch(coordOutlineX, coordOutlineY, coordOutlineZ, zeros(size(coordOutlineZ))); 
 				hold(axHandle_, 'on');
@@ -148,6 +158,11 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 				coordY = tubeShapedPSLs_Patches_.mediumPatchY(:,tarPatches);
 				coordZ = tubeShapedPSLs_Patches_.mediumPatchZ(:,tarPatches);
 				coordC = tubeShapedPSLs_Patches_.mediumPatchC(:,tarPatches, colorOpt);
+				if strcmp(stressComponentOpt, "Sigma")
+					r4Medium = [101, 200];
+					v3 = min(min(coordC)); v4 = max(max(coordC)); 
+					coordC = (r4Medium(2)-r4Medium(1))*(coordC-v3)/(v4-v3)+r4Medium(1);
+				end				
 				handleMediumPSL = surf(coordX, coordY, coordZ, coordC); 
 				shading(axHandle_, 'interp'); hold(axHandle_, 'on');
 			case 'RIBBON'
@@ -170,6 +185,11 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 					coordOutlineY = ribbonShapedPSLs_Patches_.mediumPatchOutlineY_unSmo(:,tarPatcheOutlines);
 					coordOutlineZ = ribbonShapedPSLs_Patches_.mediumPatchOutlineZ_unSmo(:,tarPatcheOutlines);						
 				end
+				if strcmp(stressComponentOpt, "Sigma")
+					r4Medium = [101, 200];
+					v3 = min(min(coordC)); v4 = max(max(coordC)); 
+					coordC = (r4Medium(2)-r4Medium(1))*(coordC-v3)/(v4-v3)+r4Medium(1);
+				end						
 				handleMediumPSL = patch(coordX, coordY, coordZ, coordC); hold(axHandle_, 'on');
 				handleRibbonOutlineMediumPSL = patch(coordOutlineX, coordOutlineY, coordOutlineZ, zeros(size(coordOutlineZ))); 
 				hold(axHandle_, 'on');
@@ -187,7 +207,12 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 				coordX = tubeShapedPSLs_Patches_.minorPatchX(:,tarPatches);
 				coordY = tubeShapedPSLs_Patches_.minorPatchY(:,tarPatches);
 				coordZ = tubeShapedPSLs_Patches_.minorPatchZ(:,tarPatches);
-				coordC = tubeShapedPSLs_Patches_.minorPatchC(:,tarPatches, colorOpt);		
+				coordC = tubeShapedPSLs_Patches_.minorPatchC(:,tarPatches, colorOpt);
+				if strcmp(stressComponentOpt, "Sigma")
+					r4Minor = [1, 100];
+					v1 = min(min(coordC)); v2 = max(max(coordC));
+					coordC = (r4Minor(2)-r4Minor(1))*(coordC-v1)/(v2-v1)+r4Minor(1);
+				end					
 				handleMinorPSL = surf(coordX, coordY, coordZ, coordC); 
 				shading(axHandle_, 'interp'); hold(axHandle_, 'on');
 			case 'RIBBON'
@@ -210,6 +235,11 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 					coordOutlineY = ribbonShapedPSLs_Patches_.minorPatchOutlineY_unSmo(:,tarPatcheOutlines);
 					coordOutlineZ = ribbonShapedPSLs_Patches_.minorPatchOutlineZ_unSmo(:,tarPatcheOutlines);						
 				end
+				if strcmp(stressComponentOpt, "Sigma")
+					r4Minor = [1, 100];
+					v1 = min(min(coordC)); v2 = max(max(coordC));
+					coordC = (r4Minor(2)-r4Minor(1))*(coordC-v1)/(v2-v1)+r4Minor(1);
+				end				
 				handleMinorPSL = patch(coordX, coordY, coordZ, coordC); hold(axHandle_, 'on');
 				handleRibbonOutlineMinorPSL = patch(coordOutlineX, coordOutlineY, coordOutlineZ, zeros(size(coordOutlineZ))); 
 				hold(axHandle_, 'on');
@@ -221,25 +251,59 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 	set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
 
 	if strcmp(stressComponentOpt, "None")
-		set(handleMajorPSL, 'FaceColor', [1 0 0]);
-		set(handleMediumPSL, 'FaceColor', [0 1 0]);
-		set(handleMinorPSL, 'FaceColor', [0 0 1]);	
+		set(handleMajorPSL, 'FaceColor', [0.40 0 0.05]);
+		set(handleMediumPSL, 'FaceColor', [0 0.27 0.11]);
+		set(handleMinorPSL, 'FaceColor', [0.03 0.19 0.42]);	
 	end
 	
 	%%Colorbar
 	if 1
 		if strcmp(stressComponentOpt, "None")
 		elseif strcmp(stressComponentOpt, "Sigma")
-			%% sth needs to do
-			% colormap([BlueRGB(); RedRGB()]);
-			colormap([winter; flip(autumn)]);			
+			% cb = colorbar(axHandle_, 'Location', 'east');
+			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
+				%colormap(axHandle_, [RedRGB()]);
+				colormap(axHandle_, 'autumn');
+				% set(cb,'Ticks',[225 275],'TickLabels', {v5 v6}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v5 v6]),'Un',0); set(cb,'xticklabel',L);					
+			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
+				%colormap(axHandle_, [GreenRGB();]);
+				colormap(axHandle_, 'copper');
+				% set(cb,'Ticks',[125 175],'TickLabels', {v3 v4}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v3 v4]),'Un',0); set(cb,'xticklabel',L);					
+			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
+				%colormap(axHandle_, [BlueRGB();]);
+				colormap(axHandle_, 'winter');
+				% set(cb,'Ticks',[25 75],'TickLabels', {v1 v2}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2]),'Un',0); set(cb,'xticklabel',L);					
+			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
+				% colormap(axHandle_, [GreenRGB(); RedRGB()]);
+				colormap(axHandle_, [pink; flip(autumn)]);
+				% set(cb,'Ticks',[125 175 225 275],'TickLabels', {v3 v4 v5 v6}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v3 v4 v5 v6]),'Un',0); set(cb,'xticklabel',L);				
+			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
+				% colormap(axHandle_, [BlueRGB(); RedRGB()]);
+				colormap(axHandle_, [winter; flip(autumn)]);
+				% set(cb,'Ticks',[25 75 225 275],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);				
+			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
+				% colormap(axHandle_, [BlueRGB(); GreenRGB();]);
+				colormap([winter; pink]);
+				% set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v3 v4}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v3 v4]),'Un',0); set(cb,'xticklabel',L);					
+			else
+				%colormap([BlueRGB(); GreenRGB(); RedRGB()]);
+				colormap([winter; pink; flip(autumn)]);
+				% set(cb,'Ticks',[25 75 125 175 225 275],'TickLabels', {v1 v2 v3 v4 v5 v6}, 'AxisLocation','out');
+				% L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v3 v4 v5 v6]),'Un',0); set(cb,'xticklabel',L);	
+			end	
 		else
 			colormap(axHandle_, 'jet'); 
 			% cb = colorbar(axHandle_, 'Location', 'east');
 			% t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
 			% L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);	
 		end
-		% set(axHandle_, 'FontName', 'Times New Roman', 'FontSize', 20);
+		set(axHandle_, 'FontName', 'Times New Roman', 'FontSize', 20);
 	end
 	
 	%%Lighting, Reflection
