@@ -58,3 +58,8 @@ global majorHierarchy_; majorHierarchy_ = [];
 global mediumHierarchy_; mediumHierarchy_ = [];
 global minorHierarchy_; minorHierarchy_ = [];
 global PSLsAppearanceOrder_; PSLsAppearanceOrder_ = [];
+
+%% 4. Visualization (only for Matlab Demo Code)
+global lineWidth_; lineWidth_ = 1;
+global tubeShapedPSLs_Patches_; tubeShapedPSLs_Patches_ = [];
+global ribbonShapedPSLs_Patches_; ribbonShapedPSLs_Patches_ = [];

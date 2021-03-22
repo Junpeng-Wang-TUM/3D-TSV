@@ -1,4 +1,4 @@
-function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
+function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
 	%% Syntax:
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
@@ -9,15 +9,20 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
 	%% smoothingOpt: %% smoothing ribbon or not (0)
-	%% minLength: minLengthVisiblePSLs_ or varargin{1} if exists, only PSLs with length larger than minLength can be shown
-	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
 	global minimumEpsilon_;
-	global minLengthVisiblePSLs_;
-	miniPSLength = minLengthVisiblePSLs_;
-	if 7==nargin, miniPSLength = varargin{1}; end
-	lineWidthTube = lw*minimumEpsilon_/5;
-	lineWidthRibbon = 3*lineWidthTube;
+	global lineWidth_;
+	global tubeShapedPSLs_Patches_; 
+	global ribbonShapedPSLs_Patches_;
+	global majorPSLs_Tube_PatchIndices_; global mediumPSLs_Tube_PatchIndices_; global minorPSLs_Tube_PatchIndices_;
+	global majorPSLs_Ribbon_PatchIndices_; global mediumPSLs_Ribbon_PatchIndices_; global minorPSLs_Ribbon_PatchIndices_;
+	if isempty(tubeShapedPSLs_Patches_) || isempty(ribbonShapedPSLs_Patches_) || lineWidth_~=lw
+		lineWidthTube = lw*minimumEpsilon_/5;
+		lineWidthRibbon = 3*lineWidthTube;
+		CreatePatchesForVis(lineWidthTube, lineWidthRibbon);
+		lineWidth_ = lw;
+	end
+	
 	%% Get Target PSLs to Draw
 	%% Major
 	switch imOpt(1)
@@ -32,13 +37,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		otherwise
 			error('Wrong Input!');
 	end
-	tarMajorPSLs = majorPSLpool_(tarMajorPSLindex);
-	tarIndice = [];
-	for ii=1:length(tarMajorPSLs)
-		if tarMajorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
-	end
-	tarMajorPSLs = tarMajorPSLs(tarIndice);	
-	numTarMajorPSLs = length(tarMajorPSLs);
+	numTarMajorPSLs = length(tarMajorPSLindex);
 	
 	%% Medium
 	switch imOpt(2)
@@ -52,14 +51,8 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			tarMediumPSLindex = find(mediumHierarchy_(:,4)>=imVal(2));
 		otherwise
 			error('Wrong Input!');
-	end
-	tarMediumPSLs = mediumPSLpool_(tarMediumPSLindex);
-	tarIndice = [];
-	for ii=1:length(tarMediumPSLs)
-		if tarMediumPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
-	end
-	tarMediumPSLs = tarMediumPSLs(tarIndice);		
-	numTarMediumPSLs = length(tarMediumPSLs);	
+	end		
+	numTarMediumPSLs = length(tarMediumPSLindex);	
 	
 	%% Minor
 	switch imOpt(3)
@@ -74,247 +67,220 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		otherwise
 			error('Wrong Input!');
 	end
-	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
-	tarIndice = [];
-	for ii=1:length(tarMinorPSLs)
-		if tarMinorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
-	end
-	tarMinorPSLs = tarMinorPSLs(tarIndice);	
-	numTarMinorPSLs = length(tarMinorPSLs);
+	numTarMinorPSLs = length(tarMinorPSLindex);
 	
 	if 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs, return; end
 	
 	%% Initialize Stress Component for Coloring
-	color4MajorPSLs = struct('arr', []); color4MajorPSLs = repmat(color4MajorPSLs, numTarMajorPSLs, 1);
-	color4MediumPSLs = struct('arr', []); color4MediumPSLs = repmat(color4MediumPSLs, numTarMediumPSLs, 1);
-	color4MinorPSLs = struct('arr', []); color4MinorPSLs = repmat(color4MinorPSLs, numTarMinorPSLs, 1);
+
 	%%'None', 'Sigma', 'Sigma_3', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 	switch stressComponentOpt
-		case 'None'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = zeros(1, tarMajorPSLs(ii).length);
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = zeros(1, tarMediumPSLs(ii).length);
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = zeros(1, tarMinorPSLs(ii).length);
-			end			
-		case 'Sigma'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).principalStressList(:,9)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).principalStressList(:,5)';
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).principalStressList(:,1)';
-			end				
-			m=100; r4Minor = [1 m]; r4Medium = m+r4Minor; r4Major = m+r4Medium;
-			cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
-			end
-			cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
-			end
-			cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = (r4Minor(2)-r4Minor(1))*(color4MinorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Minor(1);
-			end			
-		case 'Sigma_xx'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,1)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,1)';
-			end
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,1)';
-			end		
-		case 'Sigma_yy'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,2)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,2)';
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,2)';
-			end		
-		case 'Sigma_zz'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,3)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,3)';
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,3)';
-			end		
-		case 'Sigma_yz'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,4)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,4)';
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,4)';
-			end		
-		case 'Sigma_zx'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,5)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,5)';
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,5)';
-			end		
-		case 'Sigma_xy'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).cartesianStressList(:,6)';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).cartesianStressList(:,6)';
-			end			
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).cartesianStressList(:,6)';
-			end		
-		case 'Sigma_vM'
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = tarMajorPSLs(ii).vonMisesStressList';
-			end
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = tarMediumPSLs(ii).vonMisesStressList';
-			end				
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).vonMisesStressList';
-			end
+		case 'None', colorOpt = 1;
+		case 'Sigma', colorOpt = 2;
+		case 'Sigma_vM', colorOpt = 3;
+		case 'Sigma_xx', colorOpt = 4;
+		case 'Sigma_yy', colorOpt = 5;
+		case 'Sigma_zz', colorOpt = 6;
+		case 'Sigma_yz', colorOpt = 7;
+		case 'Sigma_zx', colorOpt = 8;
+		case 'Sigma_xy', colorOpt = 9;
 		otherwise
 			error('Wrong Input!');			
 	end
 	
 	%%Draw
-	figure; handleSilhouette = DrawSilhouette(); 
-	switch pslGeo(1)
-		case 'TUBE'
-			handleMajorPSL = ExpandPSLs2Tubes(tarMajorPSLs, color4MajorPSLs, lineWidthTube);
-		case 'RIBBON'
-			[handleMajorPSL, handleRibbonOutlineMajorPSL] = ...
-				ExpandPSLs2Ribbons(tarMajorPSLs, lineWidthRibbon, [6 7 8], color4MajorPSLs, ribbonSmoothingOpt);				
-	end
-	switch pslGeo(2)
-		case 'TUBE'
-			handleMediumPSL = ExpandPSLs2Tubes(tarMediumPSLs, color4MediumPSLs, lineWidthTube);
-		case 'RIBBON'
-			[handleMediumPSL, handleRibbonOutlineMediumPSL] = ...
-				ExpandPSLs2Ribbons(tarMediumPSLs, lineWidthRibbon, [2 3 4], color4MediumPSLs, ribbonSmoothingOpt);				
+	if 6==nargin
+		figure; axHandle_ = gca; lightsOpt = 1;
+		handleSilhouette = DrawSilhouette(axHandle_);
+	else
+		global handleSilhouette_;
+		axHandle_ = varargin{1}; lightsOpt = 0; 
+		handleSilhouette = handleSilhouette_;
 	end	
-	switch pslGeo(3)
-		case 'TUBE'
-			handleMinorPSL = ExpandPSLs2Tubes(tarMinorPSLs, color4MinorPSLs, lineWidthTube);
-		case 'RIBBON'
-			[handleMinorPSL, handleRibbonOutlineMinorPSL] = ...
-				ExpandPSLs2Ribbons(tarMinorPSLs, lineWidthRibbon, [6 7 8], color4MinorPSLs, ribbonSmoothingOpt);					
+	
+	handleMajorPSL = []; handleRibbonOutlineMajorPSL = [];
+	maxMajorPS = []; minMajorPS = []; 
+	if ~isempty(tarMajorPSLindex)
+		switch pslGeo(1)
+			case 'TUBE'
+				tarPatches = [majorPSLs_Tube_PatchIndices_(tarMajorPSLindex).arr];				
+				coordX = tubeShapedPSLs_Patches_.majorPatchX(:,tarPatches);
+				coordY = tubeShapedPSLs_Patches_.majorPatchY(:,tarPatches);
+				coordZ = tubeShapedPSLs_Patches_.majorPatchZ(:,tarPatches);
+				coordC = tubeShapedPSLs_Patches_.majorPatchC(:,tarPatches, colorOpt);			
+				handleMajorPSL = surf(coordX, coordY, coordZ, coordC); 
+				shading(axHandle_, 'interp'); hold(axHandle_, 'on');
+			case 'RIBBON'
+				tarPatches = [majorPSLs_Ribbon_PatchIndices_(tarMajorPSLindex).arrFace];
+				tarPatcheOutlines = [majorPSLs_Ribbon_PatchIndices_(tarMajorPSLindex).arrOutline];
+				if ribbonSmoothingOpt
+					coordX = ribbonShapedPSLs_Patches_.majorPatchX(:,tarPatches);
+					coordY = ribbonShapedPSLs_Patches_.majorPatchY(:,tarPatches);
+					coordZ = ribbonShapedPSLs_Patches_.majorPatchZ(:,tarPatches);
+					coordC = ribbonShapedPSLs_Patches_.majorPatchC(:,tarPatches, colorOpt);	
+					coordOutlineX = ribbonShapedPSLs_Patches_.majorPatchOutlineX(:,tarPatcheOutlines);
+					coordOutlineY = ribbonShapedPSLs_Patches_.majorPatchOutlineY(:,tarPatcheOutlines);
+					coordOutlineZ = ribbonShapedPSLs_Patches_.majorPatchOutlineZ(:,tarPatcheOutlines);					
+				else
+					coordX = ribbonShapedPSLs_Patches_.majorPatchX_unSmo(:,tarPatches);
+					coordY = ribbonShapedPSLs_Patches_.majorPatchY_unSmo(:,tarPatches);
+					coordZ = ribbonShapedPSLs_Patches_.majorPatchZ_unSmo(:,tarPatches);
+					coordC = ribbonShapedPSLs_Patches_.majorPatchC_unSmo(:,tarPatches, colorOpt);	
+					coordOutlineX = ribbonShapedPSLs_Patches_.majorPatchOutlineX_unSmo(:,tarPatcheOutlines);
+					coordOutlineY = ribbonShapedPSLs_Patches_.majorPatchOutlineY_unSmo(:,tarPatcheOutlines);
+					coordOutlineZ = ribbonShapedPSLs_Patches_.majorPatchOutlineZ_unSmo(:,tarPatcheOutlines);						
+				end
+				handleMajorPSL = patch(coordX, coordY, coordZ, coordC); hold(axHandle_, 'on');
+				handleRibbonOutlineMajorPSL = patch(coordOutlineX, coordOutlineY, coordOutlineZ, zeros(size(coordOutlineZ))); 
+				hold(axHandle_, 'on');
+		end
+		set(handleMajorPSL, 'edgecol', 'None');
+		set(handleRibbonOutlineMajorPSL, 'facecol', 'None', 'EdgeAlpha', 1, 'edgecol', 'k', 'linew', 3);
 	end
 	
+	handleMediumPSL = []; handleRibbonOutlineMediumPSL = [];
+	maxMediumPS = []; minMediumPS = []; 
+	if ~isempty(tarMediumPSLindex)
+		switch pslGeo(2)
+			case 'TUBE'
+				tarPatches = [mediumPSLs_Tube_PatchIndices_(tarMediumPSLindex).arr];
+				coordX = tubeShapedPSLs_Patches_.mediumPatchX(:,tarPatches);
+				coordY = tubeShapedPSLs_Patches_.mediumPatchY(:,tarPatches);
+				coordZ = tubeShapedPSLs_Patches_.mediumPatchZ(:,tarPatches);
+				coordC = tubeShapedPSLs_Patches_.mediumPatchC(:,tarPatches, colorOpt);
+				handleMediumPSL = surf(coordX, coordY, coordZ, coordC); 
+				shading(axHandle_, 'interp'); hold(axHandle_, 'on');
+			case 'RIBBON'
+				tarPatches = [mediumPSLs_Ribbon_PatchIndices_(tarMediumPSLindex).arrFace];
+				tarPatcheOutlines = [mediumPSLs_Ribbon_PatchIndices_(tarMediumPSLindex).arrOutline];
+				if ribbonSmoothingOpt
+					coordX = ribbonShapedPSLs_Patches_.mediumPatchX(:,tarPatches);
+					coordY = ribbonShapedPSLs_Patches_.mediumPatchY(:,tarPatches);
+					coordZ = ribbonShapedPSLs_Patches_.mediumPatchZ(:,tarPatches);
+					coordC = ribbonShapedPSLs_Patches_.mediumPatchC(:,tarPatches, colorOpt);	
+					coordOutlineX = ribbonShapedPSLs_Patches_.mediumPatchOutlineX(:,tarPatcheOutlines);
+					coordOutlineY = ribbonShapedPSLs_Patches_.mediumPatchOutlineY(:,tarPatcheOutlines);
+					coordOutlineZ = ribbonShapedPSLs_Patches_.mediumPatchOutlineZ(:,tarPatcheOutlines);					
+				else
+					coordX = ribbonShapedPSLs_Patches_.mediumPatchX_unSmo(:,tarPatches);
+					coordY = ribbonShapedPSLs_Patches_.mediumPatchY_unSmo(:,tarPatches);
+					coordZ = ribbonShapedPSLs_Patches_.mediumPatchZ_unSmo(:,tarPatches);
+					coordC = ribbonShapedPSLs_Patches_.mediumPatchC_unSmo(:,tarPatches, colorOpt);	
+					coordOutlineX = ribbonShapedPSLs_Patches_.mediumPatchOutlineX_unSmo(:,tarPatcheOutlines);
+					coordOutlineY = ribbonShapedPSLs_Patches_.mediumPatchOutlineY_unSmo(:,tarPatcheOutlines);
+					coordOutlineZ = ribbonShapedPSLs_Patches_.mediumPatchOutlineZ_unSmo(:,tarPatcheOutlines);						
+				end
+				handleMediumPSL = patch(coordX, coordY, coordZ, coordC); hold(axHandle_, 'on');
+				handleRibbonOutlineMediumPSL = patch(coordOutlineX, coordOutlineY, coordOutlineZ, zeros(size(coordOutlineZ))); 
+				hold(axHandle_, 'on');
+		end
+		set(handleMediumPSL, 'edgecol', 'None');
+		set(handleRibbonOutlineMediumPSL, 'facecol', 'None', 'EdgeAlpha', 1, 'edgecol', 'k', 'linew', 3);
+	end
+	
+	handleMinorPSL = []; handleRibbonOutlineMinorPSL = [];
+	maxMinorPS = []; minMinorPS = []; 
+	if ~isempty(tarMinorPSLindex)
+		switch pslGeo(3)
+			case 'TUBE'
+				tarPatches = [minorPSLs_Tube_PatchIndices_(tarMinorPSLindex).arr];
+				coordX = tubeShapedPSLs_Patches_.minorPatchX(:,tarPatches);
+				coordY = tubeShapedPSLs_Patches_.minorPatchY(:,tarPatches);
+				coordZ = tubeShapedPSLs_Patches_.minorPatchZ(:,tarPatches);
+				coordC = tubeShapedPSLs_Patches_.minorPatchC(:,tarPatches, colorOpt);		
+				handleMinorPSL = surf(coordX, coordY, coordZ, coordC); 
+				shading(axHandle_, 'interp'); hold(axHandle_, 'on');
+			case 'RIBBON'
+				tarPatches = [minorPSLs_Ribbon_PatchIndices_(tarMinorPSLindex).arrFace];
+				tarPatcheOutlines = [minorPSLs_Ribbon_PatchIndices_(tarMinorPSLindex).arrOutline];
+				if ribbonSmoothingOpt
+					coordX = ribbonShapedPSLs_Patches_.minorPatchX(:,tarPatches);
+					coordY = ribbonShapedPSLs_Patches_.minorPatchY(:,tarPatches);
+					coordZ = ribbonShapedPSLs_Patches_.minorPatchZ(:,tarPatches);
+					coordC = ribbonShapedPSLs_Patches_.minorPatchC(:,tarPatches, colorOpt);	
+					coordOutlineX = ribbonShapedPSLs_Patches_.minorPatchOutlineX(:,tarPatcheOutlines);
+					coordOutlineY = ribbonShapedPSLs_Patches_.minorPatchOutlineY(:,tarPatcheOutlines);
+					coordOutlineZ = ribbonShapedPSLs_Patches_.minorPatchOutlineZ(:,tarPatcheOutlines);					
+				else
+					coordX = ribbonShapedPSLs_Patches_.minorPatchX_unSmo(:,tarPatches);
+					coordY = ribbonShapedPSLs_Patches_.minorPatchY_unSmo(:,tarPatches);
+					coordZ = ribbonShapedPSLs_Patches_.minorPatchZ_unSmo(:,tarPatches);
+					coordC = ribbonShapedPSLs_Patches_.minorPatchC_unSmo(:,tarPatches, colorOpt);	
+					coordOutlineX = ribbonShapedPSLs_Patches_.minorPatchOutlineX_unSmo(:,tarPatcheOutlines);
+					coordOutlineY = ribbonShapedPSLs_Patches_.minorPatchOutlineY_unSmo(:,tarPatcheOutlines);
+					coordOutlineZ = ribbonShapedPSLs_Patches_.minorPatchOutlineZ_unSmo(:,tarPatcheOutlines);						
+				end
+				handleMinorPSL = patch(coordX, coordY, coordZ, coordC); hold(axHandle_, 'on');
+				handleRibbonOutlineMinorPSL = patch(coordOutlineX, coordOutlineY, coordOutlineZ, zeros(size(coordOutlineZ))); 
+				hold(axHandle_, 'on');
+		end
+		set(handleMinorPSL, 'edgecol', 'None');
+		set(handleRibbonOutlineMinorPSL, 'facecol', 'None', 'EdgeAlpha', 1, 'edgecol', 'k', 'linew', 3);	
+	end
+
 	set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
-	if exist('handleRibbonOutlineMajorPSL')
-		set(handleRibbonOutlineMajorPSL, 'EdgeAlpha', 1, 'edgecol','k');
-	end
-	if exist('handleRibbonOutlineMediumPSL')
-		set(handleRibbonOutlineMediumPSL, 'EdgeAlpha', 1, 'edgecol','k');
-	end
-	if exist('handleRibbonOutlineMinorPSL')
-		set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
-	end
+
 	if strcmp(stressComponentOpt, "None")
 		set(handleMajorPSL, 'FaceColor', [1 0 0]);
 		set(handleMediumPSL, 'FaceColor', [0 1 0]);
 		set(handleMinorPSL, 'FaceColor', [0 0 1]);	
 	end
-	set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
-	set(handleMediumPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
-	set(handleMinorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 	
 	%%Colorbar
 	if 1
 		if strcmp(stressComponentOpt, "None")
 		elseif strcmp(stressComponentOpt, "Sigma")
-			cb = colorbar('Location', 'east');
-			v1 = min(cValOnMinor); v2 = max(cValOnMinor);
-			v3 = min(cValOnMedium); v4 = max(cValOnMedium);
-			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
-			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
-				%colormap([RedRGB()]);
-				colormap('autumn');
-			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
-				%colormap([GreenRGB();]);
-				colormap('copper');
-			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
-				%colormap([BlueRGB();]);
-				colormap('winter');
-			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
-				% colormap([GreenRGB(); RedRGB()]);
-				colormap([pink; flip(autumn)]);
-			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
-				% colormap([BlueRGB(); RedRGB()]);
-				colormap([winter; pink; flip(autumn)]);
-			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
-				% colormap([BlueRGB(); GreenRGB();]);
-				colormap([winter; pink]);
-			else
-				%colormap([BlueRGB(); GreenRGB(); RedRGB()]);
-				colormap([BlueRGB(); RedRGB()]);
-				% colormap([winter; pink; flip(autumn)]);
-				%colormap([winter; flip(autumn)]);
-			end
-			colorbar off
+			%% sth needs to do
+			% colormap([BlueRGB(); RedRGB()]);
+			colormap([winter; flip(autumn)]);			
 		else
-			colormap('jet'); cb = colorbar('Location', 'east');
-			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
-			L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);	
+			colormap(axHandle_, 'jet'); 
+			% cb = colorbar(axHandle_, 'Location', 'east');
+			% t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
+			% L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);	
 		end
-		set(gca, 'FontName', 'Times New Roman', 'FontSize', 20);
+		% set(axHandle_, 'FontName', 'Times New Roman', 'FontSize', 20);
 	end
 	
 	%%Lighting, Reflection
-	if 1
-		% view(6.43e+01, 1.61e+01); %%cantilever - 1
-		% view(2.89e+01, 5.90e+00); %%femur
-		% view(0, 0); %% bracket
-		% view(-1.68e+02, 8.96e+00); %%bunny
-		% view(-5.32e+00,3.77e+00); %%kitten
-		% view(-2.05e+02,1.69e+01); %%parts
-		% view(-2.44e+01, 1.24e+01); %%bridge
-		% view(3.56e+01, -1.08e+00); %%armadillo
-		lighting gouraud;
+	if lightsOpt
+		% view(axHandle_, 6.43e+01, 1.61e+01); %%cantilever - 1
+		% view(axHandle_, 2.89e+01, 5.90e+00); %%femur
+		% view(axHandle_, 0, 0); %% bracket
+		% view(axHandle_, -1.68e+02, 8.96e+00); %%bunny
+		% view(axHandle_, -5.32e+00,3.77e+00); %%kitten
+		% view(axHandle_, -2.05e+02,1.69e+01); %%parts
+		% view(axHandle_, -2.44e+01, 1.24e+01); %%bridge
+		% view(axHandle_, 3.56e+01, -1.08e+00); %%armadillo
+		lighting(axHandle_, 'gouraud');
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
 		
 		switch Lopt
 			case 'LA'
-				camlight('headlight','infinite');
-				camlight('right','infinite');
-				camlight('left','infinite');					
+				camlight(axHandle_, 'headlight', 'infinite');
+				camlight(axHandle_, 'right', 'infinite');
+				camlight(axHandle_, 'left', 'infinite');					
 			case 'LB'
-				camlight('headlight','infinite');				
+				camlight(axHandle_, 'headlight', 'infinite');				
 		end
-		
+		allHandles = [handleSilhouette(:); handleMajorPSL(:); handleRibbonOutlineMajorPSL(:); handleMediumPSL(:); ...
+			handleRibbonOutlineMediumPSL(:); handleMinorPSL(:); handleRibbonOutlineMinorPSL(:)];
 		switch Mopt
-			case 'M0'
-			
-			case 'MA'
-				material dull
-			case 'MB'
-				material shiny
-			case 'MC'
-				material metal
+			case 'M0',			
+			case 'MA', material(allHandles, 'dull'); 
+			case 'MB', material(allHandles, 'shiny');
+			case 'MC', material(allHandles, 'metal');
 		end
-	end		
+	end
+	if 6==nargout
+		varargout{1} = handleMajorPSL;
+		varargout{2} = handleRibbonOutlineMajorPSL;
+		varargout{3} = handleMediumPSL;
+		varargout{4} = handleRibbonOutlineMediumPSL;
+		varargout{5} = handleMinorPSL;
+		varargout{6} = handleRibbonOutlineMinorPSL;		
+	end
 end
 
 function val = RedRGB()
