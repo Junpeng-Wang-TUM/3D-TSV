@@ -42,12 +42,16 @@ function ImportStressFields(fileName)
 		%%read cartesian stress field
 		tmp = fscanf(fid, '%s %s %s %s %d', 5);
 		tmp = fscanf(fid, '%s %s', 2); numLoadedNodes = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
-		tmp(1,:) = tmp(1,:)+1; 
-		nodeLoadVec_ = tmp';
+		if numLoadedNodes>0
+			tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
+			tmp(1,:) = tmp(1,:)+1; 
+			nodeLoadVec_ = tmp';
+		end
 		tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-		fixedNodes_ = tmp'+1;
+		if numFixedNodes>0
+			tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+			fixedNodes_ = tmp'+1;
+		end
 		tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
 		tmp = fscanf(fid, '%f %f %f %f %f %f', [6, numValidNods]);
 		cartesianStressField_ = tmp';		
@@ -123,12 +127,16 @@ function ImportStressFields(fileName)
 		%%read cartesian stress field
 		tmp = fscanf(fid, '%s %s %s %s %d', 5);
 		tmp = fscanf(fid, '%s %s', 2); numLoadedNodes = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
-		tmp(1,:) = tmp(1,:)+1; 
-		nodeLoadVec_ = tmp';
+		if numLoadedNodes>0
+			tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
+			tmp(1,:) = tmp(1,:)+1; 
+			nodeLoadVec_ = tmp';		
+		end
 		tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-		fixedNodes_ = tmp'+1;
+		if numFixedNodes>0
+			tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+			fixedNodes_ = tmp'+1;		
+		end
 		tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
 		tmp = fscanf(fid, '%f %f %f %f %f %f', [6, numValidNods]);
 		cartesianStressField_ = tmp';
