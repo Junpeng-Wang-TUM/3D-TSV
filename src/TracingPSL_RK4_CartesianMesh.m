@@ -4,7 +4,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	global nodeCoords_;
 	global cartesianStressField_;
 	global tracingStepWidth_;
-	
+	siE = 1.0e-06;
 	phyCoordList = zeros(limiSteps,3);
 	cartesianStressList = zeros(limiSteps,6);
 	eleIndexList = zeros(limiSteps,1);
@@ -46,7 +46,9 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
 					cartesianStressOnGivenPoint = ElementInterpolationTrilinear(cartesianStress, paraCoordinates);
 					vonMisesStress = ComputeVonMisesStress(cartesianStressOnGivenPoint);
-					principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);						
+					principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
+					evs = principalStress([1 5 9]);
+					if min([abs((evs(1)-evs(2))/2/(evs(1)+evs(2))) abs((evs(3)-evs(2))/2/(evs(3)+evs(2)))])<siE, index = index-1; break; end %%degenerate point							
 					%%k1
 					[k1, terminationCond] = BidirectionalFeatureProcessing(iniDir, principalStress(typePSL));
 					if ~terminationCond, index = index-1; break; end
