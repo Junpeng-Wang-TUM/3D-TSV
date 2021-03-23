@@ -1,4 +1,4 @@
-function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
+function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, miniPSLength, varargin)
 	%% Syntax:
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
@@ -9,6 +9,8 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
 	%% smoothingOpt: %% smoothing ribbon or not (0)
+	%% miniPSLength: only PSLs with length larger than miniPSLength can be shown
+	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
 	global minimumEpsilon_;
 	global lineWidth_;
@@ -37,7 +39,13 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 		otherwise
 			error('Wrong Input!');
 	end
-	numTarMajorPSLs = length(tarMajorPSLindex);
+	tarMajorPSLs = majorPSLpool_(tarMajorPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMajorPSLs)
+		if tarMajorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMajorPSLs = tarMajorPSLs(tarIndice);	
+	numTarMajorPSLs = length(tarMajorPSLs);	
 	
 	%% Medium
 	switch imOpt(2)
@@ -52,7 +60,13 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 		otherwise
 			error('Wrong Input!');
 	end		
-	numTarMediumPSLs = length(tarMediumPSLindex);	
+	tarMediumPSLs = mediumPSLpool_(tarMediumPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMediumPSLs)
+		if tarMediumPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMediumPSLs = tarMediumPSLs(tarIndice);		
+	numTarMediumPSLs = length(tarMediumPSLs);	
 	
 	%% Minor
 	switch imOpt(3)
@@ -67,7 +81,13 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 		otherwise
 			error('Wrong Input!');
 	end
-	numTarMinorPSLs = length(tarMinorPSLindex);
+	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
+	tarIndice = [];
+	for ii=1:length(tarMinorPSLs)
+		if tarMinorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	end
+	tarMinorPSLs = tarMinorPSLs(tarIndice);	
+	numTarMinorPSLs = length(tarMinorPSLs);
 	
 	if 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs, return; end
 	
@@ -89,7 +109,7 @@ function varargout = DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, 
 	end
 	
 	%%Draw
-	if 6==nargin
+	if 7==nargin
 		figure; axHandle_ = gca; lightsOpt = 1;
 		handleSilhouette = DrawSilhouette(axHandle_);
 	else

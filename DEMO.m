@@ -161,8 +161,8 @@ userInterface.traceAlgorithm = 'Euler';
 RunMission(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
-% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 20);
+% DrawPSLs_GUI(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
+DrawPSLs_GUI(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 20);
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);
