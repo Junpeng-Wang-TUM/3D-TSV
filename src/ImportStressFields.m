@@ -265,9 +265,13 @@ function RecoverCartesianMesh()
 	nodeCoords_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),3);
 	[nodeCoords_(:,1), nodeCoords_(:,2), nodeCoords_(:,3)] = ...
 		NodalizeDesignDomain([nelx_ nely_ nelz_], [vtxLowerBound_; vtxUpperBound_]);		
-	nodeCoords_ = nodeCoords_(originalValidNodeIndex_,:);	
-	nodeLoadVec_(:,1) = nodeMap4CutBasedModel_(nodeLoadVec_(:,1));
-	fixedNodes_ = double(nodeMap4CutBasedModel_(fixedNodes_));
+	nodeCoords_ = nodeCoords_(originalValidNodeIndex_,:);
+	if size(nodeLoadVec_,1)>0
+		nodeLoadVec_(:,1) = nodeMap4CutBasedModel_(nodeLoadVec_(:,1));
+	end
+	if length(fixedNodes_)>0
+		fixedNodes_ = double(nodeMap4CutBasedModel_(fixedNodes_));
+	end
 end
 
 function varargout = NodalizeDesignDomain(varargin)

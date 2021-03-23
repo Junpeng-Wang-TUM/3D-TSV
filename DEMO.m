@@ -148,6 +148,16 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 5;
 
+%% =======================================femur_class=======================================
+% userInterface.fileName = './data/femur_ref.vtk';
+% userInterface.fileName = './data/femur_nonOpti.vtk';
+% userInterface.fileName = './data/femur_opti.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 10;
+% userInterface.numLevels = 1;
+% userInterface.seedDensCtrl = 2;
+
 RunMission(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
@@ -155,5 +165,5 @@ RunMission(userInterface);
 DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 20);
 
 %% Show if Necessary
-% DrawSeedPoints();
+% DrawSeedPoints(0.5);
 % DrawPSLsIntersections(1);
