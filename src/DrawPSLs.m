@@ -109,19 +109,69 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			end			
 			for ii=1:numTarMinorPSLs
 				color4MinorPSLs(ii).arr = tarMinorPSLs(ii).principalStressList(:,1)';
-			end				
-			m=100; r4Minor = [1 m]; r4Medium = m+r4Minor; r4Major = m+r4Medium;
-			cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
-			for ii=1:numTarMajorPSLs
-				color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
 			end
-			cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
-			for ii=1:numTarMediumPSLs
-				color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
-			end
-			cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
-			for ii=1:numTarMinorPSLs
-				color4MinorPSLs(ii).arr = (r4Minor(2)-r4Minor(1))*(color4MinorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Minor(1);
+			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
+				m=100; r4Major = [1 m]; 
+				cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
+				for ii=1:numTarMajorPSLs
+					color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
+				end				
+			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
+				m=100; r4Medium = [1 m];
+				cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
+				for ii=1:numTarMediumPSLs
+					color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
+				end				
+			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
+				m=100; r4Minor = [1 m];
+				cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
+				for ii=1:numTarMinorPSLs
+					color4MinorPSLs(ii).arr = (r4Minor(2)-r4Minor(1))*(color4MinorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Minor(1);
+				end				
+			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
+				m=100; r4Medium = [1 m]; r4Major = m+r4Medium;
+				cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
+				for ii=1:numTarMajorPSLs
+					color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
+				end
+				cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
+				for ii=1:numTarMediumPSLs
+					color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
+				end				
+			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
+				m=100; r4Minor = [1 m]; r4Major = m+r4Minor;
+				cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
+				for ii=1:numTarMajorPSLs
+					color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
+				end
+				cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
+				for ii=1:numTarMinorPSLs
+					color4MinorPSLs(ii).arr = (r4Minor(2)-r4Minor(1))*(color4MinorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Minor(1);
+				end				
+			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
+				m=100; r4Minor = [1 m]; r4Medium = m+r4Minor;
+				cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
+				for ii=1:numTarMediumPSLs
+					color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
+				end
+				cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
+				for ii=1:numTarMinorPSLs
+					color4MinorPSLs(ii).arr = (r4Minor(2)-r4Minor(1))*(color4MinorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Minor(1);
+				end					
+			else
+				m=100; r4Minor = [1 m]; r4Medium = m+r4Minor; r4Major = m+r4Medium;
+				cValOnMajor = [color4MajorPSLs.arr]; cmin = min(cValOnMajor); cmax = max(cValOnMajor);
+				for ii=1:numTarMajorPSLs
+					color4MajorPSLs(ii).arr = (r4Major(2)-r4Major(1))*(color4MajorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Major(1);
+				end
+				cValOnMedium = [color4MediumPSLs.arr]; cmin = min(cValOnMedium); cmax = max(cValOnMedium);
+				for ii=1:numTarMediumPSLs
+					color4MediumPSLs(ii).arr = (r4Medium(2)-r4Medium(1))*(color4MediumPSLs(ii).arr-cmin)/(cmax-cmin)+r4Medium(1);
+				end
+				cValOnMinor = [color4MinorPSLs.arr]; cmin = min(cValOnMinor); cmax = max(cValOnMinor);
+				for ii=1:numTarMinorPSLs
+					color4MinorPSLs(ii).arr = (r4Minor(2)-r4Minor(1))*(color4MinorPSLs(ii).arr-cmin)/(cmax-cmin)+r4Minor(1);
+				end				
 			end			
 		case 'Sigma_xx'
 			for ii=1:numTarMajorPSLs
@@ -245,34 +295,58 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		if strcmp(stressComponentOpt, "None")
 		elseif strcmp(stressComponentOpt, "Sigma")
 			cb = colorbar('Location', 'east');
-			v1 = min(cValOnMinor); v2 = max(cValOnMinor);
-			v3 = min(cValOnMedium); v4 = max(cValOnMedium);
-			v5 = min(cValOnMajor); v6 = max(cValOnMajor);
+			% v1 = min(cValOnMinor); v2 = max(cValOnMinor);
+			% v3 = min(cValOnMedium); v4 = max(cValOnMedium);
+			% v5 = min(cValOnMajor); v6 = max(cValOnMajor);
 			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
 				%colormap([RedRGB()]);
 				colormap('autumn');
+				v5 = min(cValOnMajor); v6 = max(cValOnMajor);
+				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v5, v6, 5)}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v5, v6, 5)),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
 				%colormap([GreenRGB();]);
 				colormap('copper');
+				v3 = min(cValOnMedium); v4 = max(cValOnMedium);
+				set(cb,'Ticks',[0 25 50 75 99],'TickLabels', {linspace(v3, v4, 5)}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v3, v4, 5)),'Un',0); set(cb,'xticklabel',L);			
 			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
 				%colormap([BlueRGB();]);
-				colormap('winter');
+				colormap('winter');	
+				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
+				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v1, v2, 5)}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v1, v2, 5)),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
 				% colormap([GreenRGB(); RedRGB()]);
 				colormap([pink; flip(autumn)]);
+				v3 = min(cValOnMedium); v4 = max(cValOnMedium);
+				v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v3 v4 v5 v6}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v3 v4 v5 v6]),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
 				% colormap([BlueRGB(); RedRGB()]);
-				colormap([winter; pink; flip(autumn)]);
+				colormap([winter; flip(autumn)]);
+				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
+				v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);			
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
 				% colormap([BlueRGB(); GreenRGB();]);
 				colormap([winter; pink]);
+				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
+				v3 = min(cValOnMedium); v4 = max(cValOnMedium);			
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v3 v4}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v3 v4]),'Un',0); set(cb,'xticklabel',L);					
 			else
 				%colormap([BlueRGB(); GreenRGB(); RedRGB()]);
-				colormap([BlueRGB(); RedRGB()]);
-				% colormap([winter; pink; flip(autumn)]);
-				%colormap([winter; flip(autumn)]);
+				colormap([winter; pink; flip(autumn)]);
+				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
+				v3 = min(cValOnMedium); v4 = max(cValOnMedium);
+				v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
+				set(cb,'Ticks',[25 75 125 175 225 275],'TickLabels', {v1 v2 v3 v4 v5 v6}, 'AxisLocation','out');
+				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v3 v4 v5 v6]),'Un',0); set(cb,'xticklabel',L);
 			end
-			colorbar off
+			% colorbar off
 		else
 			colormap('jet'); cb = colorbar('Location', 'east');
 			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');

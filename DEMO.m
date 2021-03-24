@@ -70,7 +70,7 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 3;
-%% ---------------------------------------Experiment 3: %%Teaser 2nd-row
+%% ---------------------------------------Experiment 3:
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 2;
@@ -166,4 +166,4 @@ DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5,
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);
-% DrawPSLsIntersections(1);
+% DrawPSLsIntersections(["Geo", "Geo", "Geo"], [0,0,0], 1);
