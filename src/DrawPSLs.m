@@ -232,9 +232,9 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
 	end
 	if strcmp(stressComponentOpt, "None")
-		set(handleMajorPSL, 'FaceColor', [1 0 0]);
-		set(handleMediumPSL, 'FaceColor', [0 1 0]);
-		set(handleMinorPSL, 'FaceColor', [0 0 1]);	
+		set(handleMajorPSL, 'FaceColor', [0.40 0 0.05]);
+		set(handleMediumPSL, 'FaceColor', [0 0.27 0.11]);
+		set(handleMinorPSL, 'FaceColor', [0.03 0.19 0.42]);	
 	end
 	set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 	set(handleMediumPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
@@ -291,6 +291,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		% view(-2.05e+02,1.69e+01); %%parts
 		% view(-2.44e+01, 1.24e+01); %%bridge
 		% view(3.56e+01, -1.08e+00); %%armadillo
+		% view(-2.07e+00, 2.55e+01); %%femur implant
 		lighting gouraud;
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
