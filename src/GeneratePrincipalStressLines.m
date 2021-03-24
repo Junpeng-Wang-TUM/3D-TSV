@@ -1,5 +1,6 @@
 function iPSL = GeneratePrincipalStressLines(startPoint, tracingType, limiSteps)
 	global tracingFuncHandle_;
+	global sPoint_; sPoint_ = startPoint;
 	iPSL = PrincipalStressLineStruct();
 	switch tracingType
 		case 'MAJOR', psDir = [10 11 12];
@@ -23,7 +24,8 @@ function iPSL = GeneratePrincipalStressLines(startPoint, tracingType, limiSteps)
 	PSLcartesianStressList = [PSLcartesianStressList; cartesianStressList];
 	PSLeleIndexList = [PSLeleIndexList; eleIndexList];
 	PSLvonMisesStressList = [PSLvonMisesStressList; vonMisesStressList];
-	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];		
+	PSLprincipalStressList = [PSLprincipalStressList; principalStressList];
+	if size(phyCoordList,1)>0, sPoint_ = phyCoordList(end,:); end
 	%%2.2 along second direction (-v1)	
 	[phyCoordList, cartesianStressList, eleIndexList, ~, vonMisesStressList, principalStressList] = ...
 		tracingFuncHandle_(startPoint, -principalStress(1,psDir), eleIndex, psDir, limiSteps);		

@@ -4,6 +4,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	global nodeCoords_;
 	global cartesianStressField_;
 	global tracingStepWidth_;
+	global sPoint_;
 	siE = 1.0e-06;
 	phyCoordList = zeros(limiSteps,3);
 	cartesianStressList = zeros(limiSteps,6);
@@ -98,7 +99,8 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 					vonMisesStressList(index,:) = vonMisesStress;
 					principalStressList(index,:) = principalStress;						
 					%%next point
-					nextPoint = nextPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;		
+					nextPoint = nextPoint + tracingStepWidth_ * (k1 + 2*k2 + 2*k3 + k4)/6;
+					if norm(sPoint_-nextPoint)<tracingStepWidth_, break; end
 					[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);						
 				end
 			end
