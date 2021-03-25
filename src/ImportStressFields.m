@@ -176,7 +176,6 @@ function ImportStressFields(fileName)
 		
 		%% build element three
 		global nodStruct_; global eleStruct_; global boundaryElements_; 
-global normalCompares_;	normalCompares_ = zeros(numEles_, 6);
 		iNodStruct = struct('adjacentEles', []); 
 		nodStruct_ = repmat(iNodStruct, numNodes_, 1);
 		for ii=1:numEles_
