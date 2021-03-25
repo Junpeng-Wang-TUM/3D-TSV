@@ -176,6 +176,7 @@ function ImportStressFields(fileName)
 		
 		%% build element three
 		global nodStruct_; global eleStruct_; global boundaryElements_; 
+global normalCompares_;	normalCompares_ = zeros(numEles_, 6);
 		iNodStruct = struct('adjacentEles', []); 
 		nodStruct_ = repmat(iNodStruct, numNodes_, 1);
 		for ii=1:numEles_
@@ -194,14 +195,11 @@ function ImportStressFields(fileName)
 			iEleFacesX = iEleVertices(:,1); iEleFacesX = iEleFacesX(eleFaces);
 			iEleFacesY = iEleVertices(:,2); iEleFacesY = iEleFacesY(eleFaces);
 			iEleFacesZ = iEleVertices(:,3); iEleFacesZ = iEleFacesZ(eleFaces);				
-			ABs = [iEleFacesX(:,1)-iEleFacesX(:,2) iEleFacesY(:,1)-iEleFacesY(:,2) iEleFacesZ(:,1)-iEleFacesZ(:,2)];
-			ADs = [iEleFacesX(:,1)-iEleFacesX(:,4) iEleFacesY(:,1)-iEleFacesY(:,4) iEleFacesZ(:,1)-iEleFacesZ(:,4)];
-			iABxAC = cross(ABs,ADs); iABxAC = iABxAC ./ vecnorm(iABxAC,2,2);
-			CBs = -[iEleFacesX(:,3)-iEleFacesX(:,2) iEleFacesY(:,3)-iEleFacesY(:,2) iEleFacesZ(:,3)-iEleFacesZ(:,2)];
-			CDs = [iEleFacesX(:,3)-iEleFacesX(:,4) iEleFacesY(:,3)-iEleFacesY(:,4) iEleFacesZ(:,3)-iEleFacesZ(:,4)];
-			iCBxCD = cross(CBs,CDs); iCBxCD = iCBxCD ./ vecnorm(iCBxCD,2,2);
-			aveNormal = (iABxAC+iCBxCD)/2; aveNormal = aveNormal ./ vecnorm(aveNormal,2,2);
-			% iElementsSharingThisElementFaces = zeros(6,1);
+			ACs = [iEleFacesX(:,1)-iEleFacesX(:,3) iEleFacesY(:,1)-iEleFacesY(:,3) iEleFacesZ(:,1)-iEleFacesZ(:,3)];
+			BDs = [iEleFacesX(:,2)-iEleFacesX(:,4) iEleFacesY(:,2)-iEleFacesY(:,4) iEleFacesZ(:,2)-iEleFacesZ(:,4)];
+			iACxBD = cross(ACs,BDs); 
+			aveNormal = iACxBD ./ vecnorm(iACxBD,2,2);			
+			iElementsSharingThisElementFaces = zeros(6,1);
 			% for jj=1:6
 				% nodesOnThisFace = iNodes(eleFaces(jj,:));
 				% allPotentialElements = [nodStruct_(nodesOnThisFace).adjacentEles];
@@ -216,11 +214,12 @@ function ImportStressFields(fileName)
 			%% in case the node orderings on each element face are not constant
 			tmp.faceCentres = [sum(iEleFacesX,2) sum(iEleFacesY,2) sum(iEleFacesZ,2)]/4;
 			iEleCt = eleCentroidList_(ii,:);
-			refVecs = iEleCt - tmp.faceCentres; refVec = refVecs ./ vecnorm(refVecs,2,2);
-			dirEval = acos(sum(refVec .* aveNormal, 2));
+			refVecs = iEleCt - tmp.faceCentres; refVecs = refVecs ./ vecnorm(refVecs,2,2);
+			dirEval = acos(sum(refVecs .* aveNormal, 2));
 			dirDes = ones(6,1); dirDes(dirEval<pi/2) = -1;
-			tmp.faceNormals = dirDes .* aveNormal;
-			% tmp.elementsSharingThisElementFaces = iElementsSharingThisElementFaces;
+			faceNormals = dirDes .* aveNormal;
+			tmp.faceNormals = faceNormals;
+			tmp.elementsSharingThisElementFaces = iElementsSharingThisElementFaces;
 			eleStruct_(ii) = tmp;
 		end
 	end
