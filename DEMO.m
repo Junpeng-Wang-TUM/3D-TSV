@@ -23,6 +23,7 @@ userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
 %% ---------------------------------------Experiment 1
 userInterface.lineDensCtrl = 4;
 userInterface.numLevels = 1;
+userInterface.seedDensCtrl = 8;
 userInterface.maxAngleDevi = 20;
 userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 2
