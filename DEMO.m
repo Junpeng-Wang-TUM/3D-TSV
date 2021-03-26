@@ -19,8 +19,13 @@ addpath('./src');
 userInterface = InterfaceStruct();
 
 %% =======================================cantilever=======================================
+userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
 %% ---------------------------------------Experiment 1
-% userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
+userInterface.lineDensCtrl = 4;
+userInterface.numLevels = 1;
+userInterface.maxAngleDevi = 20;
+userInterface.traceAlgorithm = 'Euler';
+%% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 12.5;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 3;
@@ -28,12 +33,12 @@ userInterface = InterfaceStruct();
 % userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================femur=======================================
-userInterface.fileName = './data/Vis2021_femur3D.vtk';
+% userInterface.fileName = './data/Vis2021_femur3D.vtk';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
-userInterface.lineDensCtrl = 18;
-userInterface.numLevels = 1;
-userInterface.traceAlgorithm = 'Euler';
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 1;
+% userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 3: %%Teaser 1st-row
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
@@ -136,6 +141,12 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 5;
 % userInterface.snappingOpt = 1;
+
+%% =======================================kitten_HexMesh=======================================
+% userInterface.fileName = './data/Vis2021_kitten3D_HexMesh.vtk';
+%% ---------------------------------------Experiment 1
+% userInterface.lineDensCtrl = 20;
+% userInterface.numLevels = 2;
 
 %% =======================================parts=======================================
 % userInterface.fileName = './data/Vis2021_parts3D.vtk';

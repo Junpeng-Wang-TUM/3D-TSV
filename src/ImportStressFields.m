@@ -183,7 +183,7 @@ function ImportStressFields(fileName)
 		end		
 		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);
 		eleFaces = mapEle2patch';	 
-		iEleStruct = struct('faceCentres', [], 'faceNormals'); %%pure-Hex
+		iEleStruct = struct('faceCentres', [], 'faceNormals', []); %%pure-Hex
 		eleStruct_ = repmat(iEleStruct, numEles_, 1);
 		for ii=1:numEles_
 			iNodes = eNodMat_(ii,:);
