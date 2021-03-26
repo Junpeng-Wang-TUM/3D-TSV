@@ -185,9 +185,8 @@ function ImportStressFields(fileName)
 		end		
 		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);
 		eleFaces = mapEle2patch';	 
-		iEleStruct = struct('faceCentres', [], 'faceNormals', [], 'elementsSharingThisElementFaces', []); %%pure-Hex
+		iEleStruct = struct('faceCentres', [], 'faceNormals', [], 'avaSize', 0); %%pure-Hex
 		eleStruct_ = repmat(iEleStruct, numEles_, 1);
-		%%parfor ii=1:numEles_
 		for ii=1:numEles_
 			iNodes = eNodMat_(ii,:);
 			iEleVertices = nodeCoords_(iNodes, :);
@@ -198,16 +197,6 @@ function ImportStressFields(fileName)
 			BDs = [iEleFacesX(:,2)-iEleFacesX(:,4) iEleFacesY(:,2)-iEleFacesY(:,4) iEleFacesZ(:,2)-iEleFacesZ(:,4)];
 			iACxBD = cross(ACs,BDs); 
 			aveNormal = iACxBD ./ vecnorm(iACxBD,2,2);			
-			iElementsSharingThisElementFaces = zeros(6,1);
-			% for jj=1:6
-				% nodesOnThisFace = iNodes(eleFaces(jj,:));
-				% allPotentialElements = [nodStruct_(nodesOnThisFace).adjacentEles];
-				% [GC,GR] = hist(allPotentialElements, unique(allPotentialElements));
-				% [GC,sortMap] = sort(GC, 'descend'); GR = GR(sortMap);
-				% if 4==GC(1) && 4==GC(2)
-					% iElementsSharingThisElementFaces(jj) = setdiff(GR(1:2), ii);
-				% end				
-			% end
 			tmp = iEleStruct;			
 			%% tmp.faceNormals = aveNormal;
 			%% in case the node orderings on each element face are not constant
@@ -218,7 +207,7 @@ function ImportStressFields(fileName)
 			dirDes = ones(6,1); dirDes(dirEval<pi/2) = -1;
 			faceNormals = dirDes .* aveNormal;
 			tmp.faceNormals = faceNormals;
-			tmp.elementsSharingThisElementFaces = iElementsSharingThisElementFaces;
+			tmp.avaSize = min(norm(iEleVertices - eleCentroidList_(ii,:)));
 			eleStruct_(ii) = tmp;
 		end
 	end
