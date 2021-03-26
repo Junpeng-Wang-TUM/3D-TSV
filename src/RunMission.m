@@ -3,6 +3,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	%%1.1 variable declaration	
 	tStart = tic;
 	global tracingFuncHandle_;
+	global tracingStepWidth_;
 	global majorPSLindexList_;
 	global mediumPSLindexList_;
 	global minorPSLindexList_;	
@@ -75,7 +76,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	GenerateSeedPoints(seedStrategy, seedDensCtrl);
 	
 	%%3. PSL generation
-	tracingStepWidth_ = eleSize_*1;
+	tracingStepWidth_ = integratingStepScalingFac_ * eleSize_;
 	majorPSLindexList_ = struct('arr', []); majorPSLindexList_ = repmat(majorPSLindexList_, 1, numLevels);
 	mediumPSLindexList_ = struct('arr', []); mediumPSLindexList_ = repmat(mediumPSLindexList_, 1, numLevels);     
 	minorPSLindexList_ = struct('arr', []); minorPSLindexList_ = repmat(minorPSLindexList_, 1, numLevels);	

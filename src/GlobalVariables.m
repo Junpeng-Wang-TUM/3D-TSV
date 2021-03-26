@@ -25,7 +25,8 @@ global surfaceQuadMeshElements_;
 %% 2.0 Selected Principal Stress Fields to be Visualized
 global selectedPrincipalStressField_; 
 %% 2.1 Integrating Step Size = element Size * tracingStepWidth_
-global tracingStepWidth_; 
+% global tracingStepWidth_;
+global integratingStepScalingFac_; integratingStepScalingFac_ = 1;
 %% 2.2 %% Tracing PSL stops when the angle deviation between the neighboring tangents is larger than 180/permittedMaxAdjacentTangentAngleDeviation_
 global permittedMaxAdjacentTangentAngleDeviation_;
 %% 2.3 Store the Original Seed Points
