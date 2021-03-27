@@ -22,7 +22,10 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 					seedDensCtrl+1:seedDensCtrl:nelx_+1-seedDensCtrl, seedDensCtrl+1:seedDensCtrl:nelz_+1-seedDensCtrl);	
 				sampledNodes = reshape(sampledNodes, numel(sampledNodes), 1);
 				sampledNodes(0==sampledNodes) = [];
+				nodesOnBoundary = find(1==nodState_);
+				sampledNodes = setdiff(sampledNodes, nodesOnBoundary);
 				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
+				
 			else
 				allNodes = (1:numNodes_)';		
 				if 0
