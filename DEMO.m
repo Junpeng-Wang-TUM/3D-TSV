@@ -26,10 +26,14 @@ userInterface.numLevels = 1;
 userInterface.seedDensCtrl = 8;
 userInterface.maxAngleDevi = 20;
 userInterface.traceAlgorithm = 'Euler';
-%% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 12.5;
+%% ---------------------------------------Experiment 2 (fig. 6)
+% userInterface.lineDensCtrl = 10;
 % userInterface.numLevels = 3;
+% userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 3;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20;
 % userInterface.traceAlgorithm = 'Euler';
 
@@ -126,17 +130,26 @@ userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 1
 % userInterface.lineDensCtrl = 15;
 % userInterface.numLevels = 3;
-%% ---------------------------------------Experiment 2: %%fig.2 left
+%% ---------------------------------------Experiment 2: (fig.2 left)
+% userInterface.lineDensCtrl = 10; %%has nothing to do with result, can be anything
+% userInterface.numLevels = 1; %%has nothing to do with result, can be anything
+% userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 30;
 % userInterface.selectedPrincipalStressField = [1, 2, 3];
 % userInterface.mergingOpt = 0;
+% userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20;
-%% ---------------------------------------Experiment 3: %%fig.2 right
+% userInterface.traceAlgorithm = 'RK2';
+%% ---------------------------------------Experiment 3: (fig.2 right)
+% userInterface.lineDensCtrl = 10; %%has nothing to do with result, can be anything
+% userInterface.numLevels = 1; %%has nothing to do with result, can be anything
 % userInterface.seedStrategy = 'LoadingArea';
 % userInterface.seedDensCtrl = 2;
 % userInterface.selectedPrincipalStressField = [1, 2, 3];
 % userInterface.mergingOpt = 0;
+% userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 4: %%fig.xx
 % userInterface.lineDensCtrl = 15;
 % userInterface.numLevels = 3;
