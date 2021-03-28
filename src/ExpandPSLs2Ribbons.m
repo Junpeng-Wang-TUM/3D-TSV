@@ -11,11 +11,21 @@ function varargout = ExpandPSLs2Ribbons(varargin)
 	%%			   / dir3
 	%%	===========================
 	%%
-	twistThreshold = 4/180*pi;
+	twistThreshold = 3.5/180*pi;
 	PSLs = varargin{1};
 	lw = varargin{2};
 	psDir = varargin{3};
-	if isempty(PSLs), return; end
+	if isempty(PSLs) 
+		if 1==nargout
+			varargout{1} = [];
+		elseif 2==nargout
+			varargout{1} = []; varargout{2} = [];
+		else
+			varargout{1} = []; varargout{2} = []; varargout{3} = []; varargout{4} = [];
+			varargout{5} = []; varargout{6} = []; varargout{7} = []; varargout{8} = [];
+		end
+		return; 
+	end
 	numPSLs = length(PSLs);
 	
 	if 1==nargout
@@ -41,15 +51,24 @@ function varargout = ExpandPSLs2Ribbons(varargin)
 		if smoothingOpt
 			angDeviationMetric = sum(angList)/(iPSLength-1);	
 			if angDeviationMetric>twistThreshold
-				for jj=2:iPSLength
+				effectingRadius = 3; wgts = ((effectingRadius:-1:1)').^(-2);
+				for jj=effectingRadius:iPSLength
+					if 1==jj, continue; end
 					vec0 = dirVecs(jj-1,:);
 					vec1 = dirVecs(jj,:);
 					ang1 = acos(vec0 * vec1');
-					if ang1>angDeviationMetric
-						dirVecs(jj,:) = vec0;
-					end
-				end
-			end
+					if ang1>angDeviationMetric			
+						if jj<=effectingRadius
+							iSlider = 1:jj-1; iwgts = wgts(effectingRadius-length(iSlider)+1:end);
+							tmp = sum(dirVecs(iSlider,:).*iwgts, 1);							
+						else
+							iSlider = jj-effectingRadius:jj-1;
+							tmp = sum(dirVecs(iSlider,:).*wgts, 1);	
+						end
+						dirVecs(jj,:) = tmp/norm(tmp);
+					end						
+				end				
+			end			
 		end				
 		dirVecs = dirVecs * lw;		
 		

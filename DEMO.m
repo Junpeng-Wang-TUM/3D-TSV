@@ -26,16 +26,6 @@ userInterface.numLevels = 1;
 userInterface.seedDensCtrl = 8;
 userInterface.maxAngleDevi = 20;
 userInterface.traceAlgorithm = 'Euler';
-%% ---------------------------------------Experiment 2 (fig. 6)
-% userInterface.lineDensCtrl = 10;
-% userInterface.numLevels = 3;
-% userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 3;
-% userInterface.selectedPrincipalStressField = [1, 3];
-% userInterface.mergingOpt = 1;
-% userInterface.snappingOpt = 0;
-% userInterface.maxAngleDevi = 20;
-% userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================femur=======================================
 % userInterface.fileName = './data/Vis2021_femur3D.vtk';
@@ -43,7 +33,7 @@ userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 1;
-% userInterface.traceAlgorithm = 'Euler';
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 3: %%Teaser 1st-row
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
@@ -150,7 +140,17 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20;
 % userInterface.traceAlgorithm = 'RK2';
-%% ---------------------------------------Experiment 4: %%fig.xx
+%% ---------------------------------------Experiment 4 (fig. 6)
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 3;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 4;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
+%% ---------------------------------------Experiment 5: %%fig.xx
 % userInterface.lineDensCtrl = 15;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 5;
