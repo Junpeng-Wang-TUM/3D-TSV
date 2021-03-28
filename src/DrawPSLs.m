@@ -360,7 +360,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		% view(6.43e+01, 1.61e+01); %%cantilever - 1
 		% view(2.89e+01, 5.90e+00); %%femur
 		% view(0, 0); %% bracket
-		% view(-1.68e+02, 8.96e+00); %%bunny
+		% view(-1.93e+02, 1.39e+01); %%bunny
 		% view(-5.32e+00,3.77e+00); %%kitten
 		% view(-1.90e+00, 8.74e+01); %%kittenHex
 		% view(-2.05e+02,1.69e+01); %%parts

@@ -23,7 +23,11 @@ userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
 %% ---------------------------------------Experiment 1
 userInterface.lineDensCtrl = 4;
 userInterface.numLevels = 1;
+userInterface.seedStrategy = 'Volume';
 userInterface.seedDensCtrl = 8;
+userInterface.selectedPrincipalStressField = [1, 3];
+userInterface.mergingOpt = 1;
+userInterface.snappingOpt = 0;
 userInterface.maxAngleDevi = 20;
 userInterface.traceAlgorithm = 'Euler';
 
@@ -34,32 +38,37 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 1;
 % userInterface.traceAlgorithm = 'RK2';
-%% ---------------------------------------Experiment 3: %%Teaser 1st-row
+%% ---------------------------------------Experiment 3: %%Teaser
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
+% userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 4;
 % userInterface.selectedPrincipalStressField = [1, 2, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 4
 % userInterface.seedStrategy = 'LoadingArea';
 % userInterface.seedDensCtrl = 4;
 % userInterface.selectedPrincipalStressField = 3;
 % userInterface.mergingOpt = 0;
-%% ---------------------------------------Experiment 5: %%Teaser 2nd-row PlanB
-% userInterface.multiMergingThresholds = [2 3 1];
-% userInterface.lineDensCtrl = 18;
-% userInterface.numLevels = 1;
-% userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = [1, 2, 3];
 
 %% =======================================Bunny=======================================
 % userInterface.fileName = './data/Vis2021_bunny3D.vtk';
 %% ---------------------------------------Experiment 1
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 1;
-%% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 26;
+%% ---------------------------------------Experiment 2 (fig. x)
+% userInterface.lineDensCtrl = 20;
 % userInterface.numLevels = 3;
-% userInterface.seedDensCtrl = 4;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 5;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================Bunny_HexMesh=======================================
 % userInterface.fileName = './data/Vis2021_bunny3D_HexMesh.vtk';
@@ -71,11 +80,16 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 3;
 %% ---------------------------------------Experiment 3:
-% userInterface.lineDensCtrl = 26;
+% userInterface.lineDensCtrl = 20;
 % userInterface.numLevels = 3;
-% userInterface.seedDensCtrl = 2;
-% userInterface.selectedPrincipalStressField = [1, 2, 3];
-%% ---------------------------------------Experiment 4: %%Teaser 2nd-row Plan  B
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 3;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
+%% ---------------------------------------Experiment 4: 
 % userInterface.multiMergingThresholds = [1 3 2];
 % userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 1;
@@ -86,8 +100,15 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.fileName = './data/Vis2021_bridge3D.vtk';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 10;
-% userInterface.numLevels = 1;
+% userInterface.lineDensCtrl = 8;
+% userInterface.numLevels = 2;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 3;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 3
 % userInterface.lineDensCtrl = 10;
 % userInterface.numLevels = 3;
@@ -96,9 +117,16 @@ userInterface.traceAlgorithm = 'Euler';
 %% =======================================bracket=======================================
 % userInterface.fileName = './data/Vis2021_bracket3D.vtk';
 %% ---------------------------------------Experiment 1
-%% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 18;
-% userInterface.numLevels = 1;
+%% ---------------------------------------Experiment 2 (fig. x)
+% userInterface.lineDensCtrl = 10;
+% userInterface.numLevels = 2;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 4;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 3
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
@@ -109,7 +137,14 @@ userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 32;
-% userInterface.numLevels = 1;
+% userInterface.numLevels = 2;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 2;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 3
 % userInterface.lineDensCtrl = 32;
 % userInterface.numLevels = 3;
@@ -159,8 +194,15 @@ userInterface.traceAlgorithm = 'Euler';
 %% =======================================kitten_HexMesh=======================================
 % userInterface.fileName = './data/Vis2021_kitten3D_HexMesh.vtk';
 %% ---------------------------------------Experiment 1
-% userInterface.lineDensCtrl = 20;
-% userInterface.numLevels = 2;
+% userInterface.lineDensCtrl = 15;
+% userInterface.numLevels = 3;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 1;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================parts=======================================
 % userInterface.fileName = './data/Vis2021_parts3D.vtk';
@@ -168,20 +210,30 @@ userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 30;
 % userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 5;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 3
 % userInterface.lineDensCtrl = 30;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 5;
 
-%% =======================================femur_class=======================================
-% userInterface.fileName = './data/femur_ref.vtk';
-% userInterface.fileName = './data/femur_nonOpti.vtk';
-% userInterface.fileName = './data/femur_opti.vtk';
+%% =======================================femurPorousInfill=======================================
+% userInterface.fileName = './data/Vis2021_femurPorousInfill3D.vtk';
 %% ---------------------------------------Experiment 1
-%% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 10;
-% userInterface.numLevels = 1;
+% userInterface.lineDensCtrl = 18;
+% userInterface.numLevels = 2;
+% userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 2;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
 
 RunMission(userInterface);
 %%PSLs Visualization
