@@ -80,7 +80,7 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 3;
 %% ---------------------------------------Experiment 3:
-% userInterface.lineDensCtrl = 20;
+% userInterface.lineDensCtrl = 26;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 3;
@@ -101,7 +101,7 @@ userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 8;
-% userInterface.numLevels = 2;
+% userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 3;
 % userInterface.selectedPrincipalStressField = [1, 3];
@@ -118,8 +118,8 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.fileName = './data/Vis2021_bracket3D.vtk';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2 (fig. x)
-% userInterface.lineDensCtrl = 10;
-% userInterface.numLevels = 2;
+% userInterface.lineDensCtrl = 12;
+% userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 4;
 % userInterface.selectedPrincipalStressField = [1, 3];
@@ -194,7 +194,7 @@ userInterface.traceAlgorithm = 'Euler';
 %% =======================================kitten_HexMesh=======================================
 % userInterface.fileName = './data/Vis2021_kitten3D_HexMesh.vtk';
 %% ---------------------------------------Experiment 1
-% userInterface.lineDensCtrl = 15;
+% userInterface.lineDensCtrl = 20;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 1;
@@ -225,8 +225,8 @@ userInterface.traceAlgorithm = 'Euler';
 %% =======================================femurPorousInfill=======================================
 % userInterface.fileName = './data/Vis2021_femurPorousInfill3D.vtk';
 %% ---------------------------------------Experiment 1
-% userInterface.lineDensCtrl = 18;
-% userInterface.numLevels = 2;
+% userInterface.lineDensCtrl = 20;
+% userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 2;
 % userInterface.selectedPrincipalStressField = [1, 3];
