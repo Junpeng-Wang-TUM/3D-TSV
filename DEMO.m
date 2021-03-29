@@ -1,3 +1,10 @@
+%% 3D-TSV
+%% The 3D Trajectory-based Stress Visualizer (3D-TSV), a visual analysis tool for the exploration 
+%% of the principal stress directions in 3D solids under load.
+%% This repository was created for the paper "The 3D Trajectory-based Stress Visualizer" 
+%% 	by Junpeng Wang, Christoph Neuhauser, Jun Wu, Xifeng Gao and Rüdiger Westermann, 
+%% which was submitted to IEEE VIS 2021.
+
 clc;
 addpath('./src');
 
@@ -100,7 +107,7 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.fileName = './data/Vis2021_bridge3D.vtk';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
-% userInterface.lineDensCtrl = 8;
+% userInterface.lineDensCtrl = 10;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 3;
@@ -209,7 +216,7 @@ userInterface.traceAlgorithm = 'Euler';
 %% ---------------------------------------Experiment 1
 %% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 30;
-% userInterface.numLevels = 1;
+% userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 5;
 % userInterface.selectedPrincipalStressField = [1, 3];
@@ -221,6 +228,20 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.lineDensCtrl = 30;
 % userInterface.numLevels = 3;
 % userInterface.seedDensCtrl = 5;
+
+%% =======================================parts=======================================
+% userInterface.fileName = './data/Vis2021_bumpyTorus3D.vtk';
+%% ---------------------------------------Experiment 1
+%% ---------------------------------------Experiment 2
+% userInterface.lineDensCtrl = 30;
+% userInterface.numLevels = 3;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 4;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================femurPorousInfill=======================================
 % userInterface.fileName = './data/Vis2021_femurPorousInfill3D.vtk';
