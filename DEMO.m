@@ -12,29 +12,29 @@ userInterface = InterfaceStruct();
 
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================
-userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
-userInterface.lineDensCtrl = 4;
-userInterface.numLevels = 1;
-userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 8;
-userInterface.selectedPrincipalStressField = [1, 3];
-userInterface.mergingOpt = 1;
-userInterface.snappingOpt = 0;
-userInterface.maxAngleDevi = 20;
-userInterface.traceAlgorithm = 'Euler';
+% userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
+% userInterface.lineDensCtrl = 4;
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 8;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'Euler';
 
 
 %% =======================================femur=======================================
-% userInterface.fileName = './data/Vis2021_femur3D.vtk';
-% userInterface.lineDensCtrl = 18;
-% userInterface.numLevels = 3;
-% userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = [1, 2, 3];
-% userInterface.mergingOpt = 1;
-% userInterface.snappingOpt = 0;
-% userInterface.maxAngleDevi = 6;
-% userInterface.traceAlgorithm = 'RK2';
+userInterface.fileName = './data/Vis2021_femur3D.vtk';
+userInterface.lineDensCtrl = 18;
+userInterface.numLevels = 3;
+userInterface.seedStrategy = 'Volume';
+userInterface.seedDensCtrl = 4;
+userInterface.selectedPrincipalStressField = [1, 2, 3];
+userInterface.mergingOpt = 1;
+userInterface.snappingOpt = 0;
+userInterface.maxAngleDevi = 10;
+userInterface.traceAlgorithm = 'RK2';
 
 
 %% =======================================Bunny_HexMesh=======================================
