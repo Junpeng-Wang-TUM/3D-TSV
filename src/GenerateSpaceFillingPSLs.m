@@ -3,6 +3,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	global seedPointsValence_; global tracingStepWidth_;
 	global selectedPrincipalStressField_;
 	global mergingOpt_;
+	global snappingOpt_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
 	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
 	global PSLsAppearanceOrder_;
@@ -168,15 +169,25 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				switch iPSF
 					case 1
 						majorPSL = GridGrowthTrigger(seed, 'MAJOR'); 
+						if snappingOpt_, majorPSL = CroppingPSLifNeeded(majorPSL, 'MAJOR'); end
+						if 0==majorPSL.length, continue; end
 						majorPSLpool_(end+1,1) = majorPSL;
+						majorCoordList_(end+1:end+majorPSL.length,:) = majorPSL.phyCoordList;
 						PSLsAppearanceOrder_(end+1,:) = [1 length(majorPSLpool_)];
+						
 					case 2
-						mediumPSL = GridGrowthTrigger(seed, 'MEDIUM'); 
+						mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');
+						if snappingOpt_, mediumPSL = CroppingPSLifNeeded(mediumPSL, 'MEDIUM'); end	
+						if 0==mediumPSL.length, continue; end
 						mediumPSLpool_(end+1,1) = mediumPSL;
+						mediumCoordList_(end+1:end+mediumPSL.length,:) = mediumPSL.phyCoordList;
 						PSLsAppearanceOrder_(end+1,:) = [2 length(mediumPSLpool_)];
 					case 3
-						minorPSL = GridGrowthTrigger(seed, 'MINOR'); 
+						minorPSL = GridGrowthTrigger(seed, 'MINOR');
+						if snappingOpt_, minorPSL = CroppingPSLifNeeded(minorPSL, 'MINOR'); end		
+						if 0==minorPSL.length, continue; end
 						minorPSLpool_(end+1,1) = minorPSL;
+						minorCoordList_(end+1:end+minorPSL.length,:) = minorPSL.phyCoordList;
 						PSLsAppearanceOrder_(end+1,:) = [3 length(minorPSLpool_)];
 				end
 			end					
