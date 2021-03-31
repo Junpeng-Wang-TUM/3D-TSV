@@ -10,6 +10,8 @@ addpath('./src');
 
 userInterface = InterfaceStruct();
 
+%% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
+
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================
 userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
@@ -65,6 +67,16 @@ userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================kitten=======================================
 % userInterface.fileName = './data/Vis2021_kitten3D.vtk';
+%% ---------------------------------------Experiment 1: (fig.2 left new)
+% userInterface.lineDensCtrl = 18/4; %%has nothing to do with result, can be anything
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 30;
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
+% userInterface.mergingOpt = 0;
+% userInterface.snappingOpt = 1;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 1: (fig.2 left)
 % userInterface.lineDensCtrl = 18; %%has nothing to do with result, can be anything
 % userInterface.numLevels = 1; %%has nothing to do with result, can be anything
