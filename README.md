@@ -26,4 +26,4 @@ with the 3D line cluster renderer "" by Christoph Neuhauser.
 More data sets can be found from https://syncandshare.lrz.de/getlink/fiF6ChRDyPyKhtw3aCgQU1aG/3D-TSV-Data
 
 # 3. run
-Demo.m
+Go to 'TSV3D_script.m' or 'TSV3D_GUI.m'
