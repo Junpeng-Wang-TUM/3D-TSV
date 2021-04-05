@@ -142,27 +142,21 @@ classdef TSV3D_GUI < matlab.apps.AppBase
         function LightingDropDownValueChanged(app, event)
             global handleLights_;
             value = app.LightingDropDown.Value;          
-            lighting(app.UIAxes, 'none');
             if ~isempty(handleLights_)
                 set(handleLights_, 'visible', 'off'); handleLights_ = [];
             end
             switch value
                 case 'Left'
-                    lighting(app.UIAxes, 'gouraud');
                     handleLights_ = camlight(app.UIAxes, 'left','infinite');	
                 case 'Right'
-                    lighting(app.UIAxes, 'gouraud');
                     handleLights_ = camlight(app.UIAxes, 'right','infinite');
                 case 'Top'
-                    lighting(app.UIAxes, 'gouraud');
                     handleLights_ = camlight(app.UIAxes, 'headlight','infinite');
                 case 'All'
-                    lighting(app.UIAxes, 'gouraud');
                     handleLights_(1) = camlight(app.UIAxes, 'left','infinite');
                     handleLights_(2) = camlight(app.UIAxes, 'right','infinite');
                     handleLights_(3) = camlight(app.UIAxes, 'headlight','infinite');
             end
-            material(app.UIAxes, 'metal'); 
         end
 
         % Value changed function: MajorLoDsDropDown
