@@ -1,4 +1,4 @@
-function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, varargin)
+function hdGraphicPSLsPrimitives = DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, miniPSLength, varargin)
 	%% Syntax:
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
 	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
@@ -9,15 +9,15 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
 	%% smoothingOpt: %% smoothing ribbon or not (0)
-	%% minLength: minLengthVisiblePSLs_ or varargin{1} if exists, only PSLs with length larger than minLength can be shown
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global majorHierarchy_; global mediumHierarchy_; global minorHierarchy_;
 	global minimumEpsilon_;
 	global minLengthVisiblePSLs_;
-	miniPSLength = minLengthVisiblePSLs_;
-	if 7==nargin, miniPSLength = varargin{1}; end
+	global MATLAB_GUI_opt_;
+	global axHandle_;
 	lineWidthTube = lw*minimumEpsilon_/5;
 	lineWidthRibbon = 3*lineWidthTube;
+	hdGraphicPSLsPrimitives = [];
 	%% Get Target PSLs to Draw
 	%% Major
 	switch imOpt(1)
@@ -248,7 +248,15 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 	end
 	
 	%%Draw
-	figure; handleSilhouette = DrawSilhouette(); 
+	if 7==nargin, 
+		figure; axHandle_ = gca;
+		handleSilhouette = DrawSilhouette(); 
+	else
+		axHandle_ = varargin{1}; 
+		global handleSilhoutte_; handleSilhouette = handleSilhoutte_;
+	end	
+	
+	handleMajorPSL = []; handleRibbonOutlineMajorPSL = [];
 	switch pslGeo(1)
 		case 'TUBE'
 			handleMajorPSL = ExpandPSLs2Tubes(tarMajorPSLs, color4MajorPSLs, lineWidthTube);
@@ -256,13 +264,15 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			[handleMajorPSL, handleRibbonOutlineMajorPSL] = ...
 				ExpandPSLs2Ribbons(tarMajorPSLs, lineWidthRibbon, [6 7 8], color4MajorPSLs, ribbonSmoothingOpt);				
 	end
+	handleMediumPSL = []; handleRibbonOutlineMediumPSL = [];
 	switch pslGeo(2)
 		case 'TUBE'
 			handleMediumPSL = ExpandPSLs2Tubes(tarMediumPSLs, color4MediumPSLs, lineWidthTube);
 		case 'RIBBON'
 			[handleMediumPSL, handleRibbonOutlineMediumPSL] = ...
 				ExpandPSLs2Ribbons(tarMediumPSLs, lineWidthRibbon, [2 3 4], color4MediumPSLs, ribbonSmoothingOpt);				
-	end	
+	end
+	handleMinorPSL = []; handleRibbonOutlineMinorPSL = [];
 	switch pslGeo(3)
 		case 'TUBE'
 			handleMinorPSL = ExpandPSLs2Tubes(tarMinorPSLs, color4MinorPSLs, lineWidthTube);
@@ -270,93 +280,84 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 			[handleMinorPSL, handleRibbonOutlineMinorPSL] = ...
 				ExpandPSLs2Ribbons(tarMinorPSLs, lineWidthRibbon, [6 7 8], color4MinorPSLs, ribbonSmoothingOpt);					
 	end
-	
 	set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
-	if exist('handleRibbonOutlineMajorPSL')
-		set(handleRibbonOutlineMajorPSL, 'EdgeAlpha', 1, 'edgecol','k');
-	end
-	if exist('handleRibbonOutlineMediumPSL')
-		set(handleRibbonOutlineMediumPSL, 'EdgeAlpha', 1, 'edgecol','k');
-	end
-	if exist('handleRibbonOutlineMinorPSL')
-		set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
-	end
+	set(handleRibbonOutlineMajorPSL, 'EdgeAlpha', 1, 'edgecol','k');
+	set(handleRibbonOutlineMediumPSL, 'EdgeAlpha', 1, 'edgecol','k');
+	set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
 	if strcmp(stressComponentOpt, "None")
-		set(handleMajorPSL, 'FaceColor', [0.40 0 0.05]);
-		set(handleMediumPSL, 'FaceColor', [0 0.27 0.11]);
-		set(handleMinorPSL, 'FaceColor', [0.03 0.19 0.42]);	
+		set(handleMajorPSL, 'FaceColor', [252 141 98]/255);
+		set(handleMediumPSL, 'FaceColor', [141 160 203]/255);
+		set(handleMinorPSL, 'FaceColor', [102 194 165]/255);	
 	end
 	set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 	set(handleMediumPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 	set(handleMinorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
-	
+	hdGraphicPSLsPrimitives = [handleMajorPSL; handleRibbonOutlineMajorPSL; handleMediumPSL; handleRibbonOutlineMediumPSL; ...
+		handleRibbonOutlineMinorPSL; handleMinorPSL];
 	%%Colorbar
 	if 1
 		if strcmp(stressComponentOpt, "None")
 		elseif strcmp(stressComponentOpt, "Sigma")
-			cb = colorbar('Location', 'east');
-			% v1 = min(cValOnMinor); v2 = max(cValOnMinor);
-			% v3 = min(cValOnMedium); v4 = max(cValOnMedium);
-			% v5 = min(cValOnMajor); v6 = max(cValOnMajor);
+			cb = colorbar(axHandle_, 'Location', 'east', 'AxisLocation','in');
 			if 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs
-				%colormap([RedRGB()]);
-				colormap('autumn');
+				%colormap(axHandle_, [RedRGB()]);
+				colormap(axHandle_, 'autumn');
 				v5 = min(cValOnMajor); v6 = max(cValOnMajor);
-				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v5, v6, 5)}, 'AxisLocation','out');
+				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v5, v6, 5)});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v5, v6, 5)),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
-				%colormap([GreenRGB();]);
-				colormap('copper');
+				%colormap(axHandle_, [GreenRGB();]);
+				colormap(axHandle_, 'copper');
 				v3 = min(cValOnMedium); v4 = max(cValOnMedium);
-				set(cb,'Ticks',[0 25 50 75 99],'TickLabels', {linspace(v3, v4, 5)}, 'AxisLocation','out');
+				set(cb,'Ticks',[0 25 50 75 99],'TickLabels', {linspace(v3, v4, 5)});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v3, v4, 5)),'Un',0); set(cb,'xticklabel',L);			
 			elseif 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
-				%colormap([BlueRGB();]);
-				colormap('winter');	
+				%colormap(axHandle_, [BlueRGB();]);
+				colormap(axHandle_, 'winter');	
 				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
-				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v1, v2, 5)}, 'AxisLocation','out');
+				set(cb,'Ticks',[0 25 50 75 100],'TickLabels', {linspace(v1, v2, 5)});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(v1, v2, 5)),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0<numTarMajorPSLs && 0<numTarMediumPSLs && 0==numTarMinorPSLs
-				% colormap([GreenRGB(); RedRGB()]);
-				colormap([pink; flip(autumn)]);
+				% colormap(axHandle_, [GreenRGB(); RedRGB()]);
+				colormap(axHandle_, [pink; flip(autumn)]);
 				v3 = min(cValOnMedium); v4 = max(cValOnMedium);
 				v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
-				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v3 v4 v5 v6}, 'AxisLocation','out');
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v3 v4 v5 v6});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v3 v4 v5 v6]),'Un',0); set(cb,'xticklabel',L);				
 			elseif 0<numTarMajorPSLs && 0==numTarMediumPSLs && 0<numTarMinorPSLs
-				% colormap([BlueRGB(); RedRGB()]);
-				colormap([winter; flip(autumn)]);
+				% colormap(axHandle_, [BlueRGB(); RedRGB()]);
+				colormap(axHandle_, [winter; flip(autumn)]);
 				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
 				v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
-				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6}, 'AxisLocation','out');
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v5 v6});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v5 v6]),'Un',0); set(cb,'xticklabel',L);			
 			elseif 0==numTarMajorPSLs && 0<numTarMediumPSLs && 0<numTarMinorPSLs
-				% colormap([BlueRGB(); GreenRGB();]);
-				colormap([winter; pink]);
+				% colormap(axHandle_, [BlueRGB(); GreenRGB();]);
+				colormap(axHandle_, [winter; pink]);
 				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
 				v3 = min(cValOnMedium); v4 = max(cValOnMedium);			
-				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v3 v4}, 'AxisLocation','out');
+				set(cb,'Ticks',[25 75 125 175],'TickLabels', {v1 v2 v3 v4});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v3 v4]),'Un',0); set(cb,'xticklabel',L);					
 			else
-				%colormap([BlueRGB(); GreenRGB(); RedRGB()]);
-				colormap([winter; pink; flip(autumn)]);
+				%colormap(axHandle_, [BlueRGB(); GreenRGB(); RedRGB()]);
+				colormap(axHandle_, [winter; pink; flip(autumn)]);
 				v1 = min(cValOnMinor); v2 = max(cValOnMinor);
 				v3 = min(cValOnMedium); v4 = max(cValOnMedium);
 				v5 = min(cValOnMajor); v6 = max(cValOnMajor);				
-				set(cb,'Ticks',[25 75 125 175 225 275],'TickLabels', {v1 v2 v3 v4 v5 v6}, 'AxisLocation','out');
+				set(cb,'Ticks',[25 75 125 175 225 275],'TickLabels', {v1 v2 v3 v4 v5 v6});
 				L=cellfun(@(x)sprintf('%.2e',x),num2cell([v1 v2 v3 v4 v5 v6]),'Un',0); set(cb,'xticklabel',L);
 			end
 			% colorbar off
 		else
-			colormap('jet'); cb = colorbar('Location', 'east');
-			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5),'AxisLocation','out');
+			colormap(axHandle_, 'jet'); cb = colorbar(axHandle_, 'Location', 'east', 'AxisLocation','in');
+			t=get(cb,'Limits'); set(cb,'Ticks',linspace(t(1),t(2),5));
 			L=cellfun(@(x)sprintf('%.2e',x),num2cell(linspace(t(1),t(2),5)),'Un',0); set(cb,'xticklabel',L);	
 		end
-		set(gca, 'FontName', 'Times New Roman', 'FontSize', 20);
+		set(axHandle_, 'FontName', 'Times New Roman', 'FontSize', 20);
 	end
 	
 	%%Lighting, Reflection
-	if 1
+	if ~MATLAB_GUI_opt_
 		% view(6.43e+01, 1.61e+01); %%cantilever - 1
 		% view(2.89e+01, 5.90e+00); %%femur
 		% view(-1.96e+01, 1.06e+01); %%femur_porousInfill
@@ -368,28 +369,28 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingO
 		% view(-3.80e+01, 9.30e+00); %%bridge
 		% view(3.56e+01, -1.08e+00); %%armadillo
 		% view(-2.07e+00, 2.55e+01); %%femur implant
-		lighting gouraud;
+		lighting(axHandle_, 'gouraud');
 		Lopt = 'LA'; %% 'LA', 'LB'
 		Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'
 		
 		switch Lopt
 			case 'LA'
-				camlight('headlight','infinite');
-				camlight('right','infinite');
-				camlight('left','infinite');					
+				camlight(axHandle_, 'headlight','infinite');
+				camlight(axHandle_, 'right','infinite');
+				camlight(axHandle_, 'left','infinite');					
 			case 'LB'
-				camlight('headlight','infinite');				
+				camlight(axHandle_, 'headlight','infinite');				
 		end
 		
 		switch Mopt
 			case 'M0'
 			
 			case 'MA'
-				material dull
+				material(axHandle_, 'dull');
 			case 'MB'
-				material shiny
+				material(axHandle_, 'shiny');
 			case 'MC'
-				material metal
+				material(axHandle_, 'metal'); 
 		end
 	end		
 end

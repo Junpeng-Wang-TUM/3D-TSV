@@ -11,6 +11,7 @@ function varargout = ExpandPSLs2Ribbons(varargin)
 	%%			   / dir3
 	%%	===========================
 	%%
+	global axHandle_;
 	twistThreshold = 3.5/180*pi;
 	PSLs = varargin{1};
 	lw = varargin{2};
@@ -158,14 +159,14 @@ function varargout = ExpandPSLs2Ribbons(varargin)
 		yPatchsFace = yCoord(quadMapFace);
 		zPatchsFace = zCoord(quadMapFace);
 		cPatchsFace = faceColorList(quadMapFace);
-		hdFace = patch(xPatchsFace, yPatchsFace, zPatchsFace, cPatchsFace); 
-		shading('interp'); hold('on');
+		hdFace = patch(axHandle_, xPatchsFace, yPatchsFace, zPatchsFace, cPatchsFace); 
+		shading(axHandle_, 'interp'); hold(axHandle_, 'on');
 		
 		xPatchsOutline = xCoord(quadMapOutline);
 		yPatchsOutline = yCoord(quadMapOutline);
 		zPatchsOutline = zCoord(quadMapOutline);
 		cPatchsOutline = zeros(size(xPatchsOutline));
-		hdOutline = patch(xPatchsOutline, yPatchsOutline, zPatchsOutline, cPatchsOutline); hold('on');
+		hdOutline = patch(axHandle_, xPatchsOutline, yPatchsOutline, zPatchsOutline, cPatchsOutline); hold(axHandle_, 'on');
 		set(hdOutline, 'facecol', 'None', 'linew', 3);
 		varargout{1} = hdFace; varargout{2} = hdOutline;		
 	else
