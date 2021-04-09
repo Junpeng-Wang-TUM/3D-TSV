@@ -227,6 +227,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
         function ColoringDropDownValueChanged(app, event)
             global handleGraphicPSLsPrimitives_;
             [imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, miniPSLength] = GatherPSLvisCtrls(app);
+            if strcmp(stressComponentOpt, 'None'), colorbar(app.UIAxes, 'off'); end
             handleGraphicPSLsPrimitives_ = DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, miniPSLength, app.UIAxes);               
         end
 
