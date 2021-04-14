@@ -94,8 +94,8 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
     BuildPSLs4Hierarchy();
 	
 	%%5. write results
-	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
-	ExportResult(pslDataNameOutput);
+	% pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
+	% ExportResult(pslDataNameOutput);
 	opt = 1;
 	tEnd = toc(tStart);
 	PrintAlgorithmStatistics(tEnd);
