@@ -12,16 +12,16 @@ userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
 
-userInterface.fileName = 'D:/MyDataSets/StressFields4LLGP/cuboid.vtk';
-userInterface.lineDensCtrl = 10;
+userInterface.fileName = 'D:/MyDataSets/StressFields4LLGP/Vis2021_femur3D.vtk';
+userInterface.lineDensCtrl = 15;
 userInterface.numLevels = 1;
 userInterface.seedStrategy = 'Volume';
 userInterface.seedDensCtrl = 4;
-userInterface.selectedPrincipalStressField = [1, 3];
+userInterface.selectedPrincipalStressField = [1];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
-userInterface.maxAngleDevi = 20;
-userInterface.traceAlgorithm = 'Euler';
+userInterface.maxAngleDevi = 6;
+userInterface.traceAlgorithm = 'RK2';
 
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================

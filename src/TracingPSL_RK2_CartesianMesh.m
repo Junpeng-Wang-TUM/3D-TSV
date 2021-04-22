@@ -12,7 +12,7 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	paraCoordList = [];
 	vonMisesStressList = zeros(limiSteps,1);
 	principalStressList = zeros(limiSteps,12);	
-
+testOpt1 = 0;
 	%%initialize initial k1 and k2
 	k1 = iniDir;
 	midPot = startPoint + k1*tracingStepWidth_/2;
@@ -21,8 +21,13 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	if bool1
 		cartesianStress = cartesianStressField_(eNodMat_(elementIndex,:)', :);
 		cartesianStressOnGivenPoint = ElementInterpolationTrilinear(cartesianStress, paraCoordinates);
-		principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
+		principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);		
+if testOpt1
+	dirList = principalStress([2 3 4; 6 7 8; 10 11 12]); 
+	[k2, terminationCond] = BidirectionalFeatureProcessingNew(k1, [dirList; -dirList]);	
+else
 		[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress(typePSL));
+end		
 		nextPoint = startPoint + tracingStepWidth_*k2;
 		[elementIndex, paraCoordinates, bool1] = SearchNextIntegratingPointOnCartesianMesh(nextPoint);
 		while bool1
@@ -34,7 +39,12 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			principalStress = ComputePrincipalStress(cartesianStressOnGivenPoint);
 			evs = principalStress([1 5 9]);
 			if min([abs((evs(1)-evs(2))/2/(evs(1)+evs(2))) abs((evs(3)-evs(2))/2/(evs(3)+evs(2)))])<siE, index = index-1; break; end %%degenerate point			
+if testOpt1
+	dirList = principalStress([2 3 4; 6 7 8; 10 11 12]); 
+	[k1, terminationCond] = BidirectionalFeatureProcessingNew(iniDir, [dirList; -dirList]);	
+else
 			[k1, terminationCond] = BidirectionalFeatureProcessing(iniDir, principalStress(typePSL));
+end		
 			if ~terminationCond, index = index-1; break; end
 			%%k2
 			midPot = nextPoint + k1*tracingStepWidth_/2;
@@ -43,7 +53,13 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 			cartesianStress2 = cartesianStressField_(eNodMat_(elementIndex2,:)', :);
 			cartesianStressOnGivenPoint2 = ElementInterpolationTrilinear(cartesianStress2, paraCoordinates2);
 			principalStress2 = ComputePrincipalStress(cartesianStressOnGivenPoint2);
+			
+if testOpt1
+	dirList = principalStress2([2 3 4; 6 7 8; 10 11 12]); 
+	[k2, terminationCond] = BidirectionalFeatureProcessingNew(k1, [dirList; -dirList]);
+else
 			[k2, terminationCond] = BidirectionalFeatureProcessing(k1, principalStress2(typePSL));
+end				
 			%%store	
 			iniDir = k1;
 			phyCoordList(index,:) = nextPoint;
