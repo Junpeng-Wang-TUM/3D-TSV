@@ -152,13 +152,9 @@ function ImportStressFields(fileName)
 		vtxUpperBound_ = [max(nodeCoords_(:,1)) max(nodeCoords_(:,2)) max(nodeCoords_(:,3))];
 		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;
 		%%extract and Re-organize silhouette into quad-mesh for exporting
-		faceIndex = zeros(4,6*numEles_);
-		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
-		for ii=1:numEles_
-			index = (ii-1)*6;
-			iEleVtx = eNodMat_(ii,:)';
-			faceIndex(:,index+1:index+6) = iEleVtx(mapEle2patch);
-		end
+		faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
+		faceIndex = reshape(faceIndex(:), 4, 6*numEles_);		
+		
 		tmp = nodState_(faceIndex');
 		tmp = sum(tmp,2);
 		BoundaryEleFace = faceIndex(:,find(4==tmp)');
@@ -182,7 +178,7 @@ function ImportStressFields(fileName)
 			end
 		end		
 		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);
-		eleFaces = mapEle2patch';	 
+		eleFaces = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6];
 		iEleStruct = struct('faceCentres', [], 'faceNormals', []); %%pure-Hex
 		eleStruct_ = repmat(iEleStruct, numEles_, 1);
 		for ii=1:numEles_
