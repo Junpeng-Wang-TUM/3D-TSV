@@ -17,7 +17,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 		dataName_ = fileName;
 	end
 	
-	dimentions = sort(vtxUpperBound_-vtxLowerBound_); %%Ascending
+	dimentions = sort(boundingBox_(2,:)-boundingBox_(1,:)); %%Ascending
 	lineDensCtrl = userInterface.lineDensCtrl;
 	if strcmp(lineDensCtrl, 'default')
 		lineDensCtrl = (8000/(dimentions(2)/dimentions(1))/(dimentions(3)/dimentions(2)))^(1/3);
@@ -94,8 +94,8 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
     BuildPSLs4Hierarchy();
 	
 	%%5. write results
-	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
-	ExportResult(pslDataNameOutput);
+	% pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
+	% ExportResult(pslDataNameOutput);
 	opt = 1;
 	tEnd = toc(tStart);
 	PrintAlgorithmStatistics(tEnd);

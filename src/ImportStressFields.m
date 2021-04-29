@@ -1,5 +1,5 @@
 function ImportStressFields(fileName)
-	global vtxLowerBound_; global vtxUpperBound_;
+	global boundingBox_; 
 	global numNodes_;
 	global nodeCoords_;
 	global numEles_;
@@ -12,6 +12,7 @@ function ImportStressFields(fileName)
 	global eleCentroidList_;
 	global silhouetteStruct_;
 	global meshType_;
+	global eleSize_; 
 	global surfaceQuadMeshNodeCoords_;
 	global surfaceQuadMeshElements_;	
 	
@@ -30,9 +31,9 @@ function ImportStressFields(fileName)
 		tmp = fscanf(fid, '%d %d %d', [1 3]);
 		nelx_ = tmp(1); nely_ = tmp(2); nelz_ = tmp(3);
 		tmp = fscanf(fid, '%s', 1);
-		vtxLowerBound_ = fscanf(fid, '%f %f %f', [1 3]);
+		boundingBox_ = fscanf(fid, '%f %f %f', [1 3]);
 		tmp = fscanf(fid, '%s', 1);
-		vtxUpperBound_ = fscanf(fid, '%f %f %f', [1 3]);		
+		boundingBox_(2,:) = fscanf(fid, '%f %f %f', [1 3]);		
 		tmp = fscanf(fid, '%s', 1); 
 		numValidEles = fscanf(fid, '%d', 1);
 		tmp = fscanf(fid, '%s', 1);
@@ -79,8 +80,7 @@ function ImportStressFields(fileName)
 		eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;
 			
 		%%extract and Re-organize silhouette into quad-mesh for exporting
-		[nodPosX nodPosY nodPosZ] = NodalizeDesignDomain([nelx_ nely_ nelz_], ...
-			[vtxLowerBound_; vtxUpperBound_], 'inGrid');	
+		[nodPosX, nodPosY, nodPosZ] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_, 'inGrid');	
 		valForExtctBoundary = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
 		valForExtctBoundary(originalValidNodeIndex_) = 1;
 		valForExtctBoundary = reshape(valForExtctBoundary, nely_+1, nelx_+1, nelz_+1);
@@ -148,9 +148,8 @@ function ImportStressFields(fileName)
 		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
 		eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;
 		
-		vtxLowerBound_ = [min(nodeCoords_(:,1)) min(nodeCoords_(:,2)) min(nodeCoords_(:,3))];
-		vtxUpperBound_ = [max(nodeCoords_(:,1)) max(nodeCoords_(:,2)) max(nodeCoords_(:,3))];
-		global eleSize_; eleSize_ = max(vtxUpperBound_-vtxLowerBound_)/100;
+		boundingBox_ = [min(nodeCoords_, [], 1); max(nodeCoords_, [], 1)];
+		eleSize_ = max(boundingBox_(2,:)-boundingBox_(1,:))/100;
 		%%extract and Re-organize silhouette into quad-mesh for exporting
 		faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
 		faceIndex = reshape(faceIndex(:), 4, 6*numEles_);		
@@ -210,7 +209,7 @@ end
 function RecoverCartesianMesh()	
 	global nelx_; global nely_; global nelz_; 
 	global voxelizedVolume_;
-	global vtxLowerBound_; global vtxUpperBound_;
+	global boundingBox_;
 	global numEles_; global numNodes_; global eleSize_;
 	global nodeCoords_; global eNodMat_; 
 	global originalValidNodeIndex_; global validElements_;
@@ -230,8 +229,7 @@ function RecoverCartesianMesh()
 	%     	   | /           | /
 	%          1-------------2             
 	%			Hexahedral element
-	eleSize_ = min([(vtxUpperBound_(1)-vtxLowerBound_(1))/nelx_, (vtxUpperBound_(2)-...
-		vtxLowerBound_(2))/nely_, (vtxUpperBound_(3)-vtxLowerBound_(3))/nelz_]);
+	eleSize_ = min((boundingBox_(2,:)-boundingBox_(1,:))./[nelx_ nely_ nelz_]);
 	validElements_ = find(1==voxelizedVolume_);
 	validElements_ = int32(validElements_);			
 	numEles_ = length(validElements_);		
@@ -254,8 +252,7 @@ function RecoverCartesianMesh()
 		eNodMat_(:,ii) = nodeMap4CutBasedModel_(eNodMat_(:,ii));
 	end
 	nodeCoords_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),3);
-	[nodeCoords_(:,1), nodeCoords_(:,2), nodeCoords_(:,3)] = ...
-		NodalizeDesignDomain([nelx_ nely_ nelz_], [vtxLowerBound_; vtxUpperBound_]);		
+	[nodeCoords_(:,1), nodeCoords_(:,2), nodeCoords_(:,3)] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_);		
 	nodeCoords_ = nodeCoords_(originalValidNodeIndex_,:);
 	if size(nodeLoadVec_,1)>0
 		nodeLoadVec_(:,1) = nodeMap4CutBasedModel_(nodeLoadVec_(:,1));
