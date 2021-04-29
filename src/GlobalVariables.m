@@ -2,8 +2,8 @@
 
 %% 1. Dataset info.
 global dataName_; 
-global meshType_; 
-global vtxLowerBound_; global vtxUpperBound_;
+global meshType_;
+global boundingBox_; 
 global nelx_; global nely_; global nelz_; 
 global numNodes_;
 global nodeCoords_; 

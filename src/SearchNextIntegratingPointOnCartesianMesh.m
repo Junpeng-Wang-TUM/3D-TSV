@@ -3,11 +3,11 @@ function [nextElementIndex, paraCoordinates, opt] = SearchNextIntegratingPointOn
 	global eNodMat_;
 	global meshState_; global eleMapBack_;
 	global nelx_; global nely_; global nelz_; global eleSize_;
-	global vtxLowerBound_;
+	global boundingBox_;
 	
 	nextElementIndex = 0; paraCoordinates = []; opt = 0;
 	
-	physicalCoordinates = physicalCoordinates - vtxLowerBound_;
+	physicalCoordinates = physicalCoordinates - boundingBox_(1,:);
 	if 0==physicalCoordinates(1)
 		eleX = 1;				
 	else
@@ -32,7 +32,7 @@ function [nextElementIndex, paraCoordinates, opt] = SearchNextIntegratingPointOn
 		nextElementIndex = eleMapBack_(tarEle);
 		opt = 1;
 		relatedNodes = eNodMat_(nextElementIndex,:);
-		relatedNodeCoords = nodeCoords_(relatedNodes',:)-vtxLowerBound_;
+		relatedNodeCoords = nodeCoords_(relatedNodes',:)-boundingBox_(1,:);
 		paraCoordinates = 2*(physicalCoordinates - relatedNodeCoords(1,:)) / eleSize_ - 1;
 	end	
 end
