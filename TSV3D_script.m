@@ -11,16 +11,15 @@ global MATLAB_GUI_opt_; MATLAB_GUI_opt_ = 0;
 userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
-
-userInterface.fileName = 'D:/MyDataSets/StressFields4LLGP/Vis2021_femur3D.vtk';
+userInterface.fileName = './data/Vis2021_parts3D.vtk';
 userInterface.lineDensCtrl = 15;
 userInterface.numLevels = 1;
 userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 4;
-userInterface.selectedPrincipalStressField = [1];
+userInterface.seedDensCtrl = 5;
+userInterface.selectedPrincipalStressField = [1, 2, 3];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
-userInterface.maxAngleDevi = 6;
+userInterface.maxAngleDevi = 20;
 userInterface.traceAlgorithm = 'RK2';
 
 %% Some Examples used in the paper
@@ -135,7 +134,6 @@ userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================parts=======================================
 % userInterface.fileName = './data/Vis2021_parts3D.vtk';
-%% ---------------------------------------Experiment 2
 % userInterface.lineDensCtrl = 30;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
@@ -148,10 +146,11 @@ userInterface.traceAlgorithm = 'RK2';
 
 
 RunMission(userInterface);
+% RunMission_evenlySpacedSeeding(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'Sigma', 0.5, 1, 20);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 10);
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);

@@ -1,4 +1,4 @@
-function [opt, pslDataNameOutput] = RunMission(userInterface)	
+function [opt, pslDataNameOutput] = RunMission_evenlySpacedSeeding(userInterface)	
 	%%1. Initialize Experiment Environment
 	%%1.1 variable declaration	
 	tStart = tic;
@@ -51,6 +51,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	
 	mergingOpt_ = userInterface.mergingOpt;
 	if ~mergingOpt_, numLevels = 1; end
+	numLevels = 1;
 	multiMergingThresholdsCtrl_ = userInterface.multiMergingThresholds;
 	
 	snappingOpt_ = userInterface.snappingOpt;
@@ -83,7 +84,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	index = 1;
 	while index<=numLevels
 		iEpsilon = minimumEpsilon_ * 2^(numLevels-index);
-		GenerateSpaceFillingPSLs(iEpsilon);
+		GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon);
 		majorPSLindexList_(index).arr = 1:length(majorPSLpool_);
 		mediumPSLindexList_(index).arr = 1:length(mediumPSLpool_);
 		minorPSLindexList_(index).arr = 1:length(minorPSLpool_);
@@ -94,8 +95,8 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
     BuildPSLs4Hierarchy();
 	
 	%%5. write results
-	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
-	ExportResult(pslDataNameOutput);
+	% pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
+	% ExportResult(pslDataNameOutput);
 	opt = 1;
 	tEnd = toc(tStart);
 	PrintAlgorithmStatistics(tEnd);

@@ -4,6 +4,7 @@ function DrawSamplingHistory(lw)
 	global minimumEpsilon_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
 	global PSLsAppearanceOrder_;
+    global axHandle_;
 	lineWidthTube = lw*minimumEpsilon_/5;
 	seedRadius = 4*lineWidthTube;
 	[sphereX,sphereY,sphereZ] = sphere;	
@@ -11,11 +12,12 @@ function DrawSamplingHistory(lw)
 	sphereY = seedRadius*sphereY;
 	sphereZ = seedRadius*sphereZ;
 	fileName = strcat(erase(dataName_,'.vtk'), '_SamplingHistory.gif');
-	figure; handleSilhouette = DrawSilhouette(); view(0,0);
+	figure; axHandle_ = gca;
+    handleSilhouette = DrawSilhouette(axHandle_); view(0,0);
 	disp('Rotate to a Preferable View Direction if Necessary. Press Enter to Continue!'); pause
 	[az0, el0] = view;
 	material metal;
-	colormap([winter; pink; flip(autumn)]);
+	% colormap([winter; pink; flip(autumn)]);
 	for jj=1:size(PSLsAppearanceOrder_)
 		%%Fetch Seed
 		iAO = PSLsAppearanceOrder_(jj,:);
@@ -70,9 +72,9 @@ function DrawSamplingHistory(lw)
 		handleLights(2) = camlight('right','infinite');
 		% handleLights(3) = camlight('left','infinite');		
 		set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
-		set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
-		set(handleMediumPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
-		set(handleMinorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);
+		set(handleMajorPSL, 'FaceColor', [252 141 98]/255, 'FaceAlpha', 1, 'EdgeAlpha', 0);
+		set(handleMediumPSL, 'FaceColor', [141 160 203]/255, 'FaceAlpha', 1, 'EdgeAlpha', 0);
+		set(handleMinorPSL, 'FaceColor', [102 194 165]/255, 'FaceAlpha', 1, 'EdgeAlpha', 0);
 		set(handleSeed, 'FaceColor', [0 0 1], 'FaceAlpha', 1, 'EdgeColor', 'none');
 		%%Write into '.gif'
 		f = getframe(gcf);
