@@ -362,7 +362,7 @@ function hdGraphicPSLsPrimitives = DrawPSLs(imOpt, imVal, pslGeo, stressComponen
 		% view(2.89e+01, 5.90e+00); %%femur
 		% view(0, 0); %% bracket
 		% view(-1.93e+02, 1.39e+01); %%bunny
-		% view(-5.32e+00,3.77e+00); %%kitten
+		% view(0, 0); %%kitten
 		% view(-1.90e+00, 8.74e+01); %%kittenHex
 		% view(-2.05e+02,1.69e+01); %%parts
 		lighting(axHandle_, 'gouraud');
