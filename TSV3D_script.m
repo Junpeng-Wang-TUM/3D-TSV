@@ -11,16 +11,16 @@ global MATLAB_GUI_opt_; MATLAB_GUI_opt_ = 0;
 userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
-userInterface.fileName = './data/Vis2021_parts3D.vtk';
-userInterface.lineDensCtrl = 15;
+userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
+userInterface.lineDensCtrl = 4;
 userInterface.numLevels = 1;
 userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 5;
+userInterface.seedDensCtrl = 8;
 userInterface.selectedPrincipalStressField = [1, 2, 3];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
 userInterface.maxAngleDevi = 20;
-userInterface.traceAlgorithm = 'RK2';
+userInterface.traceAlgorithm = 'Euler';
 
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================
