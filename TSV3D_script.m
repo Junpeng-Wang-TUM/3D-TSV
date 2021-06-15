@@ -11,11 +11,11 @@ global MATLAB_GUI_opt_; MATLAB_GUI_opt_ = 0;
 userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
-userInterface.fileName = './data/Vis2021_kitten3D.vtk';
-userInterface.lineDensCtrl = 10;
-userInterface.numLevels = 1;
+userInterface.fileName = './data/new_holes3_R256.vtk';
+userInterface.lineDensCtrl = 15;
+userInterface.numLevels = 2;
 userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 4;
+userInterface.seedDensCtrl = 5;
 userInterface.selectedPrincipalStressField = [1, 3];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
@@ -150,7 +150,7 @@ RunMission(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 10);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 20);
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);
