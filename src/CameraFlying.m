@@ -45,7 +45,8 @@ function CameraFlying(varargin)
 				f = getframe(gcf);
 				writeVideo(v,f);
 				set(hdLight,'visible','off');
-				az = step+az;
+				az = step+az; %% rotate Z
+				% el = -step+el; %% rotate X
 				view(az, el);
 			end
 			close(v);		

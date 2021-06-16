@@ -360,6 +360,7 @@ function hdGraphicPSLsPrimitives = DrawPSLs(imOpt, imVal, pslGeo, stressComponen
 	if ~MATLAB_GUI_opt_
 		% view(6.43e+01, 1.61e+01); %%cantilever - 1
 		% view(2.89e+01, 5.90e+00); %%femur
+		% view(-7.85e+01, 1.02e+01); %% arched_bridge closeup;
 		% view(0, 0); %% bracket
 		% view(-1.93e+02, 1.39e+01); %%bunny
 		% view(0, 0); %%kitten
