@@ -1,13 +1,10 @@
 function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 	global boundingBox_; 
 	global seedPoints_; global seedPointsHistory_;
-	global seedPointsValence_; 
 	global selectedPrincipalStressField_;
 	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
-	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
 	global PSLsAppearanceOrder_;
-	global mergeTrigger_; global relaxedFactor_; global multiMergingThresholdsCtrl_;
-	global startCoord_;
+	global mergeTrigger_; 
 
 	%% Exclude the irrelated Principal Stress Fields
 	
@@ -23,7 +20,13 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 	end
 	
 	%%1. initialize sampling points
-	mergeTrigger_ = 1.2*iEpsilon;
+	mergeTrigger_ = 1.2*iEpsilon; %%original
+	% mergeTrigger_ = 1.3*iEpsilon; %%optimized cantilever_iLoad4 (dens: 6, seed: 2)
+	% mergeTrigger_ = 1.5*iEpsilon; %%optimized cantilever_iLoad4 (dens: 4, seed: 7)
+	% mergeTrigger_ = 1.2*iEpsilon; %%cantilever (dens: 4, seed: 8)	trick
+	% mergeTrigger_ = 1.15*iEpsilon; %%cantilever (dens: 5, seed: 5)	
+	% mergeTrigger_ = 1.3*iEpsilon; %% arched bridge (dens: 4, seed: 2), (dens: 6, seed: 2)
+	
 	startCoord = (boundingBox_(2,:) + boundingBox_(1,:))/2;
 	[~, pos] = min(vecnorm(startCoord-seedPointsHistory_,2,2));
 	startCoord = seedPointsHistory_(pos,:);

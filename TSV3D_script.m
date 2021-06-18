@@ -12,10 +12,10 @@ userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
 userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
-userInterface.lineDensCtrl = 4;
+userInterface.lineDensCtrl = 4; %% or 5
 userInterface.numLevels = 1;
 userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 8;
+userInterface.seedDensCtrl = 8; %% or 5
 userInterface.selectedPrincipalStressField = [1, 3];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
@@ -25,10 +25,10 @@ userInterface.traceAlgorithm = 'Euler';
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================
 % userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
-% userInterface.lineDensCtrl = 4;
+% userInterface.lineDensCtrl = 4; %% or 5
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 8;
+% userInterface.seedDensCtrl = 8; %% or 5
 % userInterface.selectedPrincipalStressField = [1, 3];
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
@@ -37,16 +37,27 @@ userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================arched_bridge=======================================
 % userInterface.fileName = './data/new_arched_bridge_R256.vtk';
-% userInterface.lineDensCtrl = 6;
+% userInterface.lineDensCtrl = 6; or 4 or 6
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 5;
+% userInterface.seedDensCtrl = 5; %%or 2 or 2
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20; %% or 30
+% userInterface.traceAlgorithm = 'RK2';
+
+%% =======================================optimized cantilever=======================================
+% userInterface.fileName = './data/cantilever3D_200_100_100_iLoad4_G_v0_5.vtk';
+% userInterface.lineDensCtrl = 6; %% or 4
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 2; %% or 7
 % userInterface.selectedPrincipalStressField = [1, 3];
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 10;
 % userInterface.traceAlgorithm = 'RK2';
-
 
 %% =======================================femur=======================================
 % userInterface.fileName = './data/Vis2021_femur3D.vtk';
@@ -162,7 +173,7 @@ RunMission(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 20);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 10);
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);
