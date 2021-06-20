@@ -22,6 +22,7 @@ userInterface.snappingOpt = 0;
 userInterface.maxAngleDevi = 20;
 userInterface.traceAlgorithm = 'Euler';
 
+
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================
 % userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
@@ -100,6 +101,16 @@ userInterface.traceAlgorithm = 'Euler';
 
 %% =======================================kitten=======================================
 % userInterface.fileName = './data/Vis2021_kitten3D.vtk';
+%% ---------------------------------------Experiment 0: (4comparison new)
+% userInterface.lineDensCtrl = 6;
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 3;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 6;
+% userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 1: (fig.2 left new)
 % userInterface.lineDensCtrl = 18/4; %%has nothing to do with result, can be anything
 % userInterface.numLevels = 1;
@@ -131,7 +142,7 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.maxAngleDevi = 20;
 % userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 3: (fig. 6)
-% userInterface.lineDensCtrl = 18;
+% userInterface.lineDensCtrl = 18; 
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 4;
