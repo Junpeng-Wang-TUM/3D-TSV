@@ -26,6 +26,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 	% mergeTrigger_ = 1.2*iEpsilon; %%cantilever (dens: 4, seed: 8)	trick
 	% mergeTrigger_ = 1.15*iEpsilon; %%cantilever (dens: 5, seed: 5)	
 	% mergeTrigger_ = 1.3*iEpsilon; %% arched bridge (dens: 4, seed: 2), (dens: 6, seed: 2)
+%     mergeTrigger_ = 1.14*iEpsilon; %%Chamfer (dens: 8, seed: 5)
 	
 	startCoord = (boundingBox_(2,:) + boundingBox_(1,:))/2;
 	[~, pos] = min(vecnorm(startCoord-seedPointsHistory_,2,2));

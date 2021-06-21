@@ -60,6 +60,30 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.maxAngleDevi = 10;
 % userInterface.traceAlgorithm = 'RK2';
 
+%% =======================================Chamfer=======================================
+% userInterface.fileName = './data/new_Chamfer_L0.vtk';
+% userInterface.lineDensCtrl = 8;
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 5;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
+
+%% =======================================asm001=======================================
+% userInterface.fileName = './data/new_asm001.vtk';
+% userInterface.lineDensCtrl = 5;
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 3;
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'RK2';
+
 %% =======================================femur=======================================
 % userInterface.fileName = './data/Vis2021_femur3D.vtk';
 % userInterface.lineDensCtrl = 18;
