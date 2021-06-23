@@ -11,7 +11,6 @@ global MATLAB_GUI_opt_; MATLAB_GUI_opt_ = 0;
 userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
-%% ---------------------------------------Experiment 2: (fig.2 top new and fig. 5)
 userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
 userInterface.lineDensCtrl = 4; %% or 5
 userInterface.numLevels = 1;
