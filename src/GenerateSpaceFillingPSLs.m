@@ -316,7 +316,7 @@ function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 	disT = disT + (coordList(:,2) - pointList(:,2)').^2;
 	disT = disT + (coordList(:,3) - pointList(:,3)').^2;
 	disT = sqrt(disT);		
-	minVal = min(disT);
+	minVal = min(disT, [], 1);
 	minVal = minVal/mergeTrigger_;
 	switch psDir
 		case 'MAJOR'
