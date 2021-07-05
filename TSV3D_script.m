@@ -13,10 +13,10 @@ userInterface = InterfaceStruct();
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
 %% ---------------------------------------Experiment 1: (fig.2 bottom new)
 userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
-userInterface.lineDensCtrl = 5; %% or 5
+userInterface.lineDensCtrl = 5; %% or 4
 userInterface.numLevels = 1;
 userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 5; %% or 5
+userInterface.seedDensCtrl = 5; %% or 8
 userInterface.selectedPrincipalStressField = [1, 3];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
@@ -27,10 +27,10 @@ userInterface.traceAlgorithm = 'Euler';
 %% Some Examples used in the paper
 %% =======================================cantilever=======================================
 % userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
-% userInterface.lineDensCtrl = 4; %% or 5
+% userInterface.lineDensCtrl = 5; %% or 4
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 8; %% or 5
+% userInterface.seedDensCtrl = 5; %% or 8
 % userInterface.selectedPrincipalStressField = [1, 3];
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
@@ -39,24 +39,24 @@ userInterface.traceAlgorithm = 'Euler';
 
 
 %% =======================================arched_bridge=======================================
-%% ---------------------------------------Experiment 1: (fig.2 bottom new)
+%% ---------------------------------------Experiment 1: (fig. 2)
 % userInterface.fileName = './data/new_arched_bridge_R256.vtk';
-% userInterface.lineDensCtrl = 6; %% or 4 or 6
+% userInterface.lineDensCtrl = 12; %% or 4 or 6
 % userInterface.numLevels = 1;
-% userInterface.seedStrategy = 'LoadingArea';
+% userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 8; %%or 2 or 2
-% userInterface.selectedPrincipalStressField = [3];
+% userInterface.selectedPrincipalStressField = [1 2 3];
 % userInterface.mergingOpt = 0;
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20; %% or 30
 % userInterface.traceAlgorithm = 'RK2';
-%% ---------------------------------------Experiment 2: (fig.2 top new and fig. 5)
+%% ---------------------------------------Experiment 2: (fig. 5)
 % userInterface.fileName = './data/new_arched_bridge_R256.vtk';
 % userInterface.lineDensCtrl = 6; %% or 4 or 6
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 2; %%or 2 or 2
-% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.selectedPrincipalStressField = [1, 2, 3];
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20; %% or 30
@@ -170,7 +170,7 @@ RunMission(userInterface);
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 10);
+DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 1, 20);
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);

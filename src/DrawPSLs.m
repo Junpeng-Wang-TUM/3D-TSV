@@ -286,7 +286,8 @@ function hdGraphicPSLsPrimitives = DrawPSLs(imOpt, imVal, pslGeo, stressComponen
 	set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
 	if strcmp(stressComponentOpt, "None")
 		set(handleMajorPSL, 'FaceColor', [252 141 98]/255);
-		set(handleMediumPSL, 'FaceColor', [141 160 203]/255);
+		%set(handleMediumPSL, 'FaceColor', [141 160 203]/255);
+		set(handleMediumPSL, 'FaceColor', [0 0 1]/1);
 		set(handleMinorPSL, 'FaceColor', [102 194 165]/255);	
 	end
 	set(handleMajorPSL, 'FaceAlpha', 1, 'EdgeAlpha', 0);

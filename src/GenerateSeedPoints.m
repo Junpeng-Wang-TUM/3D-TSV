@@ -24,8 +24,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 				sampledNodes(0==sampledNodes) = [];
 				nodesOnBoundary = find(1==nodState_);
 				sampledNodes = setdiff(sampledNodes, nodesOnBoundary);
-				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
-				
+				seedPointsHistory_ = nodeCoords_(sampledNodes,:);			
 			else
 				allNodes = (1:numNodes_)';		
 				if 0
