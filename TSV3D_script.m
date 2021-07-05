@@ -11,7 +11,6 @@ global MATLAB_GUI_opt_; MATLAB_GUI_opt_ = 0;
 userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
-%% ---------------------------------------Experiment 1: (fig.2 bottom new)
 userInterface.fileName = './data/Vis2021_cantilever3D.vtk';
 userInterface.lineDensCtrl = 5; %% or 4
 userInterface.numLevels = 1;
@@ -61,7 +60,7 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20; %% or 30
 % userInterface.traceAlgorithm = 'RK2';
-%% ---------------------------------------Experiment 3: (fig.6 new and fig.9)
+%% ---------------------------------------Experiment 3: (fig.6 and fig.9)
 % userInterface.fileName = './data/new_arched_bridge_R256.vtk';
 % userInterface.lineDensCtrl = 13; %% or 4 or 6
 % userInterface.numLevels = 3;
@@ -71,6 +70,17 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 6; %% or 30
+% userInterface.traceAlgorithm = 'RK2';
+%% ---------------------------------------Experiment 4: (new fig.6 and fig.9 )
+% userInterface.fileName = './data/new_arched_bridge_R256.vtk';
+% userInterface.lineDensCtrl = 12; %% or 4 or 6
+% userInterface.numLevels = 2;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 2; %%or 2 or 2
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20; %% or 30
 % userInterface.traceAlgorithm = 'RK2';
 
 
