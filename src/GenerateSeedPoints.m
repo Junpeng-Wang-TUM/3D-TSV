@@ -7,8 +7,6 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 	global seedPointsHistory_;
 	global originalValidNodeIndex_;
 	global nelx_; global nely_; global nelz_;
-	global nodStruct_;
-	global eNodMat_;
 	global numNodes_;
 	if 0>=seedDensCtrl, seedDensCtrl = 4; end %% in case 0>=minimumEpsilon and volumeSeedingOpt is not defined
 	switch seedStrategy
@@ -24,7 +22,9 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 				sampledNodes(0==sampledNodes) = [];
 				nodesOnBoundary = find(1==nodState_);
 				sampledNodes = setdiff(sampledNodes, nodesOnBoundary);
-				seedPointsHistory_ = nodeCoords_(sampledNodes,:);			
+				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
+                %%just for testing the random seeding
+                % samps = randi([1 size(seedPointsHistory_,1)],1,150); seedPointsHistory_ = seedPointsHistory_(samps,:);                
 			else
 				allNodes = (1:numNodes_)';		
 				if 0

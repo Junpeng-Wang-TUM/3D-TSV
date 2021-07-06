@@ -40,10 +40,10 @@ userInterface.traceAlgorithm = 'Euler';
 %% =======================================arched_bridge=======================================
 %% ---------------------------------------Experiment 1: (fig. 2)
 % userInterface.fileName = './data/new_arched_bridge_R256.vtk';
-% userInterface.lineDensCtrl = 12; %% or 4 or 6
+% userInterface.lineDensCtrl = 12; 
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 8; %%or 2 or 2
+% userInterface.seedDensCtrl = 4; 
 % userInterface.selectedPrincipalStressField = [1 2 3];
 % userInterface.mergingOpt = 0;
 % userInterface.snappingOpt = 0;
