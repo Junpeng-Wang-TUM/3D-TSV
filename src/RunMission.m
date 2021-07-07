@@ -13,6 +13,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	%%1.2 Decode input arguments
 	fileName = userInterface.fileName;
 	if ~strcmp(dataName_, fileName)		
+		disp('Loading Dataset....');
 		ImportStressFields(fileName);
 		dataName_ = fileName;
 	end

@@ -72,7 +72,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			seed = seedPoints_(spp,:);
 			if 0==valences(1)
 				seedPointsValence_(spp,1) = 1;
-				majorPSL = GridGrowthTrigger(seed, 'MAJOR');		
+				majorPSL = Have1morePSL(seed, 'MAJOR');		
 				if 0==majorPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -101,7 +101,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			
 			if 0==valences(2)
 				seedPointsValence_(spp,2) = 1;
-				mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');		
+				mediumPSL = Have1morePSL(seed, 'MEDIUM');		
 				if 0==mediumPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -130,7 +130,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			
 			if 0==valences(3)
 				seedPointsValence_(spp,3) = 1;			
-				minorPSL = GridGrowthTrigger(seed, 'MINOR');			
+				minorPSL = Have1morePSL(seed, 'MINOR');			
 				if 0==minorPSL.length
 					looper = sum(sum(seedPointsValence_)); 
 					disp([' Iteration.: ' sprintf('%4i',its) ' Progress.: ' sprintf('%6i',looper) ...
@@ -167,20 +167,20 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				iPSF = selectedPrincipalStressField_(jj);
 				switch iPSF
 					case 1
-						majorPSL = GridGrowthTrigger(seed, 'MAJOR'); 
+						majorPSL = Have1morePSL(seed, 'MAJOR'); 
 						if 0==majorPSL.length, continue; end
 						majorPSLpool_(end+1,1) = majorPSL;
 						majorCoordList_(end+1:end+majorPSL.length,:) = majorPSL.phyCoordList;
 						PSLsAppearanceOrder_(end+1,:) = [1 length(majorPSLpool_)];
 						
 					case 2
-						mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');
+						mediumPSL = Have1morePSL(seed, 'MEDIUM');
 						if 0==mediumPSL.length, continue; end
 						mediumPSLpool_(end+1,1) = mediumPSL;
 						mediumCoordList_(end+1:end+mediumPSL.length,:) = mediumPSL.phyCoordList;
 						PSLsAppearanceOrder_(end+1,:) = [2 length(mediumPSLpool_)];
 					case 3
-						minorPSL = GridGrowthTrigger(seed, 'MINOR');	
+						minorPSL = Have1morePSL(seed, 'MINOR');	
 						if 0==minorPSL.length, continue; end
 						minorPSLpool_(end+1,1) = minorPSL;
 						minorCoordList_(end+1:end+minorPSL.length,:) = minorPSL.phyCoordList;
@@ -267,7 +267,7 @@ function PreprocessSeedPoints()
 	end		
 end
 
-function iPSL = GridGrowthTrigger(seed, psDir)
+function iPSL = Have1morePSL(seed, psDir)
 	global tracingStepWidth_;
 	global boundingBox_;
 	global snappingOpt_;

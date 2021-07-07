@@ -37,7 +37,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 		seedPoints_ = seedPointsHistory_;
 		numSeedPoints = size(seedPoints_,1);
 		%%2. create the 1st streamline
-		majorPSL = GridGrowthTrigger(startCoord, 'MAJOR');
+		majorPSL = Have1morePSL(startCoord, 'MAJOR');
 		if 0==majorPSL.length
 			error('Failed to Create the 1st Streamline, Please Relocate the Start Seed Point!'); 
 		end
@@ -49,7 +49,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 			looper = looper + 1;
 			seed = spps(1,:);
 			spps(1,:) = [];
-			majorPSL = GridGrowthTrigger(seed, 'MAJOR');
+			majorPSL = Have1morePSL(seed, 'MAJOR');
 			if 0==majorPSL.length				
 				disp(['Major PS Iteration.: ' sprintf('%4i',looper) ' Progress: ' sprintf('%6i %6i', ...
 					[numSeedPoints-size(seedPoints_,1) numSeedPoints])]);
@@ -73,7 +73,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 		seedPoints_ = seedPointsHistory_;
 		numSeedPoints = size(seedPoints_,1);
 		%%2. create the 1st streamline
-		mediumPSL = GridGrowthTrigger(startCoord, 'MEDIUM');
+		mediumPSL = Have1morePSL(startCoord, 'MEDIUM');
 		if 0==mediumPSL.length
 			error('Failed to Create the 1st Streamline, Please Relocate the Start Seed Point!'); 
 		end
@@ -85,7 +85,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 			looper = looper + 1;
 			seed = spps(1,:);
 			spps(1,:) = [];
-			mediumPSL = GridGrowthTrigger(seed, 'MEDIUM');
+			mediumPSL = Have1morePSL(seed, 'MEDIUM');
 			if 0==mediumPSL.length				
 				disp(['Medium PS Iteration.: ' sprintf('%4i',looper) ' Progress: ' sprintf('%6i %6i', ...
 					[numSeedPoints-size(seedPoints_,1) numSeedPoints])]);
@@ -109,7 +109,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 		seedPoints_ = seedPointsHistory_;
 		numSeedPoints = size(seedPoints_,1);
 		%%2. create the 1st streamline
-		minorPSL = GridGrowthTrigger(startCoord, 'MINOR');
+		minorPSL = Have1morePSL(startCoord, 'MINOR');
 		if 0==minorPSL.length
 			error('Failed to Create the 1st Streamline, Please Relocate the Start Seed Point!'); 
 		end
@@ -121,7 +121,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 			looper = looper + 1;
 			seed = spps(1,:);
 			spps(1,:) = [];
-			minorPSL = GridGrowthTrigger(seed, 'MINOR');
+			minorPSL = Have1morePSL(seed, 'MINOR');
 			if 0==minorPSL.length				
 				disp(['Minor PS Iteration.: ' sprintf('%4i',looper) ' Progress: ' sprintf('%6i %6i', ...
 					[numSeedPoints-size(seedPoints_,1) numSeedPoints])]);
@@ -143,7 +143,7 @@ function GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon)
 	CompactPSLs();
 end
 
-function iPSL = GridGrowthTrigger(seed, psDir)
+function iPSL = Have1morePSL(seed, psDir)
 	global tracingStepWidth_;
 	global boundingBox_;
 	global snappingOpt_;
