@@ -3,7 +3,7 @@
 %% of the principal stress directions in 3D solids under load.
 %% This repository was created for the paper "The 3D Trajectory-based Stress Visualizer" 
 %% 	by Junpeng Wang, Christoph Neuhauser, Jun Wu, Xifeng Gao and Rüdiger Westermann, 
-%% which was submitted to IEEE VIS 2021.
+%% which was submitted to IEEE TVCG in July of 2021.
 
 clc;
 addpath('./src');
