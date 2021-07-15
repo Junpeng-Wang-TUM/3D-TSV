@@ -7,7 +7,6 @@
 
 clc;
 addpath('./src');
-global MATLAB_GUI_opt_; MATLAB_GUI_opt_ = 0;
 userInterface = InterfaceStruct();
 
 %% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
@@ -143,7 +142,7 @@ userInterface.traceAlgorithm = 'Euler';
 
 
 RunMission(userInterface);
-% RunMission_evenlySpacedSeeding(userInterface);
+
 %%PSLs Visualization
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
@@ -151,4 +150,3 @@ DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 
 
 %% Show if Necessary
 % DrawSeedPoints(0.5);
-% DrawPSLsIntersections(["Geo", "Geo", "Geo"], [0,0,0], 1);

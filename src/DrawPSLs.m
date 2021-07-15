@@ -350,17 +350,15 @@ function hdGraphicPSLsPrimitives = DrawPSLs(imOpt, imVal, pslGeo, stressComponen
 	end
 	
 	%%Lighting, Reflection
-	if ~MATLAB_GUI_opt_
-		lighting(axHandle_, 'gouraud');
-		Lopt = 'LA'; %% 'LA', 'LB'
-		switch Lopt
-			case 'LA'
-				camlight(axHandle_, 'headlight','infinite');
-				camlight(axHandle_, 'right','infinite');
-				camlight(axHandle_, 'left','infinite');					
-			case 'LB'
-				camlight(axHandle_, 'headlight','infinite');				
-		end
-		material(axHandle_, 'metal');
-	end		
+	lighting(axHandle_, 'gouraud');
+	Lopt = 'LA'; %% 'LA', 'LB'
+	switch Lopt
+		case 'LA'
+			camlight(axHandle_, 'headlight','infinite');
+			camlight(axHandle_, 'right','infinite');
+			camlight(axHandle_, 'left','infinite');					
+		case 'LB'
+			camlight(axHandle_, 'headlight','infinite');				
+	end
+	material(axHandle_, 'metal');	
 end

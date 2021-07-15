@@ -4,7 +4,8 @@ of the principal stress directions in 3D solids under load.
 
 This repository was created for the paper "The 3D Trajectory-based Stress Visualizer" 
 	by Junpeng Wang, Christoph Neuhauser, Jun Wu, Xifeng Gao and Rüdiger Westermann, 
-which was submitted to IEEE Transactions on Visualization and Computer Graphics, and also available in arXiv
+which was submitted to IEEE Transactions on Visualization and Computer Graphics (TVCG) in July of 2021, 
+	and also available in arXiv ''
 
 # 1. Functionality
 	---	Creating a space-filling and evenly spaced set of Principal Stress Lines (PSLs) in a 3D stress field with an automatic seeding strategy
@@ -23,11 +24,11 @@ implementation can be found in './src./ImportStressFields.m'.
 # 3. Use
 	---	The perfect strategy of using this tool is as the paper describes, i.e., combining it with the the 3D line cluster 
 		renderer "LineVis" (https://github.com/chrismile/LineVis) by Christoph Neuhauser.
-	--- To facilitate the initial tests of the users, this package can also be used solely, where 'TSV3D_script.m' serves as
-		a configuration file to control the input, './src/DrawPSLs.m' provides the visualization options.
+	--- To facilitate the initial tests, this package can also be used solely, where 'TSV3D.m' serves as
+		a configuration file to control the input, and './src/DrawPSLs.m' provides the visualization options.
 
 # 4. Run
-Go to 'TSV3D_script.m'
+Prepare the data set first, then go to 'TSV3D.m'
 
 # 5. Data sets
 More stress field data sets can be found from https://syncandshare.lrz.de/getlink/fiPjBXgwXXvbky55uDQP39j7/stress%20fields
