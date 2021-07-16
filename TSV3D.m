@@ -51,7 +51,7 @@ userInterface.traceAlgorithm = 'Euler';
 
 
 %% =======================================chamfer=======================================
-% userInterface.fileName = './data/chamfer_stressField.vtk';
+% userInterface.fileName = './data/chamfer3D_stressField.vtk';
 % userInterface.lineDensCtrl = 8;
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
