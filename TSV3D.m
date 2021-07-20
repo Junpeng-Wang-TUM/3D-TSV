@@ -5,6 +5,9 @@
 %% 	by Junpeng Wang, Christoph Neuhauser, Jun Wu, Xifeng Gao and Rüdiger Westermann, 
 %% which was submitted to IEEE TVCG in July of 2021.
 
+%% ============= Test data sets can be found in =============
+%%	https://syncandshare.lrz.de/getlink/fiPjBXgwXXvbky55uDQP39j7/stress%20fields 
+
 clc;
 addpath('./src');
 userInterface = InterfaceStruct();
