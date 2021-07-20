@@ -26,7 +26,7 @@ userInterface.traceAlgorithm = 'Euler';
 
 
 %% =======================================arched_bridge=======================================
-%% ---------------------------------------Experiment 1: (fig. 5)
+%% ---------------------------------------Experiment 1: (fig. 3)
 % userInterface.fileName = './data/arched_bridge3D_stressField.vtk';
 % userInterface.lineDensCtrl = 6; 
 % userInterface.numLevels = 1;
@@ -37,10 +37,21 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.snappingOpt = 0;
 % userInterface.maxAngleDevi = 20; 
 % userInterface.traceAlgorithm = 'RK2';
-%% ---------------------------------------Experiment 2: (new fig.6 and fig.9 )
+%% ---------------------------------------Experiment 2: (fig.6)
 % userInterface.fileName = './data/arched_bridge3D_stressField.vtk';
 % userInterface.lineDensCtrl = 12; 
 % userInterface.numLevels = 2;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 2; 
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20; 
+% userInterface.traceAlgorithm = 'RK2';
+%% ---------------------------------------Experiment 2: (fig.4)
+% userInterface.fileName = './data/arched_bridge3D_stressField.vtk';
+% userInterface.lineDensCtrl = 24; 
+% userInterface.numLevels = 4;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 2; 
 % userInterface.selectedPrincipalStressField = [1, 3];
