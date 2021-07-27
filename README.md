@@ -4,8 +4,7 @@ of the principal stress directions in 3D solids under load.
 
 This repository was created for the paper "The 3D Trajectory-based Stress Visualizer" 
 	by Junpeng Wang, Christoph Neuhauser, Jun Wu, Xifeng Gao and Rüdiger Westermann, 
-which was submitted to IEEE Transactions on Visualization and Computer Graphics (TVCG) in July of 2021, 
-	and also available in arXiv ''
+which was submitted to IEEE Transactions on Visualization and Computer Graphics (TVCG) in July of 2021.
 
 # 1. Functionality
 	---	Creating a space-filling and evenly spaced set of Principal Stress Lines (PSLs) in a 3D stress field with an automatic seeding strategy
