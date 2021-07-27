@@ -12,20 +12,35 @@ clc;
 addpath('./src');
 userInterface = InterfaceStruct();
 
-%% Uncomment one of the experiments below to run the 3D-TSV, please be sure to relate the correct directory of data set
+%% Prepare the data set, and uncomment one of the experiments below to run the 3D-TSV for testing
+%% (The 'KittenHex' model described in the associated paper is directly provided as the default test case here.)
+%% *****please be sure to relate the correct directory of data set*****
 
 %% Some Examples used in the paper
-%% =======================================cantilever=======================================
-userInterface.fileName = './data/cantilever3D_stressField.vtk';
-userInterface.lineDensCtrl = 5; 
-userInterface.numLevels = 1;
+%% =======================================kitten_HexMesh=======================================
+userInterface.fileName = './data/kitten3D_HexMesh_stressField.vtk';
+userInterface.lineDensCtrl = 20;
+userInterface.numLevels = 3;
 userInterface.seedStrategy = 'Volume';
-userInterface.seedDensCtrl = 5; 
+userInterface.seedDensCtrl = 1;
 userInterface.selectedPrincipalStressField = [1, 3];
 userInterface.mergingOpt = 1;
 userInterface.snappingOpt = 0;
-userInterface.maxAngleDevi = 20;
-userInterface.traceAlgorithm = 'Euler';
+userInterface.maxAngleDevi = 6;
+userInterface.traceAlgorithm = 'RK2';
+
+
+%% =======================================cantilever=======================================
+% userInterface.fileName = './data/cantilever3D_stressField.vtk';
+% userInterface.lineDensCtrl = 5; 
+% userInterface.numLevels = 1;
+% userInterface.seedStrategy = 'Volume';
+% userInterface.seedDensCtrl = 5; 
+% userInterface.selectedPrincipalStressField = [1, 3];
+% userInterface.mergingOpt = 1;
+% userInterface.snappingOpt = 0;
+% userInterface.maxAngleDevi = 20;
+% userInterface.traceAlgorithm = 'Euler';
 
 
 %% =======================================arched_bridge=======================================
@@ -111,19 +126,6 @@ userInterface.traceAlgorithm = 'Euler';
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 4;
-% userInterface.selectedPrincipalStressField = [1, 3];
-% userInterface.mergingOpt = 1;
-% userInterface.snappingOpt = 0;
-% userInterface.maxAngleDevi = 6;
-% userInterface.traceAlgorithm = 'RK2';
-
-
-%% =======================================kitten_HexMesh=======================================
-% userInterface.fileName = './data/kitten3D_HexMesh_stressField.vtk';
-% userInterface.lineDensCtrl = 20;
-% userInterface.numLevels = 3;
-% userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 1;
 % userInterface.selectedPrincipalStressField = [1, 3];
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
