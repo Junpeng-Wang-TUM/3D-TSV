@@ -13,8 +13,8 @@ global nodState_;
 global nodStruct_; %% Adjacent Elements for each Mesh Vertex (only for Unstructured Hex-mesh)
 global eleStruct_; %% Element, face normals, adjacent element of each face 
 global cartesianStressField_; 
-global nodeLoadVec_; 
-global fixedNodes_; 	
+global loadingCond_; 
+global fixingCond_; 	
 global eleSize_; %% Element Size for Cartesian Mesh, or an Assumed one for Unstructured Hex-mesh
 global silhouetteStruct_; %% Patches for Draw Silhoutte of Stress Field
 global carNodMapBack_; %% Only for Cartesian Mesh

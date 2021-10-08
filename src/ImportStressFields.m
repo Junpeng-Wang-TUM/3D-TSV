@@ -8,8 +8,8 @@ function ImportStressFields(fileName)
 	global nodState_;	
 	global numStressFields_;
 	global cartesianStressField_;
-	global nodeLoadVec_; 
-	global fixedNodes_;	
+	global loadingCond_; 
+	global fixingCond_;	
 	global eleCentroidList_;
 	global silhouetteStruct_;
 	global meshType_;
@@ -50,12 +50,12 @@ function ImportStressFields(fileName)
 		if numLoadedNodes>0
 			tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
 			tmp(1,:) = tmp(1,:)+1; 
-			nodeLoadVec_ = tmp';
+			loadingCond_ = tmp';
 		end
 		tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
 		if numFixedNodes>0
 			tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-			fixedNodes_ = tmp'+1;
+			fixingCond_ = tmp'+1;
 		end
 		tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
 		tmp = fscanf(fid, '%f %f %f %f %f %f', [6, numValidNods]);
@@ -134,12 +134,12 @@ function ImportStressFields(fileName)
 		if numLoadedNodes>0
 			tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
 			tmp(1,:) = tmp(1,:)+1; 
-			nodeLoadVec_ = tmp';		
+			loadingCond_ = tmp';		
 		end
 		tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
 		if numFixedNodes>0
 			tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-			fixedNodes_ = tmp'+1;		
+			fixingCond_ = tmp'+1;		
 		end
 		tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
 		tmp = fscanf(fid, '%f %f %f %f %f %f', [6, numValidNods]);
@@ -217,7 +217,7 @@ function RecoverCartesianMesh()
 	global nodeCoords_; global eNodMat_; 	
 	global carEleMapBack_; global carEleMapForward_;
 	global carNodMapBack_; global carNodMapForward_;
-	global nodeLoadVec_; global fixedNodes_;
+	global loadingCond_; global fixingCond_;
 	%    z
 	%    |__ x
 	%   / 
@@ -255,11 +255,11 @@ function RecoverCartesianMesh()
 	nodeCoords_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),3);
 	[nodeCoords_(:,1), nodeCoords_(:,2), nodeCoords_(:,3)] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_);		
 	nodeCoords_ = nodeCoords_(carNodMapBack_,:);
-	if size(nodeLoadVec_,1)>0
-		nodeLoadVec_(:,1) = carNodMapForward_(nodeLoadVec_(:,1));
+	if size(loadingCond_,1)>0
+		loadingCond_(:,1) = carNodMapForward_(loadingCond_(:,1));
 	end
-	if length(fixedNodes_)>0
-		fixedNodes_ = double(carNodMapForward_(fixedNodes_));
+	if length(fixingCond_)>0
+		fixingCond_ = double(carNodMapForward_(fixingCond_));
 	end
 end
 

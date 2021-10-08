@@ -2,8 +2,8 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 	global meshType_;
 	global nodeCoords_;
 	global nodState_;
-	global nodeLoadVec_;
-	global fixedNodes_;
+	global loadingCond_;
+	global fixingCond_;
 	global seedPointsHistory_;
 	global carNodMapBack_;
 	global nelx_; global nely_; global nelz_;
@@ -58,8 +58,8 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 			seedPointsHistory_ = nodeCoords_(1==nodState_,:);
 			seedPointsHistory_ = seedPointsHistory_(1:seedDensCtrl:end,:);
 		case 'LoadingArea'			
-			seedPointsHistory_ = nodeCoords_(nodeLoadVec_(1:seedDensCtrl:end,1),:);
+			seedPointsHistory_ = nodeCoords_(loadingCond_(1:seedDensCtrl:end,1),:);
 		case 'FixedArea' 
-			seedPointsHistory_ = nodeCoords_(fixedNodes_(1:seedDensCtrl:end,1),:);
+			seedPointsHistory_ = nodeCoords_(fixingCond_(1:seedDensCtrl:end,1),:);
 	end
 end
