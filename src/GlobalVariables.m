@@ -17,7 +17,7 @@ global nodeLoadVec_;
 global fixedNodes_; 	
 global eleSize_; %% Element Size for Cartesian Mesh, or an Assumed one for Unstructured Hex-mesh
 global silhouetteStruct_; %% Patches for Draw Silhoutte of Stress Field
-global originalValidNodeIndex_; %% Only for Cartesian Mesh
+global carNodMapBack_; %% Only for Cartesian Mesh
 global surfaceQuadMeshNodeCoords_;
 global surfaceQuadMeshElements_;	
 

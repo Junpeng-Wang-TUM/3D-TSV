@@ -8,13 +8,22 @@ function ImportStressFields(fileName)
 	global nodState_;	
 	global numStressFields_;
 	global cartesianStressField_;
-	global nodeLoadVec_; global fixedNodes_;	
+	global nodeLoadVec_; 
+	global fixedNodes_;	
 	global eleCentroidList_;
 	global silhouetteStruct_;
 	global meshType_;
 	global eleSize_; 
 	global surfaceQuadMeshNodeCoords_;
 	global surfaceQuadMeshElements_;	
+	global nelx_;
+	global nely_;
+	global nelz_;
+	global carNodMapBack_;
+	global voxelizedVolume_;
+	global nodStruct_; 
+	global eleStruct_; 
+	global boundaryElements_; 
 	
 	%%read mesh and cartesian stress field
 	fid = fopen(fileName, 'r');
@@ -22,11 +31,6 @@ function ImportStressFields(fileName)
 	tmp = fscanf(fid, '%s', 1);	
 	meshType_ = fscanf(fid, '%s', 1);
 	if strcmp(meshType_, 'CARTESIAN_GRID')
-		global nelx_;
-		global nely_;
-		global nelz_;
-		global originalValidNodeIndex_;
-		global voxelizedVolume_;
 		tmp = fscanf(fid, '%s', 1);
 		tmp = fscanf(fid, '%d %d %d', [1 3]);
 		nelx_ = tmp(1); nely_ = tmp(2); nelz_ = tmp(3);
@@ -82,7 +86,7 @@ function ImportStressFields(fileName)
 		%%extract and Re-organize silhouette into quad-mesh for exporting
 		[nodPosX, nodPosY, nodPosZ] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_, 'inGrid');	
 		valForExtctBoundary = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
-		valForExtctBoundary(originalValidNodeIndex_) = 1;
+		valForExtctBoundary(carNodMapBack_) = 1;
 		valForExtctBoundary = reshape(valForExtctBoundary, nely_+1, nelx_+1, nelz_+1);
 		fv = isosurface(nodPosX, nodPosY, nodPosZ, valForExtctBoundary, 0);		
 		fv.facevertexcdata = zeros(size(fv.vertices));
@@ -168,7 +172,6 @@ function ImportStressFields(fileName)
 		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.zPatchs));		
 		
 		%% build element three
-		global nodStruct_; global eleStruct_; global boundaryElements_; 
 		iNodStruct = struct('adjacentEles', []); 
 		nodStruct_ = repmat(iNodStruct, numNodes_, 1);
 		for ii=1:numEles_
@@ -211,9 +214,9 @@ function RecoverCartesianMesh()
 	global voxelizedVolume_;
 	global boundingBox_;
 	global numEles_; global numNodes_; global eleSize_;
-	global nodeCoords_; global eNodMat_; 
-	global originalValidNodeIndex_; global validElements_;
-	global meshState_; global eleMapBack_;
+	global nodeCoords_; global eNodMat_; 	
+	global carEleMapBack_; global carEleMapForward_;
+	global carNodMapBack_; global carNodMapForward_;
 	global nodeLoadVec_; global fixedNodes_;
 	%    z
 	%    |__ x
@@ -230,35 +233,33 @@ function RecoverCartesianMesh()
 	%          1-------------2             
 	%			Hexahedral element
 	eleSize_ = min((boundingBox_(2,:)-boundingBox_(1,:))./[nelx_ nely_ nelz_]);
-	validElements_ = find(1==voxelizedVolume_);
-	validElements_ = int32(validElements_);			
-	numEles_ = length(validElements_);		
-	meshState_ = zeros(nelx_*nely_*nelz_,1,'int32');	
-	meshState_(validElements_) = 1;	
-	eleMapBack_ = zeros(nelx_*nely_*nelz_,1,'int32');	
-	eleMapBack_(validElements_) = (1:numEles_)';	
+	carEleMapBack_ = find(1==voxelizedVolume_);
+	carEleMapBack_ = int32(carEleMapBack_);			
+	numEles_ = length(carEleMapBack_);		
+	carEleMapForward_ = zeros(nelx_*nely_*nelz_,1,'int32');	
+	carEleMapForward_(carEleMapBack_) = (1:numEles_)';	
 	nodenrs = reshape(1:(nelx_+1)*(nely_+1)*(nelz_+1), 1+nely_, 1+nelx_, 1+nelz_); nodenrs = int32(nodenrs);
 	eNodVec = reshape(nodenrs(1:end-1,1:end-1,1:end-1)+1, nelx_*nely_*nelz_, 1);
-	eNodMat_ = repmat(eNodVec(validElements_),1,8);
+	eNodMat_ = repmat(eNodVec(carEleMapBack_),1,8);
 	tmp = [0 nely_+[1 0] -1 (nely_+1)*(nelx_+1)+[0 nely_+[1 0] -1]]; tmp = int32(tmp);
 	for ii=1:8
 		eNodMat_(:,ii) = eNodMat_(:,ii) + repmat(tmp(ii), numEles_,1);
 	end
-	originalValidNodeIndex_ = unique(eNodMat_);
-	numNodes_ = length(originalValidNodeIndex_);
-	nodeMap4CutBasedModel_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1,'int32');
-	nodeMap4CutBasedModel_(originalValidNodeIndex_) = (1:numNodes_)';		
+	carNodMapBack_ = unique(eNodMat_);
+	numNodes_ = length(carNodMapBack_);
+	carNodMapForward_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1,'int32');
+	carNodMapForward_(carNodMapBack_) = (1:numNodes_)';		
 	for ii=1:8
-		eNodMat_(:,ii) = nodeMap4CutBasedModel_(eNodMat_(:,ii));
+		eNodMat_(:,ii) = carNodMapForward_(eNodMat_(:,ii));
 	end
 	nodeCoords_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),3);
 	[nodeCoords_(:,1), nodeCoords_(:,2), nodeCoords_(:,3)] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_);		
-	nodeCoords_ = nodeCoords_(originalValidNodeIndex_,:);
+	nodeCoords_ = nodeCoords_(carNodMapBack_,:);
 	if size(nodeLoadVec_,1)>0
-		nodeLoadVec_(:,1) = nodeMap4CutBasedModel_(nodeLoadVec_(:,1));
+		nodeLoadVec_(:,1) = carNodMapForward_(nodeLoadVec_(:,1));
 	end
 	if length(fixedNodes_)>0
-		fixedNodes_ = double(nodeMap4CutBasedModel_(fixedNodes_));
+		fixedNodes_ = double(carNodMapForward_(fixedNodes_));
 	end
 end
 

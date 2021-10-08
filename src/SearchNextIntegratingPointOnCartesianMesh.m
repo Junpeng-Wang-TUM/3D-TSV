@@ -1,7 +1,7 @@
 function [nextElementIndex, paraCoordinates, opt] = SearchNextIntegratingPointOnCartesianMesh(physicalCoordinates)
 	global nodeCoords_;
 	global eNodMat_;
-	global meshState_; global eleMapBack_;
+	global meshState_; global carEleMapForward_;
 	global nelx_; global nely_; global nelz_; global eleSize_;
 	global boundingBox_;
 	
@@ -28,8 +28,8 @@ function [nextElementIndex, paraCoordinates, opt] = SearchNextIntegratingPointOn
 	end			
 	
 	tarEle = nelx_*nely_*(eleZ-1) + nely_*(eleX-1)+(nely_-eleY+1);
-	if meshState_(tarEle)
-		nextElementIndex = eleMapBack_(tarEle);
+	nextElementIndex = carEleMapForward_(tarEle);
+	if nextElementIndex	
 		opt = 1;
 		relatedNodes = eNodMat_(nextElementIndex,:);
 		relatedNodeCoords = nodeCoords_(relatedNodes',:)-boundingBox_(1,:);

@@ -5,7 +5,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 	global nodeLoadVec_;
 	global fixedNodes_;
 	global seedPointsHistory_;
-	global originalValidNodeIndex_;
+	global carNodMapBack_;
 	global nelx_; global nely_; global nelz_;
 	global nodStruct_;
 	global eNodMat_;
@@ -16,7 +16,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 			if strcmp(meshType_, 'CARTESIAN_GRID')
 				if seedDensCtrl > min([nelx_ nely_ nelz_])/3, seedDensCtrl = 4; end %% in case seedDensCtrl is wrongly selected
 				validNodesVolume = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
-				validNodesVolume(originalValidNodeIndex_) = (1:length(originalValidNodeIndex_))';
+				validNodesVolume(carNodMapBack_) = (1:length(carNodMapBack_))';
 				validNodesVolume = reshape(validNodesVolume, nely_+1, nelx_+1, nelz_+1);
 				sampledNodes = validNodesVolume(seedDensCtrl+1:seedDensCtrl:nely_+1-seedDensCtrl, ...
 					seedDensCtrl+1:seedDensCtrl:nelx_+1-seedDensCtrl, seedDensCtrl+1:seedDensCtrl:nelz_+1-seedDensCtrl);	
