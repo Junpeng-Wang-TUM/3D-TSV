@@ -80,10 +80,14 @@ function varargout = ExpandPSLs2Tubes(varargin)
 		gridX = squeeze(gridXYZ(1,:,:));
 		gridY = squeeze(gridXYZ(2,:,:));
 		gridZ = squeeze(gridXYZ(3,:,:));
-		varargout{1} = gridX;
-		varargout{2} = gridY;
-		varargout{3} = gridZ;
-		varargout{4} = gridC;
+		gridX(:,1) = [];
+		gridY(:,1) = [];
+		gridZ(:,1) = [];
+		gridC(:,1) = [];
+		varargout{1} = gridX; 
+		varargout{2} = gridY; 
+		varargout{3} = gridZ; 
+		varargout{4} = gridC; 
 		varargout{5} = gridIndices;
 	else
 		if isempty(PSLs)
@@ -121,9 +125,10 @@ function varargout = ExpandPSLs2Tubes(varargin)
 			c = repmat(c, n+1, 1);
 			gridC(:,end+1:end+npoints+2) = c;
 		end		
-		gridX = squeeze(gridXYZ(1,:,:));
-		gridY = squeeze(gridXYZ(2,:,:));
-		gridZ = squeeze(gridXYZ(3,:,:));		
+		gridX = squeeze(gridXYZ(1,:,:)); gridX(:,1) = [];
+		gridY = squeeze(gridXYZ(2,:,:)); gridY(:,1) = [];
+		gridZ = squeeze(gridXYZ(3,:,:)); gridZ(:,1) = [];
+		gridC(:,1) = [];
 		hd = surf(axHandle_,gridX,gridY,gridZ,gridC); shading(axHandle_,'interp'); hold(axHandle_,'on');
 		varargout{1} = hd;
 	end
