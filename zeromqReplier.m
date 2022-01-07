@@ -69,7 +69,7 @@ function zeromqReplier
 		% snappingOpt = request.snappingOpt;
 		% maxAngleDevi = request.maxAngleDevi;
 		% traceAlgorithm = request.traceAlgorithm;
-		[opt, PSLdatasetFile] = RunMission(request);
+		[opt, PSLdatasetFile] = RunMission_Via_LineVis_Call(request);
 		if 0==opt, error('Failed to Generate PSLs!'); end
 		
         % Send a reply.
