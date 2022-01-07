@@ -1,10 +1,13 @@
-function [opt, pslDataNameOutput] = RunMission(userInterface)	
+function [opt, pslDataNameOutput] = RunMission_Via_LineVis_Call(userInterface)	
+	%% **********Note**********
+	%% This Script is Dedicated to the Scenario that the Render "LineVis" (https://github.com/chrismile/LineVis)
+	%%	is Used as the Frontend to Call the "3D-TSV", where the PSL Data is Written into "NAME_psl.dat" for the Info. Exchange
 	global tracingFuncHandle_;
 	global tracingStepWidth_;
 	global majorPSLindexList_;
 	global mediumPSLindexList_;
 	global minorPSLindexList_;
-
+	
 	%%1. Initialize Experiment Environment
 	%%1.1 Variable Declaration	
 	tStart = tic;
@@ -63,9 +66,6 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	GenerateSeedPoints(seedStrategy, seedDensCtrl);
 	
 	%%3. PSL Generation
-	if integratingStepScalingFac_>1.0 || integratingStepScalingFac_<0.0
-		integratingStepScalingFac_ = 1.0;
-	end
 	if strcmp(meshType_, 'CARTESIAN_GRID')
 		tracingStepWidth_ = integratingStepScalingFac_ * eleSize_;
 		integrationStepLimit_ = ceil(1.5*norm(boundingBox_(2,:)-boundingBox_(1,:))/tracingStepWidth_);
@@ -90,7 +90,10 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
     %%4. Building Hierarchy
     BuildPSLs4Hierarchy();
 	
-	%%5. Print Results
+	%%5. Write&Print Results
+	[~,~,fileExtension] = fileparts(dataName_);
+	pslDataNameOutput = strcat(erase(dataName_, fileExtension), '_psl.dat');
+	ExportResult(pslDataNameOutput);
 	opt = 1;
 	tEnd = toc(tStart);
 	PrintAlgorithmStatistics(tEnd);

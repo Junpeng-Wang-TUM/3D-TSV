@@ -1,4 +1,5 @@
 function numIntersections = DrawPSLsIntersections(imOpt, imVal, lw, varargin)
+	global silhouetteOpacity_;
 	global snappingOpt_;
 	numIntersections = 0;
 	if snappingOpt_, disp('Not Work with Snapping Option!'); return; end
@@ -79,26 +80,12 @@ function numIntersections = DrawPSLsIntersections(imOpt, imVal, lw, varargin)
 		figure; 
 		handleSilhouette = DrawSilhouette();
 		handleIntersections = surf(patchX,patchY,patchZ); hold on
-		set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', 0.1, 'EdgeColor', 'none');
+		set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', silhouetteOpacity_, 'EdgeColor', 'none');
 		set(handleIntersections, 'FaceColor', [65 174 118]/255, 'FaceAlpha', 1, 'EdgeColor', 'none');
 		if 1
-			lighting gouraud;
-			Lopt = 'LA'; %% 'LA', 'LB'
-			Mopt = 'MC'; %% 'M0', 'MA', 'MB', 'MC'		
-			switch Lopt
-				case 'LA'
-					camlight('headlight','infinite');
-					camlight('right','infinite');
-					camlight('left','infinite');					
-				case 'LB'
-					camlight('headlight','infinite');				
-			end		
-			switch Mopt
-				case 'M0',
-				case 'MA', material([handleSilhouette(:); handleIntersections(:)], 'dull'); 
-				case 'MB', material([handleSilhouette(:); handleIntersections(:)], 'shiny'); 
-				case 'MC', material([handleSilhouette(:); handleIntersections(:)], 'metal'); 
-			end
+			lighting('gouraud');	
+			camlight('headlight','infinite');		
+			material([handleSilhouette(:); handleIntersections(:)], 'dull');
 		end		
 	else
 		hold on;

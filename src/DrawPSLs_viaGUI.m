@@ -1,15 +1,39 @@
-function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, varargin)
+function DrawPSLs_viaGUI(imOpt, imVal, pslGeo, stressComponentOpt, miniPSLength, varargin)
 	%% Syntax:
-	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw);
-	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, minLength);
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt);
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, minLength);
 	%% =====================================================================
 	%% imOpt: ["Geo", "Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
 	%% imVal: [1,0.5, 0.3]; %% PSLs with IM>=imVal shown
 	%% pslGeo: ["TUBE", "TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
 	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
-	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
-
+	%% smoothingOpt: %% smoothing ribbon or not (0)
 	global boundingBox_;
+	
+	global majorPSLs_tubeGeometry_gridX_;
+	global majorPSLs_tubeGeometry_gridY_;
+	global majorPSLs_tubeGeometry_gridZ_;
+	global majorPSLs_tubeGeometry_indices_;
+	global majorPSLs_ribbonGeometry_vertices_;
+	global majorPSLs_ribbonGeometry_faces_;
+	global majorPSLs_ribbonGeometry_indices_;
+	
+	global mediumPSLs_tubeGeometry_gridX_;
+	global mediumPSLs_tubeGeometry_gridY_;
+	global mediumPSLs_tubeGeometry_gridZ_;
+	global mediumPSLs_tubeGeometry_indices_;
+	global mediumPSLs_ribbonGeometry_vertices_;
+	global mediumPSLs_ribbonGeometry_faces_;
+	global mediumPSLs_ribbonGeometry_indices_;
+
+	global minorPSLs_tubeGeometry_gridX_;
+	global minorPSLs_tubeGeometry_gridY_;
+	global minorPSLs_tubeGeometry_gridZ_;
+	global minorPSLs_tubeGeometry_indices_;
+	global minorPSLs_ribbonGeometry_vertices_;
+	global minorPSLs_ribbonGeometry_faces_;
+	global minorPSLs_ribbonGeometry_indices_;
+	
 	global majorPSLpool_; 
 	global mediumPSLpool_; 
 	global minorPSLpool_;
@@ -19,9 +43,6 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 	global minimumEpsilon_;
 	global silhouetteOpacity_;
 	global axHandle_;
-	
-	lineWidthTube = min([lw*minimumEpsilon_/5, min(boundingBox_(2,:)-boundingBox_(1,:))/10]);
-	lineWidthRibbon = 3*lineWidthTube;
 
 	%% Get Target PSLs to Draw
 	%% Major
@@ -37,14 +58,17 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 		otherwise
 			error('Wrong Input!');
 	end
-	tarMajorPSLs = majorPSLpool_(tarMajorPSLindex);
-	tarIndice = [];
-	for ii=1:length(tarMajorPSLs)
-		if tarMajorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
-	end
-	tarMajorPSLs = tarMajorPSLs(tarIndice);	
-	numTarMajorPSLs = length(tarMajorPSLs);
 	
+	tarIndice = [];
+	for ii=1:length(tarMajorPSLindex)
+		if majorPSLpool_(tarMajorPSLindex(ii)).length > miniPSLength 
+			tarIndice(end+1,1) = ii; 
+		end
+	end	
+	tarMajorPSLindex = tarMajorPSLindex(tarIndice);
+	numTarMajorPSLs = length(tarMajorPSLindex);
+	tarMajorPSLs = majorPSLpool_(tarMajorPSLindex);
+		
 	%% Medium
 	switch imOpt(2)
 		case 'Geo'
@@ -58,13 +82,16 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 		otherwise
 			error('Wrong Input!');
 	end
-	tarMediumPSLs = mediumPSLpool_(tarMediumPSLindex);
+	
 	tarIndice = [];
-	for ii=1:length(tarMediumPSLs)
-		if tarMediumPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
+	for ii=1:length(tarMediumPSLindex)
+		if mediumPSLpool_(tarMediumPSLindex(ii)).length > miniPSLength 
+			tarIndice(end+1,1) = ii; 
+		end
 	end
-	tarMediumPSLs = tarMediumPSLs(tarIndice);		
-	numTarMediumPSLs = length(tarMediumPSLs);	
+	tarMediumPSLindex = tarMediumPSLindex(tarIndice);
+	numTarMediumPSLs = length(tarMediumPSLindex);
+	tarMediumPSLs = mediumPSLpool_(tarMediumPSLindex);	
 	
 	%% Minor
 	switch imOpt(3)
@@ -79,14 +106,16 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 		otherwise
 			error('Wrong Input!');
 	end
-	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
-	tarIndice = [];
-	for ii=1:length(tarMinorPSLs)
-		if tarMinorPSLs(ii).length > miniPSLength, tarIndice(end+1,1) = ii; end
-	end
-	tarMinorPSLs = tarMinorPSLs(tarIndice);	
-	numTarMinorPSLs = length(tarMinorPSLs);
 	
+	tarIndice = [];
+	for ii=1:length(tarMinorPSLindex)
+		if minorPSLpool_(tarMinorPSLindex(ii)).length > miniPSLength
+			tarIndice(end+1,1) = ii; 
+		end
+	end
+	tarMinorPSLindex = tarMinorPSLindex(tarIndice);
+	numTarMinorPSLs = length(tarMinorPSLindex);
+	tarMinorPSLs = minorPSLpool_(tarMinorPSLindex);
 	if 0==numTarMajorPSLs && 0==numTarMediumPSLs && 0==numTarMinorPSLs, return; end
 	
 	%% Initialize Stress Component for Coloring
@@ -253,7 +282,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 	end
 	
 	%%Draw
-	if 6==nargin 
+	if 5==nargin 
 		figure; axHandle_ = gca;
 	else
 		axHandle_ = varargin{1};  
@@ -263,56 +292,88 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 	handleMajorPSL = []; 
 	switch pslGeo(1)
 		case 'TUBE'
-			[gridX, gridY, gridZ, gridC, ~] = ExpandPSLs2Tubes(tarMajorPSLs, color4MajorPSLs, lineWidthTube);
-			if ~isempty(gridX)
-				hold(axHandle_, 'on'); 
+			if numTarMajorPSLs>0
+				hold(axHandle_, 'on');
+				surfacesToBeShow = [majorPSLs_tubeGeometry_indices_(tarMajorPSLindex).arr];
+				for ii=1:numTarMajorPSLs
+					color4MajorPSLs(ii).arr = [color4MajorPSLs(ii).arr(1) color4MajorPSLs(ii).arr color4MajorPSLs(ii).arr(end)];
+				end
+				gridC = repmat([color4MajorPSLs.arr], size(majorPSLs_tubeGeometry_gridX_,1), 1);
+				gridX = majorPSLs_tubeGeometry_gridX_(:,surfacesToBeShow);
+				gridY = majorPSLs_tubeGeometry_gridY_(:,surfacesToBeShow);
+				gridZ = majorPSLs_tubeGeometry_gridZ_(:,surfacesToBeShow);
 				handleMajorPSL = surf(axHandle_, gridX, gridY, gridZ, gridC);
 				shading(axHandle_, 'interp');
 			end		
 		case 'RIBBON'
-			[ribbonVertices, facePatches, faceColors, ~] = ...
-				ExpandPSLs2Ribbons(tarMajorPSLs, lineWidthRibbon, [6 7 8; 2 3 4], color4MajorPSLs);
-			if ~isempty(ribbonVertices)
+			if numTarMajorPSLs>0
 				hold(axHandle_, 'on');
-				handleMajorPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', ribbonVertices, ...
+				facesToBeShow = [majorPSLs_ribbonGeometry_indices_(tarMajorPSLindex).arr];
+				facePatches = majorPSLs_ribbonGeometry_faces_(facesToBeShow,:);
+				ribbonVtxToBShow = unique(facePatches);
+				tmp = repmat([color4MajorPSLs.arr], 4, 1); 
+				faceColors = zeros(size(majorPSLs_ribbonGeometry_vertices_,1),1);				
+				faceColors(ribbonVtxToBShow,1) = tmp(:);
+				handleMajorPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', majorPSLs_ribbonGeometry_vertices_, ...
 					'FaceVertexCData', faceColors, 'FaceColor', 'interp');			
 			end	
 	end
 	handleMediumPSL = []; 
 	switch pslGeo(2)
 		case 'TUBE'
-			[gridX, gridY, gridZ, gridC, ~] = ExpandPSLs2Tubes(tarMediumPSLs, color4MediumPSLs, lineWidthTube);
-			if ~isempty(gridX)
+			if numTarMediumPSLs>0
 				hold(axHandle_, 'on');
+				surfacesToBeShow = [mediumPSLs_tubeGeometry_indices_(tarMediumPSLindex).arr];
+				for ii=1:numTarMediumPSLs
+					color4MediumPSLs(ii).arr = [color4MediumPSLs(ii).arr(1) color4MediumPSLs(ii).arr color4MediumPSLs(ii).arr(end)];
+				end
+				gridC = repmat([color4MediumPSLs.arr], size(mediumPSLs_tubeGeometry_gridX_,1), 1);
+				gridX = mediumPSLs_tubeGeometry_gridX_(:,surfacesToBeShow);
+				gridY = mediumPSLs_tubeGeometry_gridY_(:,surfacesToBeShow);
+				gridZ = mediumPSLs_tubeGeometry_gridZ_(:,surfacesToBeShow);
 				handleMediumPSL = surf(axHandle_, gridX, gridY, gridZ, gridC);
 				shading(axHandle_, 'interp');
 			end				
 		case 'RIBBON'
-			psDir = [2 3 4; 10 11 12]; %% [2 3 4; 10 11 12] or [10 11 12; 2 3 4]
-			[ribbonVertices, facePatches, faceColors, ~] = ...
-				ExpandPSLs2Ribbons(tarMediumPSLs, lineWidthRibbon, psDir, color4MediumPSLs);
-			if ~isempty(ribbonVertices)
+			if numTarMediumPSLs>0
 				hold(axHandle_, 'on');
-				handleMediumPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', ribbonVertices, ...
-					'FaceVertexCData', faceColors, 'FaceColor', 'interp');						
-			end				
+				facesToBeShow = [mediumPSLs_ribbonGeometry_indices_(tarMediumPSLindex).arr];
+				facePatches = mediumPSLs_ribbonGeometry_faces_(facesToBeShow,:);
+				ribbonVtxToBShow = unique(facePatches);
+				tmp = repmat([color4MediumPSLs.arr], 4, 1); 
+				faceColors = zeros(size(mediumPSLs_ribbonGeometry_vertices_,1),1);				
+				faceColors(ribbonVtxToBShow,1) = tmp(:);
+				handleMediumPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', mediumPSLs_ribbonGeometry_vertices_, ...
+					'FaceVertexCData', faceColors, 'FaceColor', 'interp');			
+			end					
 	end
 	handleMinorPSL = []; 
 	switch pslGeo(3)
 		case 'TUBE'
-			[gridX, gridY, gridZ, gridC, ~] = ExpandPSLs2Tubes(tarMinorPSLs, color4MinorPSLs, lineWidthTube);
-			if ~isempty(gridX)
+			if numTarMinorPSLs>0
 				hold(axHandle_, 'on');
+				surfacesToBeShow = [minorPSLs_tubeGeometry_indices_(tarMinorPSLindex).arr];
+				for ii=1:numTarMinorPSLs
+					color4MinorPSLs(ii).arr = [color4MinorPSLs(ii).arr(1) color4MinorPSLs(ii).arr color4MinorPSLs(ii).arr(end)];
+				end
+				gridC = repmat([color4MinorPSLs.arr], size(minorPSLs_tubeGeometry_gridX_,1), 1);
+				gridX = minorPSLs_tubeGeometry_gridX_(:,surfacesToBeShow);
+				gridY = minorPSLs_tubeGeometry_gridY_(:,surfacesToBeShow);
+				gridZ = minorPSLs_tubeGeometry_gridZ_(:,surfacesToBeShow);
 				handleMinorPSL = surf(axHandle_, gridX, gridY, gridZ, gridC);
 				shading(axHandle_, 'interp');
-			end				
-		case 'RIBBON'
-			[ribbonVertices, facePatches, faceColors, ~] = ...
-				ExpandPSLs2Ribbons(tarMinorPSLs, lineWidthRibbon, [6 7 8; 10 11 12], color4MinorPSLs);			
-			if ~isempty(ribbonVertices)
+			end			
+		case 'RIBBON'		
+			if numTarMinorPSLs>0
 				hold(axHandle_, 'on');
-				handleMinorPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', ribbonVertices, ...
-					'FaceVertexCData', faceColors, 'FaceColor', 'interp');
+				facesToBeShow = [minorPSLs_ribbonGeometry_indices_(tarMinorPSLindex).arr];
+				facePatches = minorPSLs_ribbonGeometry_faces_(facesToBeShow,:);
+				ribbonVtxToBShow = unique(facePatches);
+				tmp = repmat([color4MinorPSLs.arr], 4, 1); 
+				faceColors = zeros(size(minorPSLs_ribbonGeometry_vertices_,1),1);				
+				faceColors(ribbonVtxToBShow,1) = tmp(:);
+				handleMinorPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', minorPSLs_ribbonGeometry_vertices_, ...
+					'FaceVertexCData', faceColors, 'FaceColor', 'interp');			
 			end					
 	end
 	set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', silhouetteOpacity_, 'EdgeColor', 'none');

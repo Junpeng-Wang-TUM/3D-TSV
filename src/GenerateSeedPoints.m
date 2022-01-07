@@ -5,11 +5,17 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 	global loadingCond_;
 	global fixingCond_;
 	global seedPointsHistory_;
+	global seedAssociatedEles_;
 	global carNodMapBack_;
-	global nelx_; global nely_; global nelz_;
+	global nelx_; 
+	global nely_; 
+	global nelz_;
 	global nodStruct_;
 	global eNodMat_;
 	global numNodes_;
+	global boundaryElements_;
+	global eleCentroidList_;
+	
 	if 0>=seedDensCtrl, seedDensCtrl = 4; end %% in case 0>=minimumEpsilon and volumeSeedingOpt is not defined
 	switch seedStrategy
 		case 'Volume'
@@ -24,42 +30,51 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 				sampledNodes(0==sampledNodes) = [];
 				nodesOnBoundary = find(1==nodState_);
 				sampledNodes = setdiff(sampledNodes, nodesOnBoundary);
-				seedPointsHistory_ = nodeCoords_(sampledNodes,:);			
-			else
-				allNodes = (1:numNodes_)';		
-				if 0
-					%%for testing
-					dis2Boundary = 2;
-					boundaryNods = find(1==nodState_);
-					tmp0 = boundaryNods;
-					index = 2;
-					while index <=dis2Boundary %%Pealing away elements layer by layer
-						tmp = [];
-						for ii=1:length(tmp0)
-							iEles = nodStruct_(tmp0(ii)).adjacentEles;
-							nEles = length(iEles);
-							tmp(end+1:end+nEles) = iEles;
-						end
-						tmp0 = unique(tmp);
-						tmp0 = eNodMat_(tmp0,:);
-						tmp0 = reshape(tmp0, numel(tmp0), 1);
-						tmp0 = unique(tmp0);
-						index = index + 1;
-					end
-					passiveNodes = tmp0;
-					sampledNodes = setdiff(allNodes, passiveNodes);
-					seedPointsHistory_ = nodeCoords_(sampledNodes(1:seedDensCtrl:end),:);
-				else
-					seedPointsHistory_ = nodeCoords_(0==nodState_,:); %%exclude the boundary nodes
-					seedPointsHistory_ = seedPointsHistory_(1:seedDensCtrl:end,:);
+				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
+				seedAssociatedEles_ = ones(size(seedPointsHistory_,1),1);
+			else				
+				tarNodes = find(0==nodState_);
+				tarNodes = tarNodes(1:seedDensCtrl:end,1);
+				seedPointsHistory_ = nodeCoords_(tarNodes,:); %%exclude the boundary nodes
+				seedAssociatedEles_ = zeros(size(tarNodes));
+				for ii=1:length(tarNodes)
+					iNode = tarNodes(ii);
+					seedAssociatedEles_(ii) = nodStruct_(iNode).adjacentEles(1);
 				end
 			end
 		case 'Surface'
-			seedPointsHistory_ = nodeCoords_(1==nodState_,:);
-			seedPointsHistory_ = seedPointsHistory_(1:seedDensCtrl:end,:);
+			potentialElements = boundaryElements_(1:seedDensCtrl:end,1);
+			seedPointsHistory_ = eleCentroidList_(potentialElements,:);
+			seedAssociatedEles_ = potentialElements;
 		case 'LoadingArea'			
-			seedPointsHistory_ = nodeCoords_(loadingCond_(1:seedDensCtrl:end,1),:);
+			if isempty(loadingCond_)
+				seedPointsHistory_ = [];
+				warning('There is no Loaded Node Available!'); return;
+			end
+			if strcmp(meshType_, 'CARTESIAN_GRID')
+				seedPointsHistory_ = nodeCoords_(loadingCond_(1:seedDensCtrl:end,1),:);
+			else
+				potentialElements = unique([nodStruct_(loadingCond_(:,1)).adjacentEles]);
+				potentialElements = potentialElements(:);
+				potentialElements = potentialElements(1:seedDensCtrl:end,1);
+				seedPointsHistory_ = eleCentroidList_(potentialElements,:);
+				seedAssociatedEles_ = potentialElements;
+			end	
 		case 'FixedArea' 
-			seedPointsHistory_ = nodeCoords_(fixingCond_(1:seedDensCtrl:end,1),:);
+			if isempty(fixingCond_)
+				seedPointsHistory_ = [];
+				warning('There is no Fixed Node Available!'); return;		
+			end
+			if strcmp(meshType_, 'CARTESIAN_GRID')
+				seedPointsHistory_ = nodeCoords_(fixingCond_(1:seedDensCtrl:end,1),:);
+			else				
+				potentialElements = unique([nodStruct_(fixingCond_).adjacentEles]);
+				potentialElements = potentialElements(:);
+				potentialElements = potentialElements(1:seedDensCtrl:end,1);
+				seedPointsHistory_ = eleCentroidList_(potentialElements,:);
+				seedAssociatedEles_ = potentialElements;
+			end
+		otherwise
+			error('Unsupported Seed Type!');
 	end
 end

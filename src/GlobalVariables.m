@@ -4,7 +4,9 @@
 global dataName_; 
 global meshType_;
 global boundingBox_; 
-global nelx_; global nely_; global nelz_; 
+global nelx_; 
+global nely_; 
+global nelz_; 
 global numNodes_;
 global nodeCoords_; 
 global numEles_; 
@@ -12,14 +14,16 @@ global eNodMat_;
 global nodState_; 
 global nodStruct_; %% Adjacent Elements for each Mesh Vertex (only for Unstructured Hex-mesh)
 global eleStruct_; %% Element, face normals, adjacent element of each face 
-global cartesianStressField_; 
+global cartesianStressField_; %% at each row in the oder: Sigma_xx, Sigma_yy, Sigma_zz, Sigma_yz, Sigma_zx, Sigma_xy
 global loadingCond_; 
 global fixingCond_; 	
-global eleSize_; %% Element Size for Cartesian Mesh, or an Assumed one for Unstructured Hex-mesh
+global eleSize_; %% Element Size for Cartesian Mesh
+global eleSizeList_; %% Element Sizes for Unstructured Hex-mesh
+global integrationStepLimit_; %% Maximum Integration Steps
 global silhouetteStruct_; %% Patches for Draw Silhoutte of Stress Field
 global carNodMapBack_; %% Only for Cartesian Mesh
 global surfaceQuadMeshNodeCoords_;
-global surfaceQuadMeshElements_;	
+global surfaceQuadMeshElements_;
 
 %% 2. Algorithm Control
 %% 2.0 Selected Principal Stress Fields to be Visualized
@@ -60,5 +64,6 @@ global PSLsAppearanceOrder_; PSLsAppearanceOrder_ = [];
 
 %% 4. Visualization (only for Matlab Demo Code)
 global lineWidth_; lineWidth_ = 1;
+global silhouetteOpacity_; silhouetteOpacity_ = 0.1;
 global tubeShapedPSLs_Patches_; tubeShapedPSLs_Patches_ = [];
 global ribbonShapedPSLs_Patches_; ribbonShapedPSLs_Patches_ = [];

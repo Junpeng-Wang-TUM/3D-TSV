@@ -1,5 +1,7 @@
 function ExportResult(fileName)	
+	global boundingBox_;
 	global meshType_;
+	global minimumEpsilon_;
 	global majorPSLpool_;
 	global mediumPSLpool_;
 	global minorPSLpool_;
@@ -10,7 +12,7 @@ function ExportResult(fileName)
 	global surfaceQuadMeshNodeCoords_;
 	global surfaceQuadMeshElements_;	
 	global tracingStepWidth_;
-	lineWidthTube = 4*tracingStepWidth_;
+	lineWidthTube = min([1.5*minimumEpsilon_/5, min(boundingBox_(2,:)-boundingBox_(1,:))/10]);
 	
 	fid = fopen(fileName, 'w');
 	outPutFormat1 = '%16.6e';
@@ -18,6 +20,7 @@ function ExportResult(fileName)
 	outPutFormat3 = ' %.6f';
 	outPutFormat = outPutFormat2;
 	%%1. write PSLs
+	iColor = struct('arr', []);
 	%%1.1 major
 	numMajorPSLs = length(majorPSLpool_);
 	majorPSLsGlobalAppearanceOrder = find(1==PSLsAppearanceOrder_(:,1));
@@ -25,10 +28,12 @@ function ExportResult(fileName)
 	for ii=1:numMajorPSLs
 		iPSL = majorPSLpool_(ii);
 		iSeed = iPSL.phyCoordList(iPSL.midPointPosition,:);
-		pslCoords = iPSL.phyCoordList; pslCoords = reshape(pslCoords', numel(pslCoords), 1)';		
-		ribbonCoordsUnsmoothed = ExpandPSLs2Ribbons(iPSL, lineWidthTube, [6 7 8], 0);
+		pslCoords = iPSL.phyCoordList; 
+		pslCoords = reshape(pslCoords', numel(pslCoords), 1)';
+		iColor.arr = ones(1,iPSL.length);
+		[ribbonCoordsUnsmoothed, ~, ~, ~] = ExpandPSLs2RibbonsSim(iPSL, lineWidthTube, [6 7 8], iColor, 0);
 		ribbonCoordsUnsmoothed = reshape(ribbonCoordsUnsmoothed', numel(ribbonCoordsUnsmoothed), 1)';
-		ribbonCoordsSmoothed = ExpandPSLs2Ribbons(iPSL, lineWidthTube, [6 7 8], 1);
+		[ribbonCoordsSmoothed, ~, ~, ~] = ExpandPSLs2RibbonsSim(iPSL, lineWidthTube, [6 7 8], iColor, 1);
 		ribbonCoordsSmoothed = reshape(ribbonCoordsSmoothed', numel(ribbonCoordsSmoothed), 1)';
 		stressScalarFields4ColorCoding = [iPSL.principalStressList(:,9) iPSL.vonMisesStressList iPSL.cartesianStressList];
 		
@@ -48,10 +53,12 @@ function ExportResult(fileName)
 	for ii=1:numMediumPSLs
 		iPSL = mediumPSLpool_(ii);
 		iSeed = iPSL.phyCoordList(iPSL.midPointPosition,:);
-		pslCoords = iPSL.phyCoordList; pslCoords = reshape(pslCoords', numel(pslCoords), 1)';		
-		ribbonCoordsUnsmoothed = ExpandPSLs2Ribbons(iPSL, lineWidthTube, [2 3 4], 0);
+		pslCoords = iPSL.phyCoordList; 
+		pslCoords = reshape(pslCoords', numel(pslCoords), 1)';
+		iColor.arr = ones(1,iPSL.length);
+		[ribbonCoordsUnsmoothed, ~, ~, ~] = ExpandPSLs2RibbonsSim(iPSL, lineWidthTube, [2 3 4], iColor, 0);
 		ribbonCoordsUnsmoothed = reshape(ribbonCoordsUnsmoothed', numel(ribbonCoordsUnsmoothed), 1)';
-		ribbonCoordsSmoothed = ExpandPSLs2Ribbons(iPSL, lineWidthTube, [2 3 4], 1);
+		[ribbonCoordsSmoothed, ~, ~, ~] = ExpandPSLs2RibbonsSim(iPSL, lineWidthTube, [2 3 4], iColor, 1);
 		ribbonCoordsSmoothed = reshape(ribbonCoordsSmoothed', numel(ribbonCoordsSmoothed), 1)';
 		stressScalarFields4ColorCoding = [iPSL.principalStressList(:,5) iPSL.vonMisesStressList iPSL.cartesianStressList];
 
@@ -71,10 +78,12 @@ function ExportResult(fileName)
 	for ii=1:numMinorPSLs
 		iPSL = minorPSLpool_(ii);
 		iSeed = iPSL.phyCoordList(iPSL.midPointPosition,:);
-		pslCoords = iPSL.phyCoordList; pslCoords = reshape(pslCoords', numel(pslCoords), 1)';		
-		ribbonCoordsUnsmoothed = ExpandPSLs2Ribbons(iPSL, lineWidthTube, [6 7 8], 0);		
+		pslCoords = iPSL.phyCoordList; 
+		pslCoords = reshape(pslCoords', numel(pslCoords), 1)';
+		iColor.arr = ones(1,iPSL.length);		
+		[ribbonCoordsUnsmoothed, ~, ~, ~] = ExpandPSLs2RibbonsSim(iPSL, lineWidthTube, [6 7 8], iColor, 0);		
 		ribbonCoordsUnsmoothed = reshape(ribbonCoordsUnsmoothed', numel(ribbonCoordsUnsmoothed), 1)';
-		ribbonCoordsSmoothed = ExpandPSLs2Ribbons(iPSL, lineWidthTube, [6 7 8], 1);
+		[ribbonCoordsSmoothed, ~, ~, ~] = ExpandPSLs2RibbonsSim(iPSL, lineWidthTube, [6 7 8], iColor, 1);
 		ribbonCoordsSmoothed = reshape(ribbonCoordsSmoothed', numel(ribbonCoordsSmoothed), 1)';
 		stressScalarFields4ColorCoding = [iPSL.principalStressList(:,1) iPSL.vonMisesStressList iPSL.cartesianStressList];
 		

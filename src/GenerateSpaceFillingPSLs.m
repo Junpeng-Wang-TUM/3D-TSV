@@ -1,16 +1,30 @@
 function GenerateSpaceFillingPSLs(iEpsilon)
-	global seedPoints_; global seedPointsHistory_;
+	global seedPoints_;
+	global seedAssociatedEles_;
+    global seedPointsHistory_;
 	global seedPointsValence_; 
 	global selectedPrincipalStressField_;
 	global mergingOpt_;
-	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
-	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
+	global majorPSLpool_; 
+    global mediumPSLpool_; 
+    global minorPSLpool_; 
+	global majorCoordList_; 
+    global mediumCoordList_; 
+    global minorCoordList_;
 	global PSLsAppearanceOrder_;
-	global mergeTrigger_; global relaxedFactor_; global multiMergingThresholdsCtrl_;
+	global mergeTrigger_; 
+    global relaxedFactor_; 
+    global multiMergingThresholdsCtrl_;
 	global startCoord_;
 	
-	%%Taking the geometrical center as the start seed point 
-	lowerBound = min(seedPointsHistory_); upperBound = max(seedPointsHistory_);
+	%%Taking the geometrical center as the start seed point
+	if isempty(seedPointsHistory_)
+		majorPSLpool_ = [];
+		mediumPSLpool_ = [];
+		minorPSLpool_ = [];
+		warning('There is no Seed Point Available!'); return;
+	end
+	lowerBound = min(seedPointsHistory_, [], 1); upperBound = max(seedPointsHistory_, [], 1);
 	startCoord_ = zeros(1,3);
 	startCoord_(1) = lowerBound(1)+(upperBound(1)-lowerBound(1))/2;
 	startCoord_(2) = lowerBound(2)+(upperBound(2)-lowerBound(2))/2;
@@ -18,7 +32,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 	
 	%% Pre-process Seed Points
 	mergeTrigger_ = iEpsilon;
-    seedPoints_ = seedPointsHistory_;
+    seedPoints_ = [seedAssociatedEles_ seedPointsHistory_];
 	numSeedPoints = size(seedPoints_,1);	
     seedPointsValence_ = ones(numSeedPoints, 3);
 	%% Exclude the irrelated Principal Stress Fields 
@@ -44,27 +58,27 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 			switch numPSF
 				case 1
 					unFinishedSppsValence2 = find(2==valenceMetric);
-					[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence2,:),2,2));
+					[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence2,end-2:end),2,2));
 					spp = unFinishedSppsValence2(tarPos);
 				case 2
 					unFinishedSppsValence2 = find(2==valenceMetric); 
 					if ~isempty(unFinishedSppsValence2) %% 1st Priority
-						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence2,:),2,2)); %% 2nd Priority
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence2,end-2:end),2,2)); %% 2nd Priority
 						spp = unFinishedSppsValence2(tarPos);
 					else
 						unFinishedSppsValence1 = find(1==valenceMetric);
-						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence1,:),2,2)); %% 2nd Priority
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence1,end-2:end),2,2)); %% 2nd Priority
 						spp = unFinishedSppsValence1(tarPos);			
 					end					
 				case 3
 					unFinishedSppsValence12 = find(3>valenceMetric); 
 					unFinishedSppsValence12 = unFinishedSppsValence12(valenceMetric(unFinishedSppsValence12)>0); 
 					if ~isempty(unFinishedSppsValence12) %% 1st Priority
-						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence12,:),2,2)); %% 2nd Priority
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence12,end-2:end),2,2)); %% 2nd Priority
 						spp = unFinishedSppsValence12(tarPos);
 					else
 						unFinishedSppsValence0 = find(0==valenceMetric);
-						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence0,:),2,2)); %% 2nd Priority
+						[~, tarPos] = min(vecnorm(startCoord_-seedPoints_(unFinishedSppsValence0,end-2:end),2,2)); %% 2nd Priority
 						spp = unFinishedSppsValence0(tarPos);		
 					end						
 			end
@@ -85,7 +99,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				sppsEmptyMajorValence = find(0==seedPointsValence_(:,1));
 				if ~isempty(sppsEmptyMajorValence)
 					[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(seedPoints_(...
-							sppsEmptyMajorValence,:), majorPSL.phyCoordList);					
+							sppsEmptyMajorValence,:), [majorPSL.eleIndexList majorPSL.phyCoordList]);					
 					potentialSolidSppsMajor = find(potentialDisListMajor<multiMergingThresholdsCtrl_(1)*relaxedFactor_);
 					if ~isempty(potentialSolidSppsMajor)
 						spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);
@@ -114,7 +128,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				sppsEmptyMediumValence = find(0==seedPointsValence_(:,2));
 				if ~isempty(sppsEmptyMediumValence)
 					[potentialDisListMedium, potentialPosListMedium] = GetDisListOfPointList2Curve(seedPoints_(...
-							sppsEmptyMediumValence,:), mediumPSL.phyCoordList);					
+							sppsEmptyMediumValence,:), [mediumPSL.eleIndexList mediumPSL.phyCoordList]);					
 					potentialSolidSppsMedium = find(potentialDisListMedium<multiMergingThresholdsCtrl_(2)*relaxedFactor_);
 					if ~isempty(potentialSolidSppsMedium)
 						spps2BeMerged = sppsEmptyMediumValence(potentialSolidSppsMedium);
@@ -143,7 +157,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 				sppsEmptyMinorValence = find(0==seedPointsValence_(:,3));
 				if ~isempty(sppsEmptyMinorValence)   
 					[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(seedPoints_(...
-							sppsEmptyMinorValence,:), minorPSL.phyCoordList);					
+							sppsEmptyMinorValence,:), [minorPSL.eleIndexList minorPSL.phyCoordList]);					
 					potentialSolidSppsMinor = find(potentialDisListMinor<multiMergingThresholdsCtrl_(3)*relaxedFactor_);
 					if ~isempty(potentialSolidSppsMinor)
 						spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
@@ -162,7 +176,7 @@ function GenerateSpaceFillingPSLs(iEpsilon)
 		end
 	else
 		for ii=1:numSeedPoints
-			seed = seedPoints_(ii,:);		
+			seed = seedPoints_(ii,:);
 			for jj=1:numPSF
 				iPSF = selectedPrincipalStressField_(jj);
 				switch iPSF
@@ -196,7 +210,9 @@ end
 function PreprocessSeedPoints()
 	global seedPoints_;
 	global seedPointsValence_;
-	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_; 
+	global majorPSLpool_; 
+	global mediumPSLpool_; 
+	global minorPSLpool_; 
 	global relaxedFactor_;
 	global multiMergingThresholdsCtrl_;
 	
@@ -207,7 +223,7 @@ function PreprocessSeedPoints()
 			sppsEmptyMajorValence = find(0==seedPointsValence_(:,1));
             if ~isempty(sppsEmptyMajorValence)
 				[potentialDisListMajor, potentialPosListMajor] = GetDisListOfPointList2Curve(...	
-					seedPoints_(sppsEmptyMajorValence,:), majorPSL.phyCoordList);
+					seedPoints_(sppsEmptyMajorValence,:), [majorPSL.eleIndexList majorPSL.phyCoordList]);
 				potentialSolidSppsMajor = find(potentialDisListMajor<=multiMergingThresholdsCtrl_(1)*relaxedFactor_);
 				if ~isempty(potentialSolidSppsMajor)
 					spps2BeMerged = sppsEmptyMajorValence(potentialSolidSppsMajor);							
@@ -229,7 +245,7 @@ function PreprocessSeedPoints()
 			sppsEmptyMediumValence = find(0==seedPointsValence_(:,2));
             if ~isempty(sppsEmptyMediumValence)
 				[potentialDisListMedium, potentialPosListMedium] = GetDisListOfPointList2Curve(...	
-					seedPoints_(sppsEmptyMediumValence,:), mediumPSL.phyCoordList);
+					seedPoints_(sppsEmptyMediumValence,:), [mediumPSL.eleIndexList mediumPSL.phyCoordList]);
 				potentialSolidSppsMedium = find(potentialDisListMedium<=multiMergingThresholdsCtrl_(2)*relaxedFactor_);
 				if ~isempty(potentialSolidSppsMedium)
 					spps2BeMerged = sppsEmptyMediumValence(potentialSolidSppsMedium);							
@@ -251,7 +267,7 @@ function PreprocessSeedPoints()
 			sppsEmptyMinorValence = find(0==seedPointsValence_(:,3));
             if ~isempty(sppsEmptyMinorValence)
 				[potentialDisListMinor, potentialPosListMinor] = GetDisListOfPointList2Curve(...	
-					seedPoints_(sppsEmptyMinorValence,:), minorPSL.phyCoordList);
+					seedPoints_(sppsEmptyMinorValence,:), [minorPSL.eleIndexList minorPSL.phyCoordList]);
 				potentialSolidSppsMinor = find(potentialDisListMinor<=multiMergingThresholdsCtrl_(3)*relaxedFactor_);
 				if ~isempty(potentialSolidSppsMinor)
 					spps2BeMerged = sppsEmptyMinorValence(potentialSolidSppsMinor);
@@ -268,28 +284,29 @@ function PreprocessSeedPoints()
 end
 
 function iPSL = Have1morePSL(seed, psDir)
-	global tracingStepWidth_;
-	global boundingBox_;
 	global snappingOpt_;
-	stopCond = ceil(1.5*norm(boundingBox_(2,:)-boundingBox_(1,:))/tracingStepWidth_);	
-	iPSL = GeneratePrincipalStressLines(seed, psDir, stopCond);
+	iPSL = CreatePrincipalStressLine(seed, psDir);
 	if snappingOpt_, iPSL = CroppingPSLifNeeded(iPSL, psDir); end	
 end
 
 function [potentialDisList, potentialPosList] = GetDisListOfPointList2Curve(pointList, curveLine)
 	global mergeTrigger_;
-	disT = (curveLine(:,1) - pointList(:,1)').^2;
-	disT = disT + (curveLine(:,2) - pointList(:,2)').^2;
-	disT = disT + (curveLine(:,3) - pointList(:,3)').^2;
+	
+	disT = (curveLine(:,end-2) - pointList(:,end-2)').^2;
+	disT = disT + (curveLine(:,end-1) - pointList(:,end-1)').^2;
+	disT = disT + (curveLine(:,end) - pointList(:,end)').^2;
 	disT = sqrt(disT);	
 	[minVal, minValPos] = min(disT,[],1);
 	potentialDisList = minVal';
 	potentialDisList = potentialDisList/mergeTrigger_;
-	potentialPosList = curveLine(minValPos,:);	
+	potentialPosList = curveLine(minValPos,:);
+
 end
 
 function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
-	global majorCoordList_; global mediumCoordList_; global minorCoordList_;
+	global majorCoordList_; 
+	global mediumCoordList_; 
+	global minorCoordList_;		
 	global seedPoints_;
 	global seedPointsValence_;
 	global mergeTrigger_;
@@ -301,15 +318,18 @@ function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 		case 'MAJOR'
 			if isempty(majorCoordList_), modifiedValences = []; return; end
 			coordList = majorCoordList_;
-			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,1)));
+			% spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,1)));
+            spps2BeMerged = spps2BeMerged(0==seedPointsValence_(spps2BeMerged,1));
 		case 'MEDIUM'
 			if isempty(mediumCoordList_), modifiedValences = []; return; end
 			coordList = mediumCoordList_;
-			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,2)));			
+			% spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,2)));
+            spps2BeMerged = spps2BeMerged(0==seedPointsValence_(spps2BeMerged,2));
 		case 'MINOR'
 			if isempty(minorCoordList_), modifiedValences = []; return; end
 			coordList = minorCoordList_;
-			spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,3)));
+			% spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,3)));
+            spps2BeMerged = spps2BeMerged(0==seedPointsValence_(spps2BeMerged,3));
 	end
 	pointList = seedPoints_(spps2BeMerged,:);
 	disT = (coordList(:,1) - pointList(:,1)').^2;
@@ -331,7 +351,9 @@ end
 
 function CompactPSLs()
 	global minLengthVisiblePSLs_;
-	global majorPSLpool_; global mediumPSLpool_; global minorPSLpool_;
+	global majorPSLpool_; 
+	global mediumPSLpool_; 
+	global minorPSLpool_;
 	global PSLsAppearanceOrder_;
 	filterThreshold = minLengthVisiblePSLs_;
 	

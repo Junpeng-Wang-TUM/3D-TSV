@@ -1,177 +1,122 @@
 function ImportStressFields(fileName)
-	global boundingBox_; 
+	global boundingBox_;
+	global nelx_;
+	global nely_;
+	global nelz_;
+	global carNodMapForward_;
+	global voxelizedVolume_;	
 	global numNodes_;
 	global nodeCoords_;
 	global numEles_;
 	global eNodMat_;
 	global eleState_;
 	global nodState_;	
-	global numStressFields_;
 	global cartesianStressField_;
 	global loadingCond_; 
 	global fixingCond_;	
 	global eleCentroidList_;
 	global silhouetteStruct_;
 	global meshType_;
-	global eleSize_; 
+	global eleSize_;
+	global eleSizeList_;
 	global surfaceQuadMeshNodeCoords_;
 	global surfaceQuadMeshElements_;	
-	global nelx_;
-	global nely_;
-	global nelz_;
-	global carNodMapBack_;
-	global voxelizedVolume_;
 	global nodStruct_; 
 	global eleStruct_; 
 	global boundaryElements_; 
 	
-	%%read mesh and cartesian stress field
-	fid = fopen(fileName, 'r');
-	fgetl(fid); fgetl(fid); fgetl(fid); 
-	tmp = fscanf(fid, '%s', 1);	
-	meshType_ = fscanf(fid, '%s', 1);
-	if strcmp(meshType_, 'CARTESIAN_GRID')
-		tmp = fscanf(fid, '%s', 1);
-		tmp = fscanf(fid, '%d %d %d', [1 3]);
-		nelx_ = tmp(1); nely_ = tmp(2); nelz_ = tmp(3);
-		tmp = fscanf(fid, '%s', 1);
-		boundingBox_ = fscanf(fid, '%f %f %f', [1 3]);
-		tmp = fscanf(fid, '%s', 1);
-		boundingBox_(2,:) = fscanf(fid, '%f %f %f', [1 3]);		
-		tmp = fscanf(fid, '%s', 1); 
-		numValidEles = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%s', 1);
-		validElements = fscanf(fid, '%d', [1, numValidEles])';
-		validElements = validElements + 1;
-			
-		%%read cartesian stress field
-		tmp = fscanf(fid, '%s %s %s %s %d', 5);
-		tmp = fscanf(fid, '%s %s', 2); numLoadedNodes = fscanf(fid, '%d', 1);
-		if numLoadedNodes>0
-			tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
-			tmp(1,:) = tmp(1,:)+1; 
-			loadingCond_ = tmp';
-		end
-		tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
-		if numFixedNodes>0
-			tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-			fixingCond_ = tmp'+1;
-		end
-		tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%f %f %f %f %f %f', [6, numValidNods]);
-		cartesianStressField_ = tmp';		
-		fclose(fid);
-		
-		%%recover cartesian mesh
-		voxelizedVolume_ = zeros(nelx_*nely_*nelz_,1);
-		voxelizedVolume_(validElements) = 1;
-		voxelizedVolume_ = reshape(voxelizedVolume_, nely_, nelx_, nelz_);				
-		RecoverCartesianMesh();
-		numNod2ElesVec = zeros(numNodes_,1);
-		for ii=1:numEles_
-			for jj=1:8
-				numNod2ElesVec(eNodMat_(ii,jj)) = numNod2ElesVec(eNodMat_(ii,jj))+1;
+	%%Read mesh and cartesian stress field
+	[~,~,dataType] = fileparts(fileName);
+	switch dataType
+		case '.carti'
+			meshType_ = 'CARTESIAN_GRID';
+			[nelx_, nely_, nelz_, boundingBox_, voxelizedVolume_, loadingCond_, fixingCond_, cartesianStressField_] = ...
+				ReadDataSimulatedOnCartesianMesh_carti(fileName);
+			%%Recover Cartesian Mesh
+			RecoverCartesianMesh();
+		case '.vtk'
+			meshType_ = 'UNSTRUCTURED_GRID';
+			[numNodes_, nodeCoords_, numEles_, eNodMat_, nodState_, loadingCond_, fixingCond_, cartesianStressField_] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_vtk(fileName);
+		case '.mesh'
+			meshType_ = 'UNSTRUCTURED_GRID';
+			[numNodes_, nodeCoords_, numEles_, eNodMat_, loadingCond_, fixingCond_, cartesianStressField_] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_mesh(fileName);
+			%%Extract Boundary Element Info.
+			faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
+			faceIndex = reshape(faceIndex(:), 4, 6*numEles_);
+			tmp = sort(faceIndex,1)';
+			[~, ia, ic] = unique(tmp, 'rows');
+			numRawPatchs = 6*numEles_;
+			patchState = zeros(length(ia),1);
+			for ii=1:numRawPatchs
+				patchState(ic(ii)) = patchState(ic(ii)) + 1;
 			end
-		end
-		nodesOutline = find(numNod2ElesVec<8);	
-		nodState_ = zeros(numNodes_,1); nodState_(nodesOutline) = 1;
-		eleState_ = 12*ones(1, numEles_);
-		
-		%% element centroids
-		eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
-		eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
-		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
-		eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;
-			
-		%%extract and Re-organize silhouette into quad-mesh for exporting
-		[nodPosX, nodPosY, nodPosZ] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_, 'inGrid');	
-		valForExtctBoundary = zeros((nelx_+1)*(nely_+1)*(nelz_+1),1);
-		valForExtctBoundary(carNodMapBack_) = 1;
-		valForExtctBoundary = reshape(valForExtctBoundary, nely_+1, nelx_+1, nelz_+1);
-		fv = isosurface(nodPosX, nodPosY, nodPosZ, valForExtctBoundary, 0);		
-		fv.facevertexcdata = zeros(size(fv.vertices));
-		fvc = isocaps(nodPosX, nodPosY, nodPosZ, valForExtctBoundary, 0);
-		silhouetteStruct_ = fv;
-		silhouetteStruct_(2) = fvc;	
-		
-		faceIndex = zeros(4,6*numEles_);
-		mapEle2patch = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6]';
-		for ii=1:numEles_
-			index = (ii-1)*6;
-			iEleVtx = eNodMat_(ii,:)';
-			faceIndex(:,index+1:index+6) = iEleVtx(mapEle2patch);
-		end
-		tmp = nodState_(faceIndex'); tmp = sum(tmp,2);
-		BoundaryEleFace = faceIndex(:,find(4==tmp)');		
-		boundaryNode = find(1==nodState_);
-		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
-		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
-		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');		
+			patchIndexOnBoundary = ia(1==patchState);
+			boundaryPatchs = faceIndex(:,patchIndexOnBoundary');
+			nodesOutline = unique(boundaryPatchs);
+			nodState_ = zeros(numNodes_,1);
+			nodState_(nodesOutline) = 1;
+		case '.stress'
+			meshType_ = 'UNSTRUCTURED_GRID';
+			[numNodes_, nodeCoords_, numEles_, eNodMat_, loadingCond_, fixingCond_, cartesianStressField_] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_stressANSYS(fileName);
+			%%Extract Boundary Element Info.
+			faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
+			faceIndex = reshape(faceIndex(:), 4, 6*numEles_);
+			tmp = sort(faceIndex,1)';
+			[~, ia, ic] = unique(tmp, 'rows');
+			numRawPatchs = 6*numEles_;
+			patchState = zeros(length(ia),1);
+			for ii=1:numRawPatchs
+				patchState(ic(ii)) = patchState(ic(ii)) + 1;
+			end
+			patchIndexOnBoundary = ia(1==patchState);
+			boundaryPatchs = faceIndex(:,patchIndexOnBoundary');
+			nodesOutline = unique(boundaryPatchs);
+			nodState_ = zeros(numNodes_,1);
+			nodState_(nodesOutline) = 1;					
+		otherwise
+			error('Unsupported Data Format!');
+	end
+	
+	%%Extract and Re-organize Silhouette into Quad-mesh for Exporting
+	faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
+	faceIndex = reshape(faceIndex(:), 4, 6*numEles_);	
+	tmp = nodState_(faceIndex'); 
+	tmp = sum(tmp,2);
+	boundaryEleFace = faceIndex(:,find(4==tmp)');		
+	boundaryNode = find(1==nodState_);
+	surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
+	tmp = zeros(numNodes_,1); 
+	tmp(boundaryNode) = (1:length(boundaryNode))';
+	surfaceQuadMeshElements_ = tmp(boundaryEleFace');
+	
+	%%Extract Silhouette for Visualization
+	if strcmp(meshType_, 'CARTESIAN_GRID')
+		[nodPosX, nodPosY, nodPosZ] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_, 'inGrid');
+		iSurface = isosurface(nodPosX, nodPosY, nodPosZ, reshape(carNodMapForward_, nely_+1, nelx_+1, nelz_+1), 0);
+		iCap = isocaps(nodPosX, nodPosY, nodPosZ, reshape(carNodMapForward_, nely_+1, nelx_+1, nelz_+1), 0);
+		iCap.faces = size(iSurface.vertices,1) + iCap.faces;
+		silhouetteStruct_.vertices = [iSurface.vertices; iCap.vertices];
+		silhouetteStruct_.faces = [iSurface.faces; iCap.faces];
+		silhouetteStruct_ = CompactPatchVertices(silhouetteStruct_);
 	else
-		tmp = fscanf(fid, '%s', 1); 
-		numNodes_ = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%s', 1);
-		
-		%%read mesh 
-		nodeCoords_ = fscanf(fid, '%f %f %f', [3, numNodes_]); 
-		nodeCoords_ = nodeCoords_';	
-		tmp = fscanf(fid, '%s', 1);
-		numEles_ = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%d', 1);
-		eNodMat_ = fscanf(fid, '%d %d %d %d %d %d %d %d %d', [9, numEles_]); 
-		eNodMat_ = eNodMat_'; eNodMat_(:,1) = []; eNodMat_ = eNodMat_ + 1;
-		tmp = fscanf(fid, '%s', 1);
-		tmp = fscanf(fid, '%d', 1);
-		eleState_ = fscanf(fid, '%d', [1 numEles_])';
-		tmp = fscanf(fid, '%s %s', 2);
-		tmp = fscanf(fid, '%s %s %s', 3);
-		tmp = fscanf(fid, '%s %s', 2);
-		nodState_ = fscanf(fid, '%d', [1 numNodes_])';
-		
-		%%read cartesian stress field
-		tmp = fscanf(fid, '%s %s %s %s %d', 5);
-		tmp = fscanf(fid, '%s %s', 2); numLoadedNodes = fscanf(fid, '%d', 1);
-		if numLoadedNodes>0
-			tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
-			tmp(1,:) = tmp(1,:)+1; 
-			loadingCond_ = tmp';		
-		end
-		tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
-		if numFixedNodes>0
-			tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-			fixingCond_ = tmp'+1;		
-		end
-		tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
-		tmp = fscanf(fid, '%f %f %f %f %f %f', [6, numValidNods]);
-		cartesianStressField_ = tmp';
-		fclose(fid);
-		
-		%% element centroids and size	
-		eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
-		eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
-		eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
-		eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;
-		
+		silhouetteStruct_.vertices = surfaceQuadMeshNodeCoords_;
+		silhouetteStruct_.faces = surfaceQuadMeshElements_;
+	end
+	
+	%%element centroids
+	eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
+	eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
+	eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
+	eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;	
+	
+	%%Build Element Tree for Unstructured Hex-Mesh
+	if strcmp(meshType_, 'UNSTRUCTURED_GRID')
 		boundingBox_ = [min(nodeCoords_, [], 1); max(nodeCoords_, [], 1)];
 		eleSize_ = max(boundingBox_(2,:)-boundingBox_(1,:))/100;
-		%%extract and Re-organize silhouette into quad-mesh for exporting
-		faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
-		faceIndex = reshape(faceIndex(:), 4, 6*numEles_);		
-		
-		tmp = nodState_(faceIndex');
-		tmp = sum(tmp,2);
-		BoundaryEleFace = faceIndex(:,find(4==tmp)');
-		boundaryNode = find(1==nodState_);
-		surfaceQuadMeshNodeCoords_ = nodeCoords_(boundaryNode,:);
-		tmp = zeros(numNodes_,1); tmp(boundaryNode) = (1:length(boundaryNode))';
-		surfaceQuadMeshElements_ = tmp(BoundaryEleFace');
-		silhouetteStruct_ = struct('xPatchs', [], 'yPatchs', [], 'zPatchs', [], 'cPatchs',[]);
-		xPatchs = surfaceQuadMeshNodeCoords_(:,1); silhouetteStruct_.xPatchs = xPatchs(surfaceQuadMeshElements_');
-		yPatchs = surfaceQuadMeshNodeCoords_(:,2); silhouetteStruct_.yPatchs = yPatchs(surfaceQuadMeshElements_');
-		zPatchs = surfaceQuadMeshNodeCoords_(:,3); silhouetteStruct_.zPatchs = zPatchs(surfaceQuadMeshElements_');
-		silhouetteStruct_.cPatchs = zeros(size(silhouetteStruct_.zPatchs));		
-		
-		%% build element three
+		%% build element three		
 		iNodStruct = struct('adjacentEles', []); 
 		nodStruct_ = repmat(iNodStruct, numNodes_, 1);
 		for ii=1:numEles_
@@ -180,6 +125,9 @@ function ImportStressFields(fileName)
 			end
 		end		
 		boundaryElements_ = unique([nodStruct_(boundaryNode).adjacentEles]);
+		boundaryElements_ = boundaryElements_(:);
+		eleState_ = zeros(numEles_,1);
+		eleState_(boundaryElements_,1) = 1;
 		eleFaces = [4 3 2 1; 5 6 7 8; 1 2 6 5; 8 7 3 4; 5 8 4 1; 2 3 7 6];
 		iEleStruct = struct('faceCentres', [], 'faceNormals', []); %%pure-Hex
 		eleStruct_ = repmat(iEleStruct, numEles_, 1);
@@ -205,19 +153,319 @@ function ImportStressFields(fileName)
 			tmp.faceNormals = faceNormals;
 			eleStruct_(ii) = tmp;
 		end
+		
+		%% Evaluate Element Sizes
+		tmpSizeList = zeros(6,numEles_);
+		for ii=1:numEles_
+			tmpSizeList(:,ii) = vecnorm(eleCentroidList_(ii,:)-eleStruct_(ii).faceCentres,2,2);
+		end
+		eleSizeList_ = 2*min(tmpSizeList,[],1)';		
 	end
+end
 
+function [nx, ny, nz, boundingBox, cellVolume, loadingCond, fixingCond, cartesianStressField] = ...
+				ReadDataSimulatedOnCartesianMesh_carti(fileName)
+	fid = fopen(fileName, 'r');
+	%%Mesh
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'Resolution:'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	tmp = fscanf(fid, '%d %d %d', [1 3]);
+	nx = tmp(1); ny = tmp(2); nz = tmp(3);
+	tmp = fscanf(fid, '%s', 1);
+	boundingBox = fscanf(fid, '%f %f %f', [1 3]);
+	tmp = fscanf(fid, '%s', 1);
+	boundingBox(2,:) = fscanf(fid, '%f %f %f', [1 3]);		
+	tmp = fscanf(fid, '%s', 1); 
+	numValidEles = fscanf(fid, '%d', 1);
+	tmp = fscanf(fid, '%s', 1);
+	validElements = fscanf(fid, '%d', [1, numValidEles])';
+	validElements = validElements + 1;
+	cellVolume = zeros(nx*ny*nz,1);
+	cellVolume(validElements) = 1;
+	cellVolume = reshape(cellVolume, ny, nx, nz);	
+		
+	%%Stress Field
+	tmp = fscanf(fid, '%s %s %s %s %d', 5);
+	tmp = fscanf(fid, '%s %s', 2); numLoadedNodes = fscanf(fid, '%d', 1);
+	if numLoadedNodes>0
+		tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
+		tmp(1,:) = tmp(1,:)+1; 
+		loadingCond = tmp';
+	else
+		loadingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); numFixedNodes = fscanf(fid, '%d', 1);
+	if numFixedNodes>0
+		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+		fixingCond = tmp'+1;
+	else
+		fixingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
+	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
+	fclose(fid);
+end
+
+function [numNodes, nodeCoords, numEles, eNodMat, nodState, loadingCond, fixingCond, cartesianStressField] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_vtk(fileName)
+	fid = fopen(fileName, 'r');
+	%%Mesh
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'POINTS'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	numNodes = fscanf(fid, '%d', 1);
+	tmp = fscanf(fid, '%s', 1);
+	nodeCoords = fscanf(fid, '%f %f %f', [3, numNodes])'; 
+	tmp = fscanf(fid, '%s', 1);
+	numEles = fscanf(fid, '%d', 1);
+	tmp = fscanf(fid, '%d', 1);
+	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d %d', [9, numEles])'; 
+	eNodMat(:,1) = []; 
+	eNodMat = eNodMat + 1;
+	tmp = fscanf(fid, '%s', 1);
+	tmp = fscanf(fid, '%d', 1);
+	tmp = fscanf(fid, '%d', [1 numEles])';
+	tmp = fscanf(fid, '%s %s', 2);
+	tmp = fscanf(fid, '%s %s %s', 3);
+	tmp = fscanf(fid, '%s %s', 2);
+	nodState = fscanf(fid, '%d', [1 numNodes])';
+	
+	%%Stress Field
+	tmp = fscanf(fid, '%s %s %s %s %d', 5);
+	tmp = fscanf(fid, '%s %s', 2); 
+	numLoadedNodes = fscanf(fid, '%d', 1);
+	if numLoadedNodes>0
+		tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
+		tmp(1,:) = tmp(1,:)+1; 
+		loadingCond = tmp';
+	else
+		loadingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numFixedNodes = fscanf(fid, '%d', 1);
+	if numFixedNodes>0
+		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+		fixingCond = tmp(:)+1;
+	else
+		fixingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
+	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
+	fclose(fid);
+end
+
+function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_mesh(fileName)
+	fid = fopen(fileName, 'r');
+	%%Mesh
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'Vertices'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	numNodes = fscanf(fid, '%d', 1);
+	nodeCoords = fscanf(fid, '%f %f %f %f', [4, numNodes])'; 
+	nodeCoords(:,4) = [];
+	
+	tmp = fscanf(fid, '%s', 1);
+	numEles = fscanf(fid, '%d', 1);
+	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d %d', [9, numEles])'; 
+	eNodMat(:,end) = [];
+	tmp = fscanf(fid, '%s', 1);
+	
+	%%Stress Field
+	tmp = fscanf(fid, '%s %s %s %s %d', 5);
+	tmp = fscanf(fid, '%s %s', 2); 
+	numLoadedNodes = fscanf(fid, '%d', 1);
+	if numLoadedNodes>0
+		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
+		loadingCond = tmp';
+	else
+		loadingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numFixedNodes = fscanf(fid, '%d', 1);
+	if numFixedNodes>0
+		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+		fixingCond = tmp(:);
+	else
+		fixingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numValidNods = fscanf(fid, '%d', 1);
+	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
+	fclose(fid);
+end
+
+function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_stress(fileName)
+	fid = fopen(fileName, 'r');
+	%%Mesh
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'Vertices:'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	numNodes = fscanf(fid, '%d', 1);
+	nodeCoords = fscanf(fid, '%f %f %f', [3, numNodes])'; 
+	
+	tmp = fscanf(fid, '%s', 1);
+	numEles = fscanf(fid, '%d', 1);
+	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d', [8, numEles])'; 
+	
+	%%Stress Field
+	tmp = fscanf(fid, '%s %s', 2); 
+	numLoadedNodes = fscanf(fid, '%d', 1);
+	if numLoadedNodes>0
+		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
+		loadingCond = tmp';
+	else
+		loadingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numFixedNodes = fscanf(fid, '%d', 1);
+	if numFixedNodes>0
+		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+		fixingCond = tmp(:);
+	else
+		fixingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numValidNods = fscanf(fid, '%d', 1);
+	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
+	fclose(fid);
+end
+
+function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_stressANSYS(fileName)
+	fid = fopen(fileName, 'r');
+	%%Mesh
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'Vertices:'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	numNodes = fscanf(fid, '%d', 1);
+	nodeCoords = fscanf(fid, '%f %f %f', [3, numNodes])'; 
+	
+	tmp = fscanf(fid, '%s', 1);
+	numEles = fscanf(fid, '%d', 1);
+	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d', [8, numEles])'; 
+	
+	%%Stress Field
+	tmp = fscanf(fid, '%s %s', 2); 
+	numLoadedNodes = fscanf(fid, '%d', 1);
+	if numLoadedNodes>0
+		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
+		loadingCond = tmp';
+	else
+		loadingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numFixedNodes = fscanf(fid, '%d', 1);
+	if numFixedNodes>0
+		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+		fixingCond = tmp(:);
+	else
+		fixingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numValidNods = fscanf(fid, '%d', 1);
+	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
+	fclose(fid);
+end
+
+function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
+				ReadDataSimulatedOnUnstructuredHexMesh_stressABAQUS(fileName)
+	fid = fopen(fileName, 'r');
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'Vertices:'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	numNodes = fscanf(fid, '%d', 1);
+	nodeCoords = fscanf(fid, '%d %e %e %e', [4, numNodes])'; 
+    nodeCoords(:,1) = [];
+	
+	tmp = fscanf(fid, '%s %s %s %s', 4);
+	numElesMulti8 = fscanf(fid, '%d', 1);
+	numEles = numElesMulti8/8;
+	idx = 1;
+	while idx
+		idx = idx + 1;
+		tmp = fscanf(fid, '%s', 1);
+		if strcmp(tmp, 'S23'), idx=0; break; end
+		if idx>100, error('Wrong Input!'); end
+	end
+	rawStressData = fscanf(fid, '%d %d %e %e %e %e %e %e', [8, numElesMulti8])';
+	if size(rawStressData,1) ~= numElesMulti8
+		error('The Input Data is not Hexahedral Mesh!');
+	end
+	nodMap = rawStressData(:,1);
+	eleMap = rawStressData(:,2);
+	[~, compactNodMap] = unique(nodMap);
+	cartesianStressField = rawStressData(compactNodMap, [3 4 5 8 7 6]);
+	[~, eleMapDescendingOrder] = sort(eleMap);
+	eNodMat = nodMap(eleMapDescendingOrder);
+	eNodMat = reshape(eNodMat, 8, numEles)';
+	eNodMat = eNodMat(:,[1 2 4 3 5 6 8 7]);
+	
+	tmp = fscanf(fid, '%s %s', 2); 
+	numLoadedNodes = fscanf(fid, '%d', 1);
+	if numLoadedNodes>0
+		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
+		loadingCond = tmp';
+	else
+		loadingCond = [];
+	end
+	tmp = fscanf(fid, '%s %s', 2); 
+	numFixedNodes = fscanf(fid, '%d', 1);
+	if numFixedNodes>0
+		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
+		fixingCond = tmp(:);
+	else
+		fixingCond = [];
+	end
+	fclose(fid);
 end
 
 function RecoverCartesianMesh()	
-	global nelx_; global nely_; global nelz_; 
+	global nelx_; 
+	global nely_; 
+	global nelz_; 
 	global voxelizedVolume_;
 	global boundingBox_;
-	global numEles_; global numNodes_; global eleSize_;
-	global nodeCoords_; global eNodMat_; 	
-	global carEleMapBack_; global carEleMapForward_;
-	global carNodMapBack_; global carNodMapForward_;
-	global loadingCond_; global fixingCond_;
+	global numEles_; 
+	global numNodes_; 
+	global eleSize_;
+	global nodeCoords_; 
+	global eNodMat_; 
+	global carEleMapBack_; 
+	global carEleMapForward_;
+	global carNodMapBack_; 
+	global carNodMapForward_;	
+	global loadingCond_; 
+	global fixingCond_;
+	global nodState_;
+	global boundaryElements_;
+	global eleCentroidList_;
 	%    z
 	%    |__ x
 	%   / 
@@ -255,31 +503,46 @@ function RecoverCartesianMesh()
 	nodeCoords_ = zeros((nelx_+1)*(nely_+1)*(nelz_+1),3);
 	[nodeCoords_(:,1), nodeCoords_(:,2), nodeCoords_(:,3)] = NodalizeDesignDomain([nelx_ nely_ nelz_], boundingBox_);		
 	nodeCoords_ = nodeCoords_(carNodMapBack_,:);
-	if size(loadingCond_,1)>0
+	if ~isempty(loadingCond_)
 		loadingCond_(:,1) = carNodMapForward_(loadingCond_(:,1));
 	end
-	if length(fixingCond_)>0
+	if ~isempty(fixingCond_)
 		fixingCond_ = double(carNodMapForward_(fixingCond_));
 	end
+
+	numNod2ElesVec = zeros(numNodes_,1);
+	for ii=1:numEles_
+		iNodes = eNodMat_(ii,:);
+		numNod2ElesVec(iNodes,:) = numNod2ElesVec(iNodes) + 1;
+	end
+	nodesOutline = find(numNod2ElesVec<8);	
+	nodState_ = zeros(numNodes_,1); 
+	nodState_(nodesOutline) = 1;
+	
+	allNodes = zeros(numNodes_,1,'int32');
+	allNodes(nodesOutline) = 1;	
+	tmp = zeros(numEles_,1,'int32');
+	for ii=1:8
+		tmp = tmp + allNodes(eNodMat_(:,ii));
+	end
+	boundaryElements_ = int32(find(tmp>0));			
+		
+	%% element centroids
+	eleNodCoordListX = nodeCoords_(:,1); eleNodCoordListX = eleNodCoordListX(eNodMat_);
+	eleNodCoordListY = nodeCoords_(:,2); eleNodCoordListY = eleNodCoordListY(eNodMat_);
+	eleNodCoordListZ = nodeCoords_(:,3); eleNodCoordListZ = eleNodCoordListZ(eNodMat_);
+	eleCentroidList_ = [sum(eleNodCoordListX,2) sum(eleNodCoordListY,2) sum(eleNodCoordListZ,2)]/8;	
 end
 
-function varargout = NodalizeDesignDomain(varargin)
-	numSeed = varargin{1};
-	nx = numSeed(1); ny = numSeed(2); nz = numSeed(3);
-	dd = varargin{2};		
-	xSeed = dd(1,1):(dd(2,1)-dd(1,1))/nx:dd(2,1);
-	ySeed = dd(2,2):(dd(1,2)-dd(2,2))/ny:dd(1,2);
-	zSeed = dd(1,3):(dd(2,3)-dd(1,3))/nz:dd(2,3);		
-	varargout{1} = repmat(xSeed, ny+1, 1);
-	varargout{1} = reshape(varargout{1}, (nx+1)*(ny+1), 1);
-	varargout{1} = repmat(varargout{1}, (nz+1), 1);
-	varargout{2} = repmat(ySeed, 1, nx+1 )';
-	varargout{2} = repmat(varargout{2}, (nz+1), 1);
-	varargout{3} = repmat(zSeed, (nx+1)*(ny+1), 1);
-	varargout{3} = reshape(varargout{3}, (nx+1)*(ny+1)*(nz+1), 1);
-	if 3==nargin & strcmp(varargin{3}, 'inGrid')
-		varargout{1} = reshape(varargout{1}, ny+1, nx+1, nz+1);
-		varargout{2} = reshape(varargout{2}, ny+1, nx+1, nz+1);
-		varargout{3} = reshape(varargout{3}, ny+1, nx+1, nz+1);			
-	end	
+function oPatchs = CompactPatchVertices(iPatchs)
+	oPatchs = iPatchs;
+	numOriginalVertices = size(iPatchs.vertices,1);
+	numOriginalFaces = size(iPatchs.faces,1);
+	validVertices = unique(iPatchs.faces);
+	numValidVertices = size(validVertices,1);
+	if numOriginalFaces==numOriginalVertices, return; end
+	mapVerticesValid2Original = zeros(numOriginalVertices,1);
+	mapVerticesValid2Original(validVertices) = (1:numValidVertices)';
+	oPatchs.vertices = oPatchs.vertices(validVertices,:);
+	oPatchs.faces = mapVerticesValid2Original(iPatchs.faces);
 end

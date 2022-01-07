@@ -1,0 +1,104 @@
+!!Applicable to ANSYS
+!!Write the node, element, boundary and stress information of the model
+!!load name: load_node
+!!boundry name: fix_node
+!! Author: CX Meng
+!!
+alls
+*GET, ELEMENTNUM,ELEM,0,COUNT
+*GET, NODENUM,NODE,0,COUNT 
+!! 
+*CFOPEN,data,stress 
+!! 
+!!Output node information
+*VWRITE,NODENUM
+Vertices:%7I
+*DO, I,1,NODENUM,1 
+*VWRITE,NX(I),NY(I),NZ(I)
+%12.6f%12.6f%12.6f
+!(3(1pe15.6))
+*ENDDO 
+!!
+!!Write the element information
+*VWRITE,ELEMENTNUM
+Elements:%7I
+*DO, I,1,ELEMENTNUM,1
+*VWRITE,NELEM(I,1),NELEM(I,2),NELEM(I,3),NELEM(I,4),NELEM(I,5),NELEM(I,6),NELEM(I,7),NELEM(I,8)
+%7I%7I%7I%7I%7I%7I%7I%7I
+*ENDDO
+!!
+!!Output load information
+alls
+cmsel,s,load_node
+*get,xmin,node,0,num,min
+
+*get,numx,node,0,count
+
+*dim,xarry,array,1,numx
+
+xarry(1,1)=xmin
+
+xx=xmin
+
+*VWRITE,numx
+Node Forces:%7I
+*get,fx,node,xmin,f,fx
+*get,fy,node,xmin,f,fy
+*get,fz,node,xmin,f,fz
+*VWRITE,xmin,fx,fy,fz
+%7I%15.6f%15.6f%15.6f
+*do,i,2,numx
+  
+xx=ndnext(xx)
+
+xarry(1,i)=xx
+
+*get,fx1,node,xx,f,fx
+*get,fy1,node,xx,f,fy
+*get,fz1,node,xx,f,fz
+*VWRITE,xx,fx1,fy1,fz1
+%7I%15.6f%15.6f%15.6f
+*enddo
+!!
+!!Output boundry information
+alls
+cmsel,s,fix_node
+*get,xmin,node,0,num,min
+
+*get,numx,node,0,count
+
+*dim,xarry,array,1,numx
+
+xarry(1,1)=xmin
+
+xx=xmin
+
+*VWRITE,numx
+Fixed Nodes:%7I
+*VWRITE,xmin
+%7I
+*do,i,2,numx
+  
+xx=ndnext(xx)
+
+xarry(1,i)=xx
+
+*VWRITE,xx
+%7I
+*enddo
+!!
+!!Output stress information
+*VWRITE,NODENUM
+Cartesian Stress:%7I
+*DO,I,1,NODENUM,1
+*get,S_1,node,I,s,x
+*get,S_2,node,I,s,y	 
+*get,S_3,node,I,s,z
+*get,S_4,node,I,s,yz
+*get,S_5,node,I,s,xz
+*get,S_6,node,I,s,xy
+*vwrite,S_1,S_2,S_3,S_4,S_5,S_6
+(6(1pe15.6))
+*ENDDO
+*CFCLOS
+

@@ -1,5 +1,5 @@
-function [imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, miniPSLength] = GatherPSLvisCtrls(appLabel)
-	global handleGraphicPSLsPrimitives_;
+function [imOpt, imVal, pslGeo, stressComponentOpt, miniPSLength] = GatherPSLvisCtrls(appLabel, varargin)
+	global minLengthVisiblePSLs_;
 	imOpt = [convertCharsToStrings(appLabel.MajorLoDsDropDown.Value) convertCharsToStrings(appLabel.MediumLoDsDropDown.Value) ...
 			convertCharsToStrings(appLabel.MinorLoDsDropDown.Value)];
 	imVal = [appLabel.MajorResCtrlSlider.Value appLabel.MediumResCtrlSlider.Value appLabel.MinorResCtrlSlider.Value];
@@ -18,10 +18,5 @@ function [imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, mini
 		case 'Shear Stress (zx)', stressComponentOpt = 'Sigma_zx';
 		case 'Shear Stress (xy)', stressComponentOpt = 'Sigma_xy';
 	end
-	lw = appLabel.PSLGeometryScalingFacEditField.Value;
-	ribbonSmoothingOpt = appLabel.SmoothingRibbonCheckBox.Value;
-	miniPSLength = appLabel.PermittedMinLengthofVisiblePSLEditField.Value;
-	if ~isempty(handleGraphicPSLsPrimitives_)
-		set(handleGraphicPSLsPrimitives_, 'visible', 'off'); handleGraphicPSLsPrimitives_ = [];
-	end
+	miniPSLength = max(appLabel.PermittedMinLengthofVisiblePSLEditField.Value, minLengthVisiblePSLs_);
 end

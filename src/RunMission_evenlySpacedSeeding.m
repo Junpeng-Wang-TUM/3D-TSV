@@ -1,20 +1,18 @@
-function [opt, pslDataNameOutput] = RunMission(userInterface)	
+function [opt, pslDataNameOutput] = RunMission_evenlySpacedSeeding(userInterface)	
+	%%1. Initialize Experiment Environment
+	%%1.1 variable declaration	
+	tStart = tic;
 	global tracingFuncHandle_;
 	global tracingStepWidth_;
 	global majorPSLindexList_;
 	global mediumPSLindexList_;
-	global minorPSLindexList_;
-
-	%%1. Initialize Experiment Environment
-	%%1.1 Variable Declaration	
-	tStart = tic;
+	global minorPSLindexList_;	
 	opt = 0; pslDataNameOutput = [];
 	if ~(1==nargin || 3==nargin || 10==nargin), error('Wrong Input!'); end
 	GlobalVariables;	
-	%%1.2 Decode Input Arguments
+	%%1.2 Decode input arguments
 	fileName = userInterface.fileName;
 	if ~strcmp(dataName_, fileName)		
-		disp('Loading Dataset....');
 		ImportStressFields(fileName);
 		dataName_ = fileName;
 	end
@@ -38,6 +36,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	
 	mergingOpt_ = userInterface.mergingOpt;
 	if ~mergingOpt_, numLevels = 1; end
+	numLevels = 1;
 	multiMergingThresholdsCtrl_ = userInterface.multiMergingThresholds;
 	
 	snappingOpt_ = userInterface.snappingOpt;
@@ -62,10 +61,7 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	%%2. Seeding
 	GenerateSeedPoints(seedStrategy, seedDensCtrl);
 	
-	%%3. PSL Generation
-	if integratingStepScalingFac_>1.0 || integratingStepScalingFac_<0.0
-		integratingStepScalingFac_ = 1.0;
-	end
+	%%3. PSL generation
 	if strcmp(meshType_, 'CARTESIAN_GRID')
 		tracingStepWidth_ = integratingStepScalingFac_ * eleSize_;
 		integrationStepLimit_ = ceil(1.5*norm(boundingBox_(2,:)-boundingBox_(1,:))/tracingStepWidth_);
@@ -73,24 +69,25 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 		tracingStepWidth_ = integratingStepScalingFac_ * eleSizeList_;
 		integrationStepLimit_ = ceil(1.5*norm(boundingBox_(2,:)-boundingBox_(1,:))/median(tracingStepWidth_));
 	end
-	
 	majorPSLindexList_ = struct('arr', []); majorPSLindexList_ = repmat(majorPSLindexList_, 1, numLevels);
 	mediumPSLindexList_ = struct('arr', []); mediumPSLindexList_ = repmat(mediumPSLindexList_, 1, numLevels);     
 	minorPSLindexList_ = struct('arr', []); minorPSLindexList_ = repmat(minorPSLindexList_, 1, numLevels);	
 	index = 1;
 	while index<=numLevels
 		iEpsilon = minimumEpsilon_ * 2^(numLevels-index);
-		GenerateSpaceFillingPSLs(iEpsilon);
+		GenerateSpaceFillingPSLs_evenlySpacedSeeding(iEpsilon);
 		majorPSLindexList_(index).arr = 1:length(majorPSLpool_);
 		mediumPSLindexList_(index).arr = 1:length(mediumPSLpool_);
 		minorPSLindexList_(index).arr = 1:length(minorPSLpool_);
 		index = index + 1;
 	end	
 	
-    %%4. Building Hierarchy
+    %%4. building hierarchy
     BuildPSLs4Hierarchy();
 	
-	%%5. Print Results
+	%%5. write results
+	pslDataNameOutput = strcat(erase(dataName_,'.vtk'), '_psl.dat');
+	ExportResult(pslDataNameOutput);
 	opt = 1;
 	tEnd = toc(tStart);
 	PrintAlgorithmStatistics(tEnd);

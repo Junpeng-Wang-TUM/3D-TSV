@@ -12,11 +12,11 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 	paraCoordList = [];
 	vonMisesStressList = zeros(limiSteps,1);
 	principalStressList = zeros(limiSteps,12);
-	nextPoint = startPoint + tracingStepWidth_*iniDir;
-	[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);
+	nextPoint = startPoint + tracingStepWidth_(elementIndex)*iniDir;
+	[elementIndex, nextPoint, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint, startPoint, 1);
 	index = 0;	
 	while 1==bool1
-		index = index + 1; if index > limiSteps, index = index-1; break; end
+		index = index + 1; if index > limiSteps, index = index-1; break; end		
 		NIdx = eNodMat_(elementIndex,:)';
 		vtxStress = cartesianStressField_(NIdx, :);
 		vtxCoords = nodeCoords_(NIdx,:); 
@@ -33,9 +33,9 @@ function [phyCoordList, cartesianStressList, eleIndexList, paraCoordList, vonMis
 		eleIndexList(index,:) = elementIndex;
 		vonMisesStressList(index,:) = vonMisesStress;
 		principalStressList(index,:) = principalStress;				
-		nextPoint = nextPoint + tracingStepWidth_*iniDir;
-		if norm(sPoint_-nextPoint)<tracingStepWidth_, break; end
-		[elementIndex, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint);
+		nextPoint0 = nextPoint + tracingStepWidth_(elementIndex)*iniDir;
+		if norm(sPoint_-nextPoint0)<tracingStepWidth_(elementIndex), break; end
+		[elementIndex, nextPoint, bool1] = SearchNextIntegratingPointOnUnstructuredMesh(elementIndex, nextPoint0, nextPoint, 1);	
 	end		
 	phyCoordList = phyCoordList(1:index,:);
 	cartesianStressList = cartesianStressList(1:index,:);

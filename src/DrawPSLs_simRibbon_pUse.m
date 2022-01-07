@@ -1,14 +1,14 @@
-function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, varargin)
+function DrawPSLs_simRibbon_pUse(imOpt, imVal, pslGeo, stressComponentOpt, lw, ribbonSmoothingOpt, miniPSLength, varargin)
 	%% Syntax:
-	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw);
-	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, minLength);
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt);
+	%% DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
 	%% =====================================================================
 	%% imOpt: ["Geo", "Geo", "Geo"]; %% 'Geo', 'PS', 'vM', 'Length'
 	%% imVal: [1,0.5, 0.3]; %% PSLs with IM>=imVal shown
 	%% pslGeo: ["TUBE", "TUBE", "TUBE"]; %% 'TUBE', 'RIBBON'
 	%% stressComponentOpt: %% 'None', 'Sigma', 'Sigma_xx', 'Sigma_yy', 'Sigma_zz', 'Sigma_yz', 'Sigma_zx', 'Sigma_xy', 'Sigma_vM'
 	%% lw: %% tubeRadius = lw*minimumEpsilon_/5, ribbonWidth = 3*tubeRadius
-
+	%% smoothingOpt: %% smoothing ribbon or not (0)
 	global boundingBox_;
 	global majorPSLpool_; 
 	global mediumPSLpool_; 
@@ -22,7 +22,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 	
 	lineWidthTube = min([lw*minimumEpsilon_/5, min(boundingBox_(2,:)-boundingBox_(1,:))/10]);
 	lineWidthRibbon = 3*lineWidthTube;
-
+	
 	%% Get Target PSLs to Draw
 	%% Major
 	switch imOpt(1)
@@ -253,7 +253,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 	end
 	
 	%%Draw
-	if 6==nargin 
+	if 7==nargin 
 		figure; axHandle_ = gca;
 	else
 		axHandle_ = varargin{1};  
@@ -261,6 +261,7 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 	handleSilhouette = DrawSilhouette(axHandle_); 
 	
 	handleMajorPSL = []; 
+	handleRibbonOutlineMajorPSL = [];
 	switch pslGeo(1)
 		case 'TUBE'
 			[gridX, gridY, gridZ, gridC, ~] = ExpandPSLs2Tubes(tarMajorPSLs, color4MajorPSLs, lineWidthTube);
@@ -270,15 +271,19 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 				shading(axHandle_, 'interp');
 			end		
 		case 'RIBBON'
-			[ribbonVertices, facePatches, faceColors, ~] = ...
-				ExpandPSLs2Ribbons(tarMajorPSLs, lineWidthRibbon, [6 7 8; 2 3 4], color4MajorPSLs);
+			[ribbonVertices, facePatches, outlinePatches, faceColors] = ...
+				ExpandPSLs2RibbonsSim(tarMajorPSLs, lineWidthRibbon, [6 7 8], color4MajorPSLs, ribbonSmoothingOpt);
 			if ~isempty(ribbonVertices)
 				hold(axHandle_, 'on');
 				handleMajorPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', ribbonVertices, ...
-					'FaceVertexCData', faceColors, 'FaceColor', 'interp');			
+					'FaceVertexCData', faceColors, 'FaceColor', 'interp');
+				hold(axHandle_, 'on');
+				handleRibbonOutlineMajorPSL = patch(axHandle_, 'Faces', outlinePatches, 'Vertices', ribbonVertices, ...
+					'FaceColor', 'none', 'linew', 3);				
 			end	
 	end
 	handleMediumPSL = []; 
+	handleRibbonOutlineMediumPSL = [];
 	switch pslGeo(2)
 		case 'TUBE'
 			[gridX, gridY, gridZ, gridC, ~] = ExpandPSLs2Tubes(tarMediumPSLs, color4MediumPSLs, lineWidthTube);
@@ -288,16 +293,20 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 				shading(axHandle_, 'interp');
 			end				
 		case 'RIBBON'
-			psDir = [2 3 4; 10 11 12]; %% [2 3 4; 10 11 12] or [10 11 12; 2 3 4]
-			[ribbonVertices, facePatches, faceColors, ~] = ...
-				ExpandPSLs2Ribbons(tarMediumPSLs, lineWidthRibbon, psDir, color4MediumPSLs);
+			psDir = [2 3 4]; %% [2 3 4] or [10 11 12]
+			[ribbonVertices, facePatches, outlinePatches, faceColors] = ...
+				ExpandPSLs2RibbonsSim(tarMediumPSLs, lineWidthRibbon, psDir, color4MediumPSLs, ribbonSmoothingOpt);
 			if ~isempty(ribbonVertices)
 				hold(axHandle_, 'on');
 				handleMediumPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', ribbonVertices, ...
-					'FaceVertexCData', faceColors, 'FaceColor', 'interp');						
+					'FaceVertexCData', faceColors, 'FaceColor', 'interp');
+				hold(axHandle_, 'on');
+				handleRibbonOutlineMediumPSL = patch(axHandle_, 'Faces', outlinePatches, 'Vertices', ribbonVertices, ...
+					'FaceColor', 'none', 'linew', 3);						
 			end				
 	end
 	handleMinorPSL = []; 
+	handleRibbonOutlineMinorPSL = [];
 	switch pslGeo(3)
 		case 'TUBE'
 			[gridX, gridY, gridZ, gridC, ~] = ExpandPSLs2Tubes(tarMinorPSLs, color4MinorPSLs, lineWidthTube);
@@ -307,15 +316,21 @@ function DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, miniPSLength, va
 				shading(axHandle_, 'interp');
 			end				
 		case 'RIBBON'
-			[ribbonVertices, facePatches, faceColors, ~] = ...
-				ExpandPSLs2Ribbons(tarMinorPSLs, lineWidthRibbon, [6 7 8; 10 11 12], color4MinorPSLs);			
+			[ribbonVertices, facePatches, outlinePatches, faceColors] = ...
+				ExpandPSLs2RibbonsSim(tarMinorPSLs, lineWidthRibbon, [6 7 8], color4MinorPSLs, ribbonSmoothingOpt);			
 			if ~isempty(ribbonVertices)
 				hold(axHandle_, 'on');
 				handleMinorPSL = patch(axHandle_, 'Faces', facePatches, 'Vertices', ribbonVertices, ...
 					'FaceVertexCData', faceColors, 'FaceColor', 'interp');
+				hold(axHandle_, 'on');
+				handleRibbonOutlineMinorPSL = patch(axHandle_, 'Faces', outlinePatches, 'Vertices', ribbonVertices, ...
+					'FaceColor', 'none', 'linew', 3);
 			end					
 	end
 	set(handleSilhouette, 'FaceColor', [0.5 0.5 0.5], 'FaceAlpha', silhouetteOpacity_, 'EdgeColor', 'none');
+	set(handleRibbonOutlineMajorPSL, 'EdgeAlpha', 1, 'edgecol','k');
+	set(handleRibbonOutlineMediumPSL, 'EdgeAlpha', 1, 'edgecol','k');
+	set(handleRibbonOutlineMinorPSL, 'EdgeAlpha', 1, 'edgecol','k');
 	if strcmp(stressComponentOpt, "None")
 		set(handleMajorPSL, 'FaceColor', [252 141 98]/255);
 		set(handleMediumPSL, 'FaceColor', [141 160 203]/255);

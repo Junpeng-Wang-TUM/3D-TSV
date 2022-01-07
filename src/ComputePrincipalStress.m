@@ -1,4 +1,5 @@
 function principalStress = ComputePrincipalStress(cartesianStress)
+	%% "cartesianStress" is in the order: Sigma_xx, Sigma_yy, Sigma_zz, Sigma_yz, Sigma_zx, Sigma_xy
 	principalStress = zeros(1, 12);
 	A = cartesianStress([1 6 5; 6 2 4; 5 4 3]);
 	[eigenVec, eigenVal] = eig(A);

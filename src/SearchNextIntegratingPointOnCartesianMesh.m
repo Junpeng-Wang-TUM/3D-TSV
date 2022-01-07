@@ -1,7 +1,7 @@
 function [nextElementIndex, paraCoordinates, opt] = SearchNextIntegratingPointOnCartesianMesh(physicalCoordinates)
 	global nodeCoords_;
 	global eNodMat_;
-	global meshState_; global carEleMapForward_;
+	global carEleMapForward_;
 	global nelx_; global nely_; global nelz_; global eleSize_;
 	global boundingBox_;
 	

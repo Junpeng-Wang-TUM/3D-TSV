@@ -1,7 +1,8 @@
 function [eleIndex, opt] = PositioningOnUnstructuredMesh(targetEleIndex0, startPoint)
-	global eNodMat_; global nodStruct_;
+	global eNodMat_; 
+	global nodStruct_;
 	global eleCentroidList_;
-	opt = IsThisPointWithinThatElement(targetEleIndex0, startPoint);
+	opt = IsThisPointWithinThatElement(targetEleIndex0, startPoint, 0);
 	if opt
 		eleIndex = targetEleIndex0;		
 	else %% Search the Adjacent Elements
@@ -10,7 +11,7 @@ function [eleIndex, opt] = PositioningOnUnstructuredMesh(targetEleIndex0, startP
 		potentialAdjacentElements = setdiff(allPotentialAdjacentElements, targetEleIndex0);
 		for ii=1:length(potentialAdjacentElements)
 			iEle = potentialAdjacentElements(ii);
-			opt = IsThisPointWithinThatElement(iEle, startPoint);
+			opt = IsThisPointWithinThatElement(iEle, startPoint, 0);
 			if opt, eleIndex = iEle; break; end
 		end
 	end
