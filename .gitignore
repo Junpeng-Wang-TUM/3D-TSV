@@ -19,3 +19,7 @@ bin-release/
 *.dat
 *.gif
 *.mp4
+*.stress
+*.carti
+*.vtk
+*.mesh
