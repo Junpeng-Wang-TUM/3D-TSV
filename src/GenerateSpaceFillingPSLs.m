@@ -290,8 +290,7 @@ function iPSL = Have1morePSL(seed, psDir)
 end
 
 function [potentialDisList, potentialPosList] = GetDisListOfPointList2Curve(pointList, curveLine)
-	global mergeTrigger_;
-	
+	global mergeTrigger_;	
 	disT = (curveLine(:,end-2) - pointList(:,end-2)').^2;
 	disT = disT + (curveLine(:,end-1) - pointList(:,end-1)').^2;
 	disT = disT + (curveLine(:,end) - pointList(:,end)').^2;
@@ -300,7 +299,6 @@ function [potentialDisList, potentialPosList] = GetDisListOfPointList2Curve(poin
 	potentialDisList = minVal';
 	potentialDisList = potentialDisList/mergeTrigger_;
 	potentialPosList = curveLine(minValPos,:);
-
 end
 
 function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
@@ -331,7 +329,7 @@ function modifiedValences = HighCurvatureModification(spps2BeMerged, psDir)
 			% spps2BeMerged = spps2BeMerged(find(0==seedPointsValence_(spps2BeMerged,3)));
             spps2BeMerged = spps2BeMerged(0==seedPointsValence_(spps2BeMerged,3));
 	end
-	pointList = seedPoints_(spps2BeMerged,:);
+	pointList = seedPoints_(spps2BeMerged,end-2:end);
 	disT = (coordList(:,1) - pointList(:,1)').^2;
 	disT = disT + (coordList(:,2) - pointList(:,2)').^2;
 	disT = disT + (coordList(:,3) - pointList(:,3)').^2;

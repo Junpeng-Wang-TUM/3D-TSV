@@ -31,7 +31,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 				nodesOnBoundary = find(1==nodState_);
 				sampledNodes = setdiff(sampledNodes, nodesOnBoundary);
 				seedPointsHistory_ = nodeCoords_(sampledNodes,:);
-				seedAssociatedEles_ = ones(size(seedPointsHistory_,1),1);
+				seedAssociatedEles_ = ones(size(seedPointsHistory_,1),1); %%unused
 			else				
 				tarNodes = find(0==nodState_);
 				tarNodes = tarNodes(1:seedDensCtrl:end,1);
@@ -45,7 +45,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 		case 'Surface'
 			potentialElements = boundaryElements_(1:seedDensCtrl:end,1);
 			seedPointsHistory_ = eleCentroidList_(potentialElements,:);
-			seedAssociatedEles_ = potentialElements;
+			seedAssociatedEles_ = potentialElements; %%unused for Cartesian mesh
 		case 'LoadingArea'			
 			if isempty(loadingCond_)
 				seedPointsHistory_ = [];
@@ -53,6 +53,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 			end
 			if strcmp(meshType_, 'CARTESIAN_GRID')
 				seedPointsHistory_ = nodeCoords_(loadingCond_(1:seedDensCtrl:end,1),:);
+				seedAssociatedEles_ = ones(size(seedPointsHistory_,1),1); %%unused
 			else
 				potentialElements = unique([nodStruct_(loadingCond_(:,1)).adjacentEles]);
 				potentialElements = potentialElements(:);
@@ -67,6 +68,7 @@ function GenerateSeedPoints(seedStrategy, seedDensCtrl)
 			end
 			if strcmp(meshType_, 'CARTESIAN_GRID')
 				seedPointsHistory_ = nodeCoords_(fixingCond_(1:seedDensCtrl:end,1),:);
+				seedAssociatedEles_ = ones(size(seedPointsHistory_,1),1); %%unused
 			else				
 				potentialElements = unique([nodStruct_(fixingCond_).adjacentEles]);
 				potentialElements = potentialElements(:);

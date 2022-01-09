@@ -34,33 +34,10 @@ function ImportStressFields(fileName)
 				ReadDataSimulatedOnCartesianMesh_carti(fileName);
 			%%Recover Cartesian Mesh
 			RecoverCartesianMesh();
-		case '.vtk'
-			meshType_ = 'UNSTRUCTURED_GRID';
-			[numNodes_, nodeCoords_, numEles_, eNodMat_, nodState_, loadingCond_, fixingCond_, cartesianStressField_] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_vtk(fileName);
-		case '.mesh'
-			meshType_ = 'UNSTRUCTURED_GRID';
-			[numNodes_, nodeCoords_, numEles_, eNodMat_, loadingCond_, fixingCond_, cartesianStressField_] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_mesh(fileName);
-			%%Extract Boundary Element Info.
-			faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
-			faceIndex = reshape(faceIndex(:), 4, 6*numEles_);
-			tmp = sort(faceIndex,1)';
-			[~, ia, ic] = unique(tmp, 'rows');
-			numRawPatchs = 6*numEles_;
-			patchState = zeros(length(ia),1);
-			for ii=1:numRawPatchs
-				patchState(ic(ii)) = patchState(ic(ii)) + 1;
-			end
-			patchIndexOnBoundary = ia(1==patchState);
-			boundaryPatchs = faceIndex(:,patchIndexOnBoundary');
-			nodesOutline = unique(boundaryPatchs);
-			nodState_ = zeros(numNodes_,1);
-			nodState_(nodesOutline) = 1;
 		case '.stress'
 			meshType_ = 'UNSTRUCTURED_GRID';
 			[numNodes_, nodeCoords_, numEles_, eNodMat_, loadingCond_, fixingCond_, cartesianStressField_] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_stressANSYS(fileName);
+				ReadDataSimulatedOnUnstructuredHexMesh_stress(fileName);
 			%%Extract Boundary Element Info.
 			faceIndex = eNodMat_(:, [4 3 2 1  5 6 7 8  1 2 6 5  8 7 3 4  5 8 4 1  2 3 7 6])';
 			faceIndex = reshape(faceIndex(:), 4, 6*numEles_);
@@ -211,103 +188,6 @@ function [nx, ny, nz, boundingBox, cellVolume, loadingCond, fixingCond, cartesia
 	fclose(fid);
 end
 
-function [numNodes, nodeCoords, numEles, eNodMat, nodState, loadingCond, fixingCond, cartesianStressField] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_vtk(fileName)
-	fid = fopen(fileName, 'r');
-	%%Mesh
-	idx = 1;
-	while idx
-		idx = idx + 1;
-		tmp = fscanf(fid, '%s', 1);
-		if strcmp(tmp, 'POINTS'), idx=0; break; end
-		if idx>100, error('Wrong Input!'); end
-	end
-	numNodes = fscanf(fid, '%d', 1);
-	tmp = fscanf(fid, '%s', 1);
-	nodeCoords = fscanf(fid, '%f %f %f', [3, numNodes])'; 
-	tmp = fscanf(fid, '%s', 1);
-	numEles = fscanf(fid, '%d', 1);
-	tmp = fscanf(fid, '%d', 1);
-	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d %d', [9, numEles])'; 
-	eNodMat(:,1) = []; 
-	eNodMat = eNodMat + 1;
-	tmp = fscanf(fid, '%s', 1);
-	tmp = fscanf(fid, '%d', 1);
-	tmp = fscanf(fid, '%d', [1 numEles])';
-	tmp = fscanf(fid, '%s %s', 2);
-	tmp = fscanf(fid, '%s %s %s', 3);
-	tmp = fscanf(fid, '%s %s', 2);
-	nodState = fscanf(fid, '%d', [1 numNodes])';
-	
-	%%Stress Field
-	tmp = fscanf(fid, '%s %s %s %s %d', 5);
-	tmp = fscanf(fid, '%s %s', 2); 
-	numLoadedNodes = fscanf(fid, '%d', 1);
-	if numLoadedNodes>0
-		tmp = fscanf(fid, '%d %f %f %f', [4, numLoadedNodes]); 
-		tmp(1,:) = tmp(1,:)+1; 
-		loadingCond = tmp';
-	else
-		loadingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); 
-	numFixedNodes = fscanf(fid, '%d', 1);
-	if numFixedNodes>0
-		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-		fixingCond = tmp(:)+1;
-	else
-		fixingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); numValidNods = fscanf(fid, '%d', 1);
-	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
-	fclose(fid);
-end
-
-function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_mesh(fileName)
-	fid = fopen(fileName, 'r');
-	%%Mesh
-	idx = 1;
-	while idx
-		idx = idx + 1;
-		tmp = fscanf(fid, '%s', 1);
-		if strcmp(tmp, 'Vertices'), idx=0; break; end
-		if idx>100, error('Wrong Input!'); end
-	end
-	numNodes = fscanf(fid, '%d', 1);
-	nodeCoords = fscanf(fid, '%f %f %f %f', [4, numNodes])'; 
-	nodeCoords(:,4) = [];
-	
-	tmp = fscanf(fid, '%s', 1);
-	numEles = fscanf(fid, '%d', 1);
-	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d %d', [9, numEles])'; 
-	eNodMat(:,end) = [];
-	tmp = fscanf(fid, '%s', 1);
-	
-	%%Stress Field
-	tmp = fscanf(fid, '%s %s %s %s %d', 5);
-	tmp = fscanf(fid, '%s %s', 2); 
-	numLoadedNodes = fscanf(fid, '%d', 1);
-	if numLoadedNodes>0
-		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
-		loadingCond = tmp';
-	else
-		loadingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); 
-	numFixedNodes = fscanf(fid, '%d', 1);
-	if numFixedNodes>0
-		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-		fixingCond = tmp(:);
-	else
-		fixingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); 
-	numValidNods = fscanf(fid, '%d', 1);
-	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
-	fclose(fid);
-end
-
 function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
 				ReadDataSimulatedOnUnstructuredHexMesh_stress(fileName)
 	fid = fopen(fileName, 'r');
@@ -346,103 +226,6 @@ function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, carte
 	tmp = fscanf(fid, '%s %s', 2); 
 	numValidNods = fscanf(fid, '%d', 1);
 	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
-	fclose(fid);
-end
-
-function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_stressANSYS(fileName)
-	fid = fopen(fileName, 'r');
-	%%Mesh
-	idx = 1;
-	while idx
-		idx = idx + 1;
-		tmp = fscanf(fid, '%s', 1);
-		if strcmp(tmp, 'Vertices:'), idx=0; break; end
-		if idx>100, error('Wrong Input!'); end
-	end
-	numNodes = fscanf(fid, '%d', 1);
-	nodeCoords = fscanf(fid, '%f %f %f', [3, numNodes])'; 
-	
-	tmp = fscanf(fid, '%s', 1);
-	numEles = fscanf(fid, '%d', 1);
-	eNodMat = fscanf(fid, '%d %d %d %d %d %d %d %d', [8, numEles])'; 
-	
-	%%Stress Field
-	tmp = fscanf(fid, '%s %s', 2); 
-	numLoadedNodes = fscanf(fid, '%d', 1);
-	if numLoadedNodes>0
-		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
-		loadingCond = tmp';
-	else
-		loadingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); 
-	numFixedNodes = fscanf(fid, '%d', 1);
-	if numFixedNodes>0
-		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-		fixingCond = tmp(:);
-	else
-		fixingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); 
-	numValidNods = fscanf(fid, '%d', 1);
-	cartesianStressField = fscanf(fid, '%e %e %e %e %e %e', [6, numValidNods])';	
-	fclose(fid);
-end
-
-function [numNodes, nodeCoords, numEles, eNodMat, loadingCond, fixingCond, cartesianStressField] = ...
-				ReadDataSimulatedOnUnstructuredHexMesh_stressABAQUS(fileName)
-	fid = fopen(fileName, 'r');
-	idx = 1;
-	while idx
-		idx = idx + 1;
-		tmp = fscanf(fid, '%s', 1);
-		if strcmp(tmp, 'Vertices:'), idx=0; break; end
-		if idx>100, error('Wrong Input!'); end
-	end
-	numNodes = fscanf(fid, '%d', 1);
-	nodeCoords = fscanf(fid, '%d %e %e %e', [4, numNodes])'; 
-    nodeCoords(:,1) = [];
-	
-	tmp = fscanf(fid, '%s %s %s %s', 4);
-	numElesMulti8 = fscanf(fid, '%d', 1);
-	numEles = numElesMulti8/8;
-	idx = 1;
-	while idx
-		idx = idx + 1;
-		tmp = fscanf(fid, '%s', 1);
-		if strcmp(tmp, 'S23'), idx=0; break; end
-		if idx>100, error('Wrong Input!'); end
-	end
-	rawStressData = fscanf(fid, '%d %d %e %e %e %e %e %e', [8, numElesMulti8])';
-	if size(rawStressData,1) ~= numElesMulti8
-		error('The Input Data is not Hexahedral Mesh!');
-	end
-	nodMap = rawStressData(:,1);
-	eleMap = rawStressData(:,2);
-	[~, compactNodMap] = unique(nodMap);
-	cartesianStressField = rawStressData(compactNodMap, [3 4 5 8 7 6]);
-	[~, eleMapDescendingOrder] = sort(eleMap);
-	eNodMat = nodMap(eleMapDescendingOrder);
-	eNodMat = reshape(eNodMat, 8, numEles)';
-	eNodMat = eNodMat(:,[1 2 4 3 5 6 8 7]);
-	
-	tmp = fscanf(fid, '%s %s', 2); 
-	numLoadedNodes = fscanf(fid, '%d', 1);
-	if numLoadedNodes>0
-		tmp = fscanf(fid, '%d %e %e %e', [4, numLoadedNodes]); 
-		loadingCond = tmp';
-	else
-		loadingCond = [];
-	end
-	tmp = fscanf(fid, '%s %s', 2); 
-	numFixedNodes = fscanf(fid, '%d', 1);
-	if numFixedNodes>0
-		tmp = fscanf(fid, '%d', [1, numFixedNodes]); 
-		fixingCond = tmp(:);
-	else
-		fixingCond = [];
-	end
 	fclose(fid);
 end
 

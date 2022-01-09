@@ -8,8 +8,8 @@ function [opt, pslDataNameOutput] = RunMission(userInterface)
 	%%1. Initialize Experiment Environment
 	%%1.1 Variable Declaration	
 	tStart = tic;
-	opt = 0; pslDataNameOutput = [];
-	if ~(1==nargin || 3==nargin || 10==nargin), error('Wrong Input!'); end
+	opt = 0; 
+	pslDataNameOutput = [];
 	GlobalVariables;	
 	%%1.2 Decode Input Arguments
 	fileName = userInterface.fileName;

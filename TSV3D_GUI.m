@@ -69,9 +69,6 @@ classdef TSV3D_GUI < matlab.apps.AppBase
         FilesMenu                       matlab.ui.container.Menu
         ImportStressFieldMenu           matlab.ui.container.Menu
         ExportPSLsforLineVisdatMenu     matlab.ui.container.Menu
-        ExportPSLsforTopOptiMenu        matlab.ui.container.Menu
-        BinaryFielddatMenu              matlab.ui.container.Menu
-        ReshapedBinaryFielddatMenu      matlab.ui.container.Menu
         MediaMenu                       matlab.ui.container.Menu
         ProblemDescriptionMenu          matlab.ui.container.Menu
         MeshMenu                        matlab.ui.container.Menu
@@ -100,33 +97,6 @@ classdef TSV3D_GUI < matlab.apps.AppBase
 
     % Callbacks that handle component events
     methods (Access = private)
-
-        % Callback function
-        function ImportStressFieldvtkMenuSelected(app, event)
-            addpath('./src');
-            global axHandle_;
-            global userInterface_;
-            global runEnvironment_;
-            clc;
-            runEnvironment_ = 0;
-            [fileName, dataPath] = uigetfile('.vtk', 'Select a Stress Field File to Open');
-            if isnumeric(fileName) || isnumeric(dataPath), return; end
-            [~,~,fileExtension] = fileparts(fileName);
-            if ~strcmp(fileExtension, '.vtk')
-                warning('Wrong File Format!');
-                return;
-            end
-            userInterface_ = InterfaceStruct();
-            userInterface_.fileName = strcat(dataPath,fileName);
-            GlobalVariables;
-            disp('Loading Dataset....');
-            ImportStressFields(userInterface_.fileName);
-            dataName_ = userInterface_.fileName;
-            axHandle_ = app.UIAxes;
-            view(axHandle_, 3);
-            ProblemDescriptionMenuSelected(app, event);
-            runEnvironment_ = 1;
-        end
 
         % Button pushed function: SubmitButton
         function SubmitButtonPushed(app, event)
@@ -194,155 +164,11 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             PSLGeometryScalingFacEditFieldValueChanged(app, event);            
         end
 
-        % Callback function
-        function LightingDropDownValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MajorLoDsDropDownValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MajorPSLGeometryDropDownValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MajorResCtrlSliderValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MediumLoDsDropDownValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MediumPSLGeometryDropDownValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MediumResCtrlSliderValueChanged(app, event)
-               
-        end
-
-        % Callback function
-        function MinorLoDsDropDownValueChanged(app, event)
-            
-        end
-
-        % Callback function
-        function MinorPSLGeometryDropDownValueChanged(app, event)
-               
-        end
-
-        % Callback function
-        function MinorResCtrlSliderValueChanged(app, event)
-               
-        end
-
-        % Callback function
-        function ColoringDropDownValueChanged(app, event)
-               
-        end
-
-        % Callback function
-        function SmoothingRibbonCheckBoxValueChanged(app, event)
-            
-        end
-
         % Value changed function: PSLGeometryScalingFacEditField
         function PSLGeometryScalingFacEditFieldValueChanged(app, event)
            lw = app.PSLGeometryScalingFacEditField.Value;
            CreatePSLsGeometry(lw);
            PSLsMenuSelected(app, event);
-        end
-
-        % Callback function
-        function PermittedMinLengthofVisiblePSLEditFieldValueChanged(app, event)
-           
-        end
-
-        % Menu selected function: BinaryFielddatMenu
-        function ExportBinaryFielddatMenuSelected(app, event)
-            global meshType_;
-            if strcmp(meshType_, 'CARTESIAN_GRID')
-                [fileName, dataPath] = uiputfile('*.dat', 'Select a Path to Write');
-                if isnumeric(fileName) || isnumeric(dataPath), return; end
-                PSLthickness = app.VoxelizedPSLThicknessExportEditField.Value;
-                boundaryThickness = app.BoundaryThicknessExportEditField.Value;
-                [imOpt, imVal, ~, ~, ~, ~, ~] = GatherPSLvisCtrls(app, 1);
-                ExportBinaryFieldResult(strcat(dataPath, fileName), imOpt, imVal, PSLthickness, boundaryThickness);
-            end
-        end
-
-        % Menu selected function: ReshapedBinaryFielddatMenu
-        function ExportReshapedBinaryFielddatMenuSelected(app, event)
-            global meshType_;
-            if strcmp(meshType_, 'CARTESIAN_GRID')
-                [fileName, dataPath] = uiputfile('*.dat', 'Select a Path to Write');
-                if isnumeric(fileName) || isnumeric(dataPath), return; end
-                PSLthickness = app.VoxelizedPSLThicknessExportEditField.Value;
-                boundaryThickness = app.BoundaryThicknessExportEditField.Value;
-                [imOpt, imVal, ~, ~, ~, ~, ~] = GatherPSLvisCtrls(app, 1);
-                ExportReshapedBinaryFieldResult(strcat(dataPath, fileName), imOpt, imVal, PSLthickness, boundaryThickness);
-            end            
-        end
-
-        % Callback function
-        function ImportStressFieldcartiMenuSelected(app, event)
-            addpath('./src');
-            global axHandle_;
-            global userInterface_;
-            global runEnvironment_;
-            clc;
-            [fileName, dataPath] = uigetfile('.carti', 'Select a Stress Field File to Open');
-            if isnumeric(fileName) || isnumeric(dataPath), return; end
-            [~,~,fileExtension] = fileparts(fileName);
-            if ~strcmp(fileExtension, '.carti')
-                warning('Wrong File Format!');
-                return;
-            end
-            userInterface_ = InterfaceStruct();
-            userInterface_.fileName = strcat(dataPath,fileName);
-            GlobalVariables;
-            disp('Loading Dataset....');
-            ImportStressFields(userInterface_.fileName);
-            dataName_ = userInterface_.fileName;
-            axHandle_ = app.UIAxes;
-            view(axHandle_, 3);
-            ProblemDescriptionMenuSelected(app, event);            
-            runEnvironment_ = 1;            
-        end
-
-        % Callback function
-        function ImportStressFieldmeshMenuSelected(app, event)
-            addpath('./src');
-            global axHandle_;
-            global userInterface_;
-            global runEnvironment_;
-            clc;
-            runEnvironment_ = 0;
-            [fileName, dataPath] = uigetfile('.mesh', 'Select a Stress Field File to Open');
-            if isnumeric(fileName) || isnumeric(dataPath), return; end
-            [~,~,fileExtension] = fileparts(fileName);
-            if ~strcmp(fileExtension, '.mesh')
-                warning('Wrong File Format!');
-                return;
-            end
-            userInterface_ = InterfaceStruct();
-            userInterface_.fileName = strcat(dataPath,fileName);
-            GlobalVariables;
-            disp('Loading Dataset....');
-            ImportStressFields(userInterface_.fileName);
-            dataName_ = userInterface_.fileName;
-            axHandle_ = app.UIAxes;
-            view(axHandle_, 3);
-            ProblemDescriptionMenuSelected(app, event);            
-            runEnvironment_ = 1;
         end
 
         % Menu selected function: ProblemDescriptionMenu
@@ -527,11 +353,6 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             view(axHandle_, az, el);            
         end
 
-        % Callback function
-        function MajorLoDsDropDownOpening(app, event)
-           
-        end
-
         % Value changed function: CameraZoominoutEditField
         function CameraZoominoutEditFieldValueChanged(app, event)
             value = app.CameraZoominoutEditField.Value;
@@ -541,6 +362,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
                 app.CameraZoominoutEditField.Value = 1.0;
             end
             camzoom(axHandle_, app.CameraZoominoutEditField.Value);
+            app.CameraZoominoutEditField.Value = 1.0;
         end
 
         % Menu selected function: ExportPSLsforLineVisdatMenu
@@ -564,8 +386,8 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             global runEnvironment_;
             clc;
             runEnvironment_ = 0;
-            %[fileName, dataPath] = uigetfile({'*.carti'; '*.stress'; '*.mesh'; '*.vtk'}, 'Select a Stress Field File to Open');
-            [fileName, dataPath] = uigetfile('*.*', 'Select a Stress Field File to Open');
+            [fileName, dataPath] = uigetfile({'*.carti'; '*.stress'}, 'Select a Stress Field File to Open');
+            %[fileName, dataPath] = uigetfile('*.*', 'Select a Stress Field File to Open');
             if isnumeric(fileName) || isnumeric(dataPath), return; end
             userInterface_ = InterfaceStruct();
             userInterface_.fileName = strcat(dataPath,fileName);
@@ -689,7 +511,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             % Create PermittedMaxTangentDeviEditField
             app.PermittedMaxTangentDeviEditField = uieditfield(app.SettingsTab, 'numeric');
             app.PermittedMaxTangentDeviEditField.Position = [262 348 40 22];
-            app.PermittedMaxTangentDeviEditField.Value = 6;
+            app.PermittedMaxTangentDeviEditField.Value = 20;
 
             % Create IntegratingSchemeDropDownLabel
             app.IntegratingSchemeDropDownLabel = uilabel(app.SettingsTab);
@@ -701,7 +523,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             app.IntegratingSchemeDropDown = uidropdown(app.SettingsTab);
             app.IntegratingSchemeDropDown.Items = {'Euler', 'Runge-Kutta (2)', 'Runge-Kutta (4)'};
             app.IntegratingSchemeDropDown.Position = [137 398 158 22];
-            app.IntegratingSchemeDropDown.Value = 'Runge-Kutta (2)';
+            app.IntegratingSchemeDropDown.Value = 'Euler';
 
             % Create MergingThresholdScalingFacMajorEditFieldLabel
             app.MergingThresholdScalingFacMajorEditFieldLabel = uilabel(app.SettingsTab);
@@ -801,7 +623,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             % Create SeedDensityCtrlEditField_2
             app.SeedDensityCtrlEditField_2 = uieditfield(app.SettingsTab, 'numeric');
             app.SeedDensityCtrlEditField_2.Position = [161 479 100 22];
-            app.SeedDensityCtrlEditField_2.Value = 3;
+            app.SeedDensityCtrlEditField_2.Value = 5;
 
             % Create StepsizeScalingFacdelta_sEditFieldLabel
             app.StepsizeScalingFacdelta_sEditFieldLabel = uilabel(app.SettingsTab);
@@ -947,14 +769,16 @@ classdef TSV3D_GUI < matlab.apps.AppBase
 
             % Create CameraZoominoutEditFieldLabel
             app.CameraZoominoutEditFieldLabel = uilabel(app.InteractionsTab);
+            app.CameraZoominoutEditFieldLabel.BackgroundColor = [0.651 0.651 0.651];
             app.CameraZoominoutEditFieldLabel.HorizontalAlignment = 'right';
-            app.CameraZoominoutEditFieldLabel.Position = [125 59 115 22];
+            app.CameraZoominoutEditFieldLabel.Position = [122 93 115 22];
             app.CameraZoominoutEditFieldLabel.Text = 'Camera Zoom in/out';
 
             % Create CameraZoominoutEditField
             app.CameraZoominoutEditField = uieditfield(app.InteractionsTab, 'numeric');
             app.CameraZoominoutEditField.ValueChangedFcn = createCallbackFcn(app, @CameraZoominoutEditFieldValueChanged, true);
-            app.CameraZoominoutEditField.Position = [252 59 40 22];
+            app.CameraZoominoutEditField.BackgroundColor = [0.651 0.651 0.651];
+            app.CameraZoominoutEditField.Position = [249 93 40 22];
             app.CameraZoominoutEditField.Value = 1;
 
             % Create LineDensityCtrlEditField_2Label
@@ -966,7 +790,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             % Create LineDensityCtrlEditField_2
             app.LineDensityCtrlEditField_2 = uieditfield(app.LeftPanel, 'numeric');
             app.LineDensityCtrlEditField_2.Position = [125 750 100 22];
-            app.LineDensityCtrlEditField_2.Value = 10;
+            app.LineDensityCtrlEditField_2.Value = 5;
 
             % Create NumLevelsEditField_2Label
             app.NumLevelsEditField_2Label = uilabel(app.LeftPanel);
@@ -1008,20 +832,6 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             app.ExportPSLsforLineVisdatMenu = uimenu(app.FilesMenu);
             app.ExportPSLsforLineVisdatMenu.MenuSelectedFcn = createCallbackFcn(app, @ExportPSLsforLineVisdatMenuSelected, true);
             app.ExportPSLsforLineVisdatMenu.Text = 'Export PSLs for "LineVis" (*.dat)';
-
-            % Create ExportPSLsforTopOptiMenu
-            app.ExportPSLsforTopOptiMenu = uimenu(app.FilesMenu);
-            app.ExportPSLsforTopOptiMenu.Text = 'Export PSLs for TopOpti';
-
-            % Create BinaryFielddatMenu
-            app.BinaryFielddatMenu = uimenu(app.ExportPSLsforTopOptiMenu);
-            app.BinaryFielddatMenu.MenuSelectedFcn = createCallbackFcn(app, @ExportBinaryFielddatMenuSelected, true);
-            app.BinaryFielddatMenu.Text = 'Binary Field (".dat)';
-
-            % Create ReshapedBinaryFielddatMenu
-            app.ReshapedBinaryFielddatMenu = uimenu(app.ExportPSLsforTopOptiMenu);
-            app.ReshapedBinaryFielddatMenu.MenuSelectedFcn = createCallbackFcn(app, @ExportReshapedBinaryFielddatMenuSelected, true);
-            app.ReshapedBinaryFielddatMenu.Text = 'Reshaped Binary Field (*.dat)';
 
             % Create MediaMenu
             app.MediaMenu = uimenu(app.UIFigure);

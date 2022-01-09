@@ -7,14 +7,14 @@
 %%which was submitted to the journal "Advances in Engineering Software", and also available in arXiv (2112.09202)
 
 %% ============= Test data sets can be found in =============
-%%	https://syncandshare.lrz.de/getlink/fiPjBXgwXXvbky55uDQP39j7/stress%20fields 
+%%	https://syncandshare.lrz.de/getlink/fi4W4EGjZSzMzCvxkEf9L3Aw/
 
 clc;
 addpath('./src');
 userInterface = InterfaceStruct();
 %% Prepare the data set, and uncomment one of the experiments below to run the 3D-TSV for testing the examples presented in the paper
 %% *****please be sure to relate the correct directory of data set*****
-global tCost_; tCost_ = 0;
+
 %% Some Examples used in the paper
 %% =======================================kitten=======================================
 userInterface.fileName = './data/kitten.stress';
@@ -136,7 +136,5 @@ RunMission(userInterface);
 %% ======Syntax======
 % DrawPSLs(imOpt, imVal, pslGeo, stressComponentOpt, lw, minLength);
 DrawPSLs(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 20);
-% DrawPSLs_simRibbon_pUse(imOpt, imVal, pslGeo, stressComponentOpt, lw, smoothingOpt, minLength);
-% DrawPSLs_simRibbon_pUse(["Geo", "Geo", "Geo"], [0,0,0], ["TUBE", "TUBE", "TUBE"], 'None', 0.5, 0, 10);
 %% Show if Necessary
-% DrawSeedPoints(0.5);
+% DrawSeedPoints(0.5, 'inputSeeds');
