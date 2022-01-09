@@ -22,9 +22,11 @@ In the input file, the stress tensor at each vertex is arranged in the order:
 	<<Sigma_xx, Sigma_yy, Sigma_zz, Sigma_yz, Sigma_zx, Sigma_xy>>
 One needs to be CAREFUL while importing the external stress data into the 3D-TSV.
 
-The input file of the stress field simulated on the Cartesian mesh is with the dedicated extension ".carti", the one on the 
-unstructured hexahedral mesh is with the dedicated extension ".stress". For details, one is referred to go to the the 
-associated data sets, and the input interface "./src./ImportStressFields.m".
+The input file of the stress field simulated on the Cartesian mesh is with the dedicated extension ".carti", 
+where, instead of storing the vertex coordinates and the element vertices explicitly, we only store the element indices
+in the Cartesian mesh, e.g., given a Cartesian mesh derived from a volume data "V", only the non-empty voxels are stored via
+the MatLab built-in function "find(V)". The one on the unstructured hexahedral mesh is with the dedicated extension ".stress". 
+For details, one is referred to go to the the associated data sets, and the input interface "./src./ImportStressFields.m".
 
 # 3. Use
 	---	The ideal strategy of using this tool is as the paper describes, i.e., combining it with the the 3D line cluster 
