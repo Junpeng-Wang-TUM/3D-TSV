@@ -108,7 +108,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================parts1=======================================
 % userInterface.fileName = './data/parts1.stress';
-% userInterface.lineDensCtrl = 20;
+% userInterface.lineDensCtrl = 30;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
 % userInterface.seedDensCtrl = 5;
