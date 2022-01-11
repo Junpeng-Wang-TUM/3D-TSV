@@ -31,7 +31,7 @@ For details, one is referred to go to the the associated data sets, and the inpu
 # 3. Use
 	---	The ideal strategy of using this tool is as the paper describes, i.e., combining it with the the 3D line cluster 
 		renderer "LineVis" (https://github.com/chrismile/LineVis) by Christoph Neuhauser.
-	--- To facilitate the initial tests of the users, this package can work in MatLab environment solely, 
+	--- To facilitate the initial tests of the users, this package can also work in MatLab environment solely, 
 		where 'TSV3D_script.m' serves as a configuration file to control the input, './src/DrawPSLs.m' provides 
 		the visualization options. Besides the script 'TSV3D_script.m', we also provide a slim GUI "TSV3D_GUI.m", which can
 		enable the interaction between the user and 3D-TSV.
