@@ -120,10 +120,10 @@ userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================bearing=======================================
 % userInterface.fileName = './data/bearing.stress';
-% userInterface.lineDensCtrl = 18;
+% userInterface.lineDensCtrl = 21;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
-% userInterface.seedDensCtrl = 3;
+% userInterface.seedDensCtrl = 4;
 % userInterface.selectedPrincipalStressField = [1, 3];
 % userInterface.mergingOpt = 1;
 % userInterface.snappingOpt = 0;
