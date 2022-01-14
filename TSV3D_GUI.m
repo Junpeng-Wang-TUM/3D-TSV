@@ -597,7 +597,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
             app.PermittedMinLengthofVisiblePSLEditField = uieditfield(app.SettingsTab, 'numeric');
             app.PermittedMinLengthofVisiblePSLEditField.ValueChangedFcn = createCallbackFcn(app, @PSLsMenuSelected, true);
             app.PermittedMinLengthofVisiblePSLEditField.Position = [264 143 40 22];
-            app.PermittedMinLengthofVisiblePSLEditField.Value = 20;
+            app.PermittedMinLengthofVisiblePSLEditField.Value = 10;
 
             % Create VoxelizedPSLThicknessExportEditFieldLabel
             app.VoxelizedPSLThicknessExportEditFieldLabel = uilabel(app.SettingsTab);
