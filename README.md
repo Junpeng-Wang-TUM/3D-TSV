@@ -26,18 +26,21 @@ The input file of the stress field simulated on the Cartesian mesh is with the d
 where, instead of storing the vertex coordinates and the element vertices explicitly, we only store the element indices
 in the Cartesian mesh, e.g., given a Cartesian mesh derived from a volume data "V", only the non-empty voxels are stored via
 the MatLab built-in function "find(V)". The one on the unstructured hexahedral mesh is with the dedicated extension ".stress". 
-For details, one is referred to go to the the associated data sets, and the input interface "./src./ImportStressFields.m".
+For details, one is referred to go to the the associated data sets, and the input interface "./backend/ImportStressFields.m".
 
 # 3. Use
-	---	The ideal strategy of using this tool is as the paper describes, i.e., combining it with the the 3D line cluster 
-		renderer "LineVis" (https://github.com/chrismile/LineVis) by Christoph Neuhauser.
-	--- To facilitate the initial tests of the users, this package can also work in MatLab environment solely, 
-		where 'TSV3D_script.m' serves as a configuration file to control the input, './src/DrawPSLs.m' provides 
-		the visualization options. Besides the script 'TSV3D_script.m', we also provide a slim GUI "TSV3D_GUI.m", which can
-		enable the interaction between the user and 3D-TSV.
+# 3.1 Frontend+Backend
+	
+# 3.2 Backend Only
+	To facilitate the initial tests of the users, this package can also work in MatLab environment solely, 
+	where 'TSV3D_script.m' serves as a configuration file to control the input, './backend/DrawPSLs.m' provides 
+	the visualization options. Besides the script './apps/TSV3D_script.m', we also provide a slim GUI "./apps/TSV3D_GUI.m", 
+	which can enable the interaction between the user and 3D-TSV.
+# 3.3 Frontend Only
+	
 
 # 4. Run
-Go to 'TSV3D_script.m' or 'TSV3D_script.m'
+Go to directory "./apps" to select the proper application
 
 # 5. Data sets
 More stress field data sets can be found from	https://syncandshare.lrz.de/getlink/fi4W4EGjZSzMzCvxkEf9L3Aw/

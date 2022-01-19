@@ -29,7 +29,7 @@ function zeromqReplier
     % cd(prefdir)
     % edit javaclasspath.txt
     % -> Add a global path to the .jar file.
-	addpath('./src'); %% Direct to work path
+	addpath('../backend'); %% Direct to work path
     javaclasspath('libs/jeromq-0.5.2.jar')
 	
     import org.zeromq.SocketType;

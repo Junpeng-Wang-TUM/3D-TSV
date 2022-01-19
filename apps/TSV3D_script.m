@@ -10,14 +10,14 @@
 %%	https://syncandshare.lrz.de/getlink/fi4W4EGjZSzMzCvxkEf9L3Aw/
 
 clc;
-addpath('./src');
+addpath('../backend');
 userInterface = InterfaceStruct();
 %% Prepare the data set, and uncomment one of the experiments below to run the 3D-TSV for testing the examples presented in the paper
 %% *****please be sure to relate the correct directory of data set*****
 
 %% Some Examples used in the paper
 %% =======================================kitten=======================================
-userInterface.fileName = './data/kitten.stress';
+userInterface.fileName = '../data/kitten.stress';
 userInterface.lineDensCtrl = 20;
 userInterface.numLevels = 1;
 userInterface.seedStrategy = 'Volume';
@@ -30,7 +30,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 
 %% =======================================cantilever=======================================
-% userInterface.fileName = './data/cantilever3D.carti';
+% userInterface.fileName = '../data/cantilever3D.carti';
 % userInterface.lineDensCtrl = 5; 
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
@@ -44,7 +44,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================arched_bridge=======================================
 %% ---------------------------------------Experiment 1: (fig. 3)
-% userInterface.fileName = './data/arched_bridge.carti';
+% userInterface.fileName = '../data/arched_bridge.carti';
 % userInterface.lineDensCtrl = 6; 
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
@@ -55,7 +55,7 @@ userInterface.traceAlgorithm = 'RK2';
 % userInterface.maxAngleDevi = 20; 
 % userInterface.traceAlgorithm = 'RK2';
 %% ---------------------------------------Experiment 2: (fig.4)
-% userInterface.fileName = './data/arched_bridge.carti';
+% userInterface.fileName = '../data/arched_bridge.carti';
 % userInterface.lineDensCtrl = 24; 
 % userInterface.numLevels = 4;
 % userInterface.seedStrategy = 'Volume';
@@ -68,7 +68,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 
 %% =======================================rod=======================================
-% userInterface.fileName = './data/rod.carti';
+% userInterface.fileName = '../data/rod.carti';
 % userInterface.lineDensCtrl = 5;
 % userInterface.numLevels = 1;
 % userInterface.seedStrategy = 'Volume';
@@ -81,7 +81,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 
 %% =======================================femur=======================================
-% userInterface.fileName = './data/femur.carti';
+% userInterface.fileName = '../data/femur.carti';
 % userInterface.lineDensCtrl = 18;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
@@ -94,7 +94,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 
 %% =======================================bracket=======================================
-% userInterface.fileName = './data/bracket.carti';
+% userInterface.fileName = '../data/bracket.carti';
 % userInterface.lineDensCtrl = 12;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
@@ -107,7 +107,7 @@ userInterface.traceAlgorithm = 'RK2';
 
 
 %% =======================================parts1=======================================
-% userInterface.fileName = './data/parts1.stress';
+% userInterface.fileName = '../data/parts1.stress';
 % userInterface.lineDensCtrl = 30;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';
@@ -119,7 +119,7 @@ userInterface.traceAlgorithm = 'RK2';
 % userInterface.traceAlgorithm = 'RK2';
 
 %% =======================================bearing=======================================
-% userInterface.fileName = './data/bearing.stress';
+% userInterface.fileName = '../data/bearing.stress';
 % userInterface.lineDensCtrl = 21;
 % userInterface.numLevels = 3;
 % userInterface.seedStrategy = 'Volume';

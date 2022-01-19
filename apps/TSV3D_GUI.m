@@ -391,7 +391,7 @@ classdef TSV3D_GUI < matlab.apps.AppBase
 
         % Menu selected function: ImportStressFieldMenu
         function ImportStressFieldMenuSelected(app, event)
-            addpath('./src');
+            addpath('../backend');
             global axHandle_;
             global userInterface_;
             global runEnvironment_;
