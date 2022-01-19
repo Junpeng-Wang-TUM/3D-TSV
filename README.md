@@ -53,7 +53,7 @@ To facilitate the users of ANSYS and ABAQUS, we briefly explore how to adapt the
 to our 3D-TSV, i.e., how to extract the required information from the two software and write it into the dedicated 
 format (.stress) for running 3D-TSV.
 # 6.1 ANSYS Mechanical APDL user
-We provide a script written by APDL ("./src/Ansys2TSV3D.mac"), which can automatically extract the required 
+We provide a script written by APDL ("./backend/Ansys2TSV3D.mac"), which can automatically extract the required 
 information from ANSYS environment and write it into the required format for 3D-TSV.
 # 6.2 ABAQUS user
 We suggest a manual and slightly troublesome way to do so, where the mesh information can be found from the input 
