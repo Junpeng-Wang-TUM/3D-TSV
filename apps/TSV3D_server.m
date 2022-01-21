@@ -1,6 +1,6 @@
 % BSD 2-Clause License
 % 
-% Copyright (c) 2021, Christoph Neuhauser, Junpeng Wang
+% Copyright (c) 2021-2022, Christoph Neuhauser, Junpeng Wang
 % All rights reserved.
 % 
 % Redistribution and use in source and binary forms, with or without
@@ -24,13 +24,13 @@
 % OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 % OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function zeromqReplier
+function TSV3D_worker
 	% Either call the function javaclasspath below, or use:
     % cd(prefdir)
     % edit javaclasspath.txt
     % -> Add a global path to the .jar file.
 	addpath('../backend'); %% Direct to work path
-    javaclasspath('libs/jeromq-0.5.2.jar')
+    javaclasspath('../libs/jeromq-0.5.2.jar')
 	
     import org.zeromq.SocketType;
     import org.zeromq.ZMQ;
@@ -58,17 +58,6 @@ function zeromqReplier
         %fprintf('Request string: %s\n', request_string);
         disp(request);
 
-        % ... do something with the received request ...
-		% fileName = request.fileName;
-		% lineDensCtrl = request.lineDensCtrl;
-		% numLevels = request.numLevels;
-		% seedStrategy = request.seedStrategy;
-		% seedDensCtrl = request.seedDensCtrl;
-		% selectedPrincipalStressField = request.selectedPrincipalStressField;
-		% mergingOpt = request.mergingOpt;
-		% snappingOpt = request.snappingOpt;
-		% maxAngleDevi = request.maxAngleDevi;
-		% traceAlgorithm = request.traceAlgorithm;
 		[opt, PSLdatasetFile] = RunMission_Via_LineVis_Call(request);
 		if 0==opt, error('Failed to Generate PSLs!'); end
 		
