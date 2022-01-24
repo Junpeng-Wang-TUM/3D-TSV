@@ -24,13 +24,47 @@
 % OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 % OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function TSV3D_server
-	% Either call the function javaaddpath below, or use:
-    % cd(prefdir)
-    % edit javaclasspath.txt
-    % -> Add a global path to the .jar file.
-	addpath('../backend'); %% Direct to work path
-    javaaddpath('../libs/jeromq-0.5.2.jar')
-	ZeroMQReplier()
+function ZeroMQReplier()
+    import org.zeromq.SocketType;
+    import org.zeromq.ZMQ;
+    import org.zeromq.ZContext;
+    import java.lang.Thread;
+
+    context = ZContext();
+    socket = context.createSocket(SocketType.REP);
+    socket.bind('tcp://127.0.0.1:17384'); % arbitrary port
+    socket.setReceiveTimeOut(1000);
+
+    cleanupObj = onCleanup(@()cleanUpSocket(socket));
+
+    while (~Thread.currentThread().isInterrupted())
+        request_string = socket.recvStr(0);
+        
+        if isempty(request_string)
+            continue;
+        end
+        
+        request_string = request_string.toCharArray';
+
+        % native2unicode(..., 'UTF-8') not necessary?
+        request = jsondecode(native2unicode(request_string(:)', 'UTF-8'));
+        %fprintf('Request string: %s\n', request_string);
+        disp(request);
+
+	    [opt, PSLdatasetFile] = RunMission_Via_LineVis_Call(request);
+	    if 0==opt, error('Failed to Generate PSLs!'); end
+	    
+        % Send a reply.
+        reply = struct('fileName', PSLdatasetFile);
+        reply_string = unicode2native(jsonencode(reply), 'UTF-8');
+        %fprintf('Reply string: %s\n', reply_string);
+        disp(reply);
+        
+        socket.send(reply_string, 0);
+    end
+
+    function cleanUpSocket(socket)
+        socket.close();
+    end
 end
 
