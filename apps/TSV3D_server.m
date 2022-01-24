@@ -35,7 +35,7 @@ function TSV3D_server
     import org.zeromq.SocketType;
     import org.zeromq.ZMQ;
     import org.zeromq.ZContext;
-    import java.lang.Thread
+    import java.lang.Thread;
 
     context = ZContext();
     socket = context.createSocket(SocketType.REP);
