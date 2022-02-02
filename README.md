@@ -53,7 +53,7 @@ More information on how to compile and run the frontend can be found in `./front
 Sample meshes for use with the frontend can be found in the folder `./data/`.
 
 For Windows users, a pre-compiled version of the frontend is available here:
-https://github.com/chrismile/LineVis/releases/tag/v2022-01-25
+https://github.com/chrismile/LineVis/releases/tag/v2022-02-03
 
 Under `frontend/Data/LineDataSets/mesh.json`, available simulation meshes can be specified.
 For example, when using the sample meshes of 3D-TSV, the following file content can be specified:
