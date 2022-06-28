@@ -134,3 +134,16 @@ the user also needs to output explicitly. The demo files can be founded in the d
 NOTE: The stress tensor in ABAQUS is arranged in the order Sigma_xx, Sigma_yy, Sigma_zz, Sigma_xy, Sigma_xz, Sigma_yz
 by default, which is slightly different to the required input format, so one needs to re-arrange the data order
 beforehand.
+
+## 6.3 PERMAS user (https://www.intes.de)
+
+Similar to Item 6.2, the PERMAS user can also use "3D-TSV" for stress visualization once they extract the mesh and stress data from the PERMAS 
+output files and adapt them into the required format by "3D-TSV". It's worth mentioning that the stress result is written in ".post" file by default,
+the mesh data can be found from the normal data file (".dat"). One can reach the demo files in the directory './data/PERMAS2TSV (Please Unzip it).zip'
+
+In case of huge finite element models the ".hdf" (see the attached demo file) format might be better because it's a binary format. 
+PERMAS users might use the enhanced Python interpreter pyINTES to access those files via h5py. https://www.h5py.org/
+Another possibility is to use https://vitables.org/ or https://www.hdfgroup.org/downloads/hdfview/
+
+NOTE: In the input file ".stress", the Cartesian stress at each vertex is arranged in the order: 
+<<Sigma_xx, Sigma_yy, Sigma_zz, Sigma_yz, Sigma_zx, Sigma_xy>>
