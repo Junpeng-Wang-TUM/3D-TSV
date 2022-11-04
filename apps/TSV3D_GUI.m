@@ -355,7 +355,22 @@ classdef TSV3D_GUI < matlab.apps.AppBase
 	        global mediumPSLpool_; 
 	        global minorPSLpool_;            
             if isempty(runEnvironment_), return; end
-%             if isempty(majorPSLpool_(1).phyCoordList) && isempty(mediumPSLpool_(1).phyCoordList) && isempty(minorPSLpool_(1).phyCoordList), return; end
+			optMajorPSLs = 0;
+			if isempty(majorPSLpool_), optMajorPSLs = 1;
+			else
+				if isempty(majorPSLpool_(1).phyCoordList), optMajorPSLs = 1; end
+			end
+			optMediumPSLs = 0;
+			if isempty(mediumPSLpool_), optMediumPSLs = 1;
+			else
+				if isempty(mediumPSLpool_(1).phyCoordList), optMediumPSLs = 1; end
+			end
+			optMinorPSLs = 0;
+			if isempty(minorPSLpool_), optMinorPSLs = 1;
+			else
+				if isempty(minorPSLpool_(1).phyCoordList), optMinorPSLs = 1; end
+			end			
+            if optMajorPSLs && optMediumPSLs && optMinorPSLs, return; end
             [az, el] = view(axHandle_);
             cla(axHandle_);
             colorbar(axHandle_, 'off');            
