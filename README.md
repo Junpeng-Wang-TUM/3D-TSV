@@ -3,9 +3,18 @@
 The 3D Trajectory-based Stress Visualizer (3D-TSV), a visual analysis tool for the exploration of the principal stress
 directions in 3D solids under load.
 
-This repository was created for the paper "3D-TSV: The 3D Trajectory-based Stress Visualizer" 
-	by Junpeng Wang, Christoph Neuhauser, Jun Wu, Xifeng Gao and Rüdiger Westermann, 
-which was submitted to the journal "Advances in Engineering Software", and also available on arXiv (2112.09202)
+This repository was created for the paper:
+@article{wang20223d,
+  title={3D-TSV: The 3D trajectory-based stress visualizer},
+  author={Wang, Junpeng and Neuhauser, Christoph and Wu, Jun and Gao, Xifeng and Westermann, R{\"u}diger},
+  journal={Advances in Engineering Software},
+  volume={170},
+  pages={103144},
+  year={2022},
+  doi={10.1016/j.advengsoft.2022.103144},
+  publisher={Elsevier}
+}
+
 
 
 ## 1. Functionality

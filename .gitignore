@@ -20,7 +20,12 @@ bin-release/
 *.dat
 *.gif
 *.mp4
-*.stress
 *.carti
 *.vtk
 *.mesh
+data/bearing.stress
+data/demo_data_Abaqus.stress
+data/demo_data_Ansys.stress
+data/demo_data_PREMAS.stress
+data/kitten.stress
+data/parts1.stress
